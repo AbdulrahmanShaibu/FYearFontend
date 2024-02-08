@@ -1,0 +1,433 @@
+/* Global styles */
+/* @import url('https://fonts.googleapis.com/css?family=Bubbler+One|Fredoka+One'); */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Section */
+.intro {
+    display: table;
+    width: 100%;
+    padding: 0;
+    background: url('https://th.bing.com/th/id/OIG.d.UXFKrMR3EVWYoFW7GX?w=173&h=173&c=6&r=0&o=5&dpr=1.3&pid=ImgGn') top center no-repeat;
+    background-color: #e5e5e5;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.intro .overlay {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,70ad47+100&0.6+0,0.4+100 */
+    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.6) 0%, rgba(112, 173, 71, 0.4) 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.6) 0%, rgba(112, 173, 71, 0.4) 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(112, 173, 71, 0.4) 100%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#99000000', endColorstr='#6670ad47', GradientType=0);
+    /* IE6-9 */
+}
+
+.intro .fa {
+    font-size: 94px;
+    margin-bottom: 40px;
+    color: #fff;
+}
+
+.intro h1 {
+    color: #fff;
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.intro p {
+    color: #fff;
+    font-size: 22px;
+    margin-top: 20px;
+    line-height: 28px;
+    margin-bottom: 40px;
+}
+
+.intro .btn-custom {
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+header .intro-text {
+    padding-top: 320px;
+    padding-bottom: 200px;
+    text-align: center;
+}
+
+nav ul li {
+    float: left;
+    margin: 0 10px;
+}
+
+nav ul li a {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+nav ul li a:hover {
+    background-color: white;
+    color: #000;
+}
+
+*/
+/* STARTING POINT */
+/*---------- NAV BAR ------------*/
+
+/*Style 'show menu' label button and hide it by default*/
+
+
+
+nav .navbar {
+    float: center;
+    padding-top: 15px;
+}
+
+/*Create a horizontal list with spacing*/
+
+nav .navbar li {
+    text-align: center;
+    /* padding-right: 10px; */
+    display: inline-block;
+}
+
+nav .navbar li a {
+    text-decoration: none;
+    /* min-width: 140px;
+    color: #00587A; */
+    line-height: 5px;
+    text-align: center;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+}
+
+
+/*Hover state for top level links*/
+
+nav .navbar li:hover a {
+    background: #55C34D;
+    color: #F0F1F5;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+
+/*Style for dropdown links*/
+
+nav .navbar li:hover ul a {
+    background: #f3f3f3;
+    color: #2f3036;
+    height: 40px;
+    line-height: 40px;
+}
+
+
+/*Hover state for dropdown links*/
+
+nav .navbar li:hover ul a:hover {
+    background: #19c589;
+    color: #fff;
+}
+
+
+/* hide dropdown menues */
+
+nav .navbar li ul {
+    display: none;
+}
+
+nav .navbar li ul li {
+    display: block;
+    float: none;
+}
+
+
+/*Prevent text wrapping*/
+
+nav .navbar li ul li a {
+    width: auto;
+    min-width: 100px;
+    padding: 0 20px;
+}
+
+
+/*Display the dropdown on hover*/
+
+nav .navbar li a:hover+.hiddenNav,
+.hiddenNav:hover {
+    display: block;
+}
+
+.hiddenNav {
+    position: absolute;
+}
+
+@media screen and (max-width: 1115px) {
+    nav .header {
+        width: 100%;
+        text-align: center;
+        height: 70px;
+    }
+
+    nav .navbar {
+        width: 100%;
+        padding-bottom: 10px;
+    }
+
+    nav .navbar li a {
+        font-size: 15px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    /*Make dropdown links appear inline*/
+    nav .header {
+        width: 70px;
+        height: auto;
+        margin-left: -15px;
+    }
+
+    nav ul {
+        position: static;
+        display: none;
+    }
+
+    nav .navbar li ul {
+        position: static;
+        display: none;
+    }
+
+    /*Create vertical spacing*/
+    nav li {
+        margin-bottom: 1px;
+    }
+
+    /*Make all menu links full width*/
+    nav ul li,
+    nav li a {
+        width: 100%;
+    }
+
+    /*Display 'show menu' link*/
+    nav .show-menu {
+        display: block;
+    }
+}
+
+@media screen and (max-width: 360px) {
+
+    nav {
+        font-size: 14px;
+    }
+}
+
+/* ENDING POINT */
+
+/* Sections */
+section {
+    padding: 30px;
+    width: 1450px;
+    height: auto;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    color: green;
+}
+
+/* Home Section */
+/* Style for the home section container */
+.homeSection {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+    /* background-color: #f8f8f8; */
+    border-radius: 8px;
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+}
+
+/* Style for the text within the home section */
+.homeText p {
+    font-size: 21px;
+    color: green;
+    line-height: 1.5;
+}
+
+/* Style for the two images */
+.twoImages {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.twoImages img {
+    width: 48%;
+    /* Adjust this width as needed */
+    border-radius: 8px;
+}
+
+/* Style for the about description */
+.about-desc {
+    margin-top: 20px;
+}
+
+.about-desc p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.homeText p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+
+
+/* Services Section */
+.threeCards {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 2px 4px #0000001a;
+    background-color: #303924;
+    border-radius: 5px;
+}
+
+@keyframes rotateCard {
+    0% {
+        transform: rotateY(0deg);
+    }
+
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+/* Apply the animation to the card element */
+.card {
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 5px;
+    width: 400px;
+    height: 410px;
+    text-align: center;
+    margin: 10px;
+    animation: rotateCard 15s ease-in-out;
+    /* Adjust duration and timing function */
+    will-change: transform;
+}
+
+.card img {
+    max-width: 100%;
+    height: 195px;
+    border-radius: 20px;
+}
+
+.card p {
+    margin-top: 10px;
+}
+
+
+.footerSection {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    background-color: rgb(182, 182, 231);
+    color: green;
+    padding: 0px;
+    border-radius: 10px;
+    /* font-weight: bold; */
+    height: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footerSection div {
+    margin-right: 20px;
+}
+
+.footerSection ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.footerSection ul li {
+    margin-bottom: 8px;
+}
+
+.footerSection img {
+    width: 150px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+/* Styling links */
+.footerSection a {
+    text-decoration: none;
+    color: #333;
+}
+
+/* .footerSection a:hover {
+    color: #555;
+} */
+
+/* Animation for list items */
+.footerSection ul li {
+    margin-bottom: 8px;
+    margin: auto;
+    padding-top: 0px;
+}
+
+/* .footerSection ul li:hover {
+    color: #f28056;
+} */
+
+.footerSection ul li.animated {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.paragraph {
+    text-align: center;
+}
+
+.paragraphStyling {
+    background-color: white;
+    font-size: medium;
+    /* color: lightsteelblue; */
+    font-weight: bold;
+    justify-content: space-between;
+    transition: ease-in-out;
+    font-family: Arial, Helvetica, sans-serif;
+}
