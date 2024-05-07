@@ -1,0 +1,28 @@
+h1 {
+  text-align: center;
+  color: green;
+  background-color: aliceblue;
+  margin: auto;
+  height: auto;
+  width: auto;
+}
+
+.animated-image {
+  height: 45px;
+  width: 50px;
+  margin-left: -520px;
+  margin-top: 10px;
+  animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

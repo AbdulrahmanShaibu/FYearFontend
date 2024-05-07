@@ -1,0 +1,82 @@
+/* Update the styles for a more professional look */
+.documentation-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 50px;
+}
+
+.documentation {
+    background-color: #f1ecec;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+}
+
+.title {
+    font-size: 30px;
+    color: #333333;
+    margin: auto;
+    text-decoration: underline;
+    font-weight: bold;
+    margin-left: 40px;
+}
+
+h3 {
+    font-weight: bold;
+}
+
+.description {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #555555;
+}
+
+.section-heading {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #333333;
+}
+
+ul {
+    list-style-type: none;
+    margin-left: 20px;
+    display: flex;
+    background-color: #555555;
+    color: #ffffff;
+    text-justify: auto;
+}
+
+/* Improve list items */
+ul li {
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-right: 10px;
+    background-color: #777777;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+ul li:hover {
+    background-color: #999999;
+}
+
+/* Style links */
+a {
+    color: #3366cc;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #0044cc;
+}
+
+/* Add box shadow to elements */
+.title,
+.section-heading,
+.description,
+ul {
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}

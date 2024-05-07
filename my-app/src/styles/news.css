@@ -1,0 +1,23 @@
+  
+  /* Animated Gradient Background */
+  @keyframes gradientAnimation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  /* Apply the animation to the body  #84629a */
+  body {
+    animation: gradientAnimation 25s linear infinite;
+    background: linear-gradient(45deg, #84629a, #6aa19f, #755888, #49a09d);
+    background-size: 400% 400%;
+  }
+  
+  
+ 
