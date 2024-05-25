@@ -103,9 +103,9 @@ const Departments = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {departmentData.map(department => (
+                            {departmentData.map((department, index) => (
                                 <TableRow key={department.departmentID}>
-                                    <TableCell>{department.departmentID}</TableCell>
+                                    <TableCell>{index + 1}</TableCell>
                                     <TableCell>{department.departmentName}</TableCell>
 
                                     <TableCell>

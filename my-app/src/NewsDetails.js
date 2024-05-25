@@ -4,21 +4,13 @@ import Alert from '@mui/material/Alert';
 import { Button, FormControl } from '@mui/material';
 import { Paper } from '@mui/material';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Select,
-    MenuItem
+    Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, TextField,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
 const NewsDetails = () => {
     const [open, setOpen] = useState(false);
@@ -27,45 +19,31 @@ const NewsDetails = () => {
     const [supervisorData, setSupervisorData] = useState([]);
     const [supervisors, setSupervisors] = useState({
         supervisorName: '',
-        departmentID: '',
-        department: {
-            departmentName: ''
-        }
+        department: []
     });
     const [departmentId, setDepartmentId] = useState('');
     const [departments, setDepartments] = useState([]);
-
-    const [updateDepartmentNameInput, setupdateDepartmentNameInput] = useState('');
-    const [updateSupervisorNameInput, setupdateSupervisorNameInput] = useState('');
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
     const [loading, setLoading] = useState(true);
-
-
-    const DeleteAPI = 'http://localhost:8080/api/v1/delete/supervisors/${id}'
-    const UpdateAPI = 'http://localhost:8080/api/v1/update/supervisors/${id}'
-
-    // Handler function for form elements for department name
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        // Update the departments state
-        setDepartments([
-            ...departments,
-            [name], value
-        ]);
-    };
-
 
     useEffect(() => {
         axios.get('http://localhost:8080/api/v1/list/supervisors')
             .then(response => {
-                setSupervisorData(response.data);
-                console.log('supervisors list:', response.data);
+                const supervisors = response.data.map(supervisor => {
+                    return {
+                        ...supervisor,
+                        departmentNames: []
+                    };
+                });
+                setSupervisorData(supervisors);
+                console.log('supervisors list:', supervisors);
             })
             .catch(error => {
                 console.log('Error while listing the data', error);
             });
 
-        axios.get('http://localhost:8080/api/v1/list/department') // Fetch departments
+        axios.get('http://localhost:8080/api/v1/list/department')
             .then(response => {
                 setDepartments(response.data);
                 console.log('departments list:', response.data);
@@ -76,67 +54,78 @@ const NewsDetails = () => {
             });
     }, []);
 
+    useEffect(() => {
+        if (supervisorData.length > 0 && departments.length > 0) {
+            const updatedSupervisorData = supervisorData.map(supervisor => {
+                const departmentNames = supervisor.department.map(deptId => {
+                    const dept = departments.find(d => d.departmentID === deptId);
+                    return dept ? dept.departmentName : "Unknown Department";
+                });
+                return {
+                    ...supervisor,
+                    departmentNames
+                };
+            });
+            setSupervisorData(updatedSupervisorData);
+        }
+    }, [supervisorData, departments]);
+
     const handleAddData = () => {
         axios.post('http://localhost:8080/api/v1/post/supervisors', {
             ...supervisors,
-            departmentID: departmentId // Assign selected department ID
+            department: [departmentId]
         })
             .then(response => {
                 setSupervisorData([...supervisorData, response.data]);
-                setSupervisors({ supervisorName: '' });
-                setDepartmentId(''); // Clear department ID
+                setDepartmentId('');
+                setSupervisors({ supervisorName: '', department: [] });
                 showNotification('Supervisor added successfully', 'success');
                 console.log('added supervisor details:', response.data);
-                console.log('Supervisor added successfully', 'success');
             })
             .catch(error => {
                 showNotification('Error adding supervisor', 'error');
-                console.log('Supervisor failed to be added', 'failure', error);
+                console.log('Supervisor failed to be added', error);
             });
     }
 
-    const handleAddDelete = (id) => {
-        axios.delete(`${DeleteAPI.replace('${id}', id)}`)
+    const handleDelete = (id) => {
+        axios.delete(`http://localhost:8080/api/v1/delete/supervisors/${id}`)
             .then(response => {
-                setSupervisorData(supervisorData.filter(supervisor => supervisor.supervisorID !== id))
-                console.log('delete response data:', response.data)
-                console.log('supervisor deleted successifully')
+                setSupervisorData(supervisorData.filter(supervisor => supervisor.supervisorID !== id));
+                showNotification('Supervisor deleted successfully', 'success');
+                console.log('delete response data:', response.data);
             })
             .catch(error => {
-                console.log('error while deleting supervisors', error)
-            })
+                showNotification('Error deleting supervisor', 'error');
+                console.log('error while deleting supervisors', error);
+            });
     }
 
-    // 
-    const handleUpdateData = (id, updatedDepartmentName, updatedSupervisorName) => {
+    const handleUpdateData = (id, updatedSupervisorName) => {
         const data = {
             supervisorName: updatedSupervisorName,
-            department: {
-                departmentName: updatedDepartmentName
-            }
+            department: []
         }
-        axios.put(`${UpdateAPI.replace('${id}', id)}`, data)
+        axios.put(`http://localhost:8080/api/v1/update/supervisors/${id}`, data)
             .then(response => {
-                // Update logic
                 const updatedData = supervisorData.map(supervisor => {
                     if (supervisor.supervisorID === id) {
                         return {
-                            ...supervisors,
+                            ...supervisor,
                             supervisorName: updatedSupervisorName,
-                            departmentName: updatedDepartmentName
                         }
                     }
-                    return supervisors;
+                    return supervisor;
                 })
-                setSupervisorData(updatedData)
-                console.log('update supervisor responses:', response.data)
-                console.log('update supervisor worked')
+                setSupervisorData(updatedData);
+                showNotification('Supervisor updated successfully', 'success');
+                console.log('update supervisor responses:', response.data);
             })
             .catch(error => {
-                console.warn('update supevisor failed:', error)
+                showNotification('Error updating supervisor', 'error');
+                console.warn('update supervisor failed:', error);
             })
     }
-
 
     const showNotification = (message, severity) => {
         setMessage(message);
@@ -152,17 +141,22 @@ const NewsDetails = () => {
         return <div>Loading...</div>;
     }
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = supervisorData.slice(indexOfFirstItem, indexOfLastItem);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
     return (
         <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', padding: '60px' }}>
-            <div style={{ backgroundColor: 'white', color: 'white', textAlign: 'center', padding: '20px 0', borderRadius: '8px', marginBottom: '20px' }}>
-                <h2
-                    style={{
-                        color: ' #333333',
-                        fontWeight: 'normal',
-                        fontFamily: 'Arial, sans-serif',
-                        fontSize: '20px'
-                    }}
-                >Supervisor Information</h2>
+            <div style={{
+                backgroundColor: 'white', color: 'white', textAlign: 'center',
+                padding: '20px 0', borderRadius: '8px', marginBottom: '20px'
+            }}>
+                <h2 style={{
+                    color: '#333333', fontWeight: 'normal',
+                    fontFamily: 'Arial, sans-serif', fontSize: '20px'
+                }}>Supervisor Information</h2>
             </div>
 
             <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
@@ -172,11 +166,8 @@ const NewsDetails = () => {
             </Snackbar>
 
             <div style={{
-                marginBottom: '20px',
-                textAlign: 'center',
-                display: 'flex',
-                gap: '10px',
-                paddingLeft: '280px',
+                marginBottom: '20px', textAlign: 'center',
+                display: 'flex', gap: '10px', marginLeft: '30%'
             }}>
                 <TextField
                     label="Supervisor Name"
@@ -184,117 +175,72 @@ const NewsDetails = () => {
                     onChange={(e) => setSupervisors({ ...supervisors, supervisorName: e.target.value })}
                 />
                 <select
-                    style={{ width: '200px', height: '60px' }}
+                    style={{ width: '200px', height: '40px' }}
                     label="Department"
-                    value={departments.departmentName}
-                    onChange={handleInputChange}
+                    value={departmentId}
+                    onChange={(e) => setDepartmentId(e.target.value)}
                 >
                     <option value="">Select Department</option>
                     {departments.map((department) => (
-                        <option key={department.departmentID} value={department.departmentName}>
+                        <option key={department.departmentID} value={department.departmentID}>
                             {department.departmentName}
                         </option>
                     ))}
                 </select>
-                <TextField
-                    // style={{height:'45px'}}
-                    disabled={true}
-                    label="Add Department ID"
-                    type='number'
-                    value={departmentId}
-                    onChange={(e) => setDepartmentId(e.target.value)}
-                />
-
                 <Button
-                    style={{ backgroundColor: 'green', fontWeight: 'bolder', height: '45px', marginTop: '5px' }}
-                    onClick={handleAddData} variant="contained"
-                    startIcon={<AddIcon />}>
+                    style={{ width: '200px', height: '40px', fontWeight: 'bold' }}
+                    onClick={handleAddData}
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                >
                     Add Supervisor
                 </Button>
             </div>
 
-            {/* Update Form */}
-            {/* <h2 style={{ margin: 'auto' }}>Update Form</h2> */}
-
             <TableContainer component={Paper} style={{
-                margin: 'auto', maxWidth: '950px',
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', borderRadius: '8px', overflow: 'hidden'
+                margin: 'auto', maxWidth: '950px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                borderRadius: '8px', overflow: 'hidden'
             }}>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell style={{ fontWeight: 'bold', color: 'white', backgroundColor: '#332' }}>Supervisor Id</TableCell>
                             <TableCell style={{ fontWeight: 'bold', color: 'white', backgroundColor: '#332' }}>Supervisor Name</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', color: 'white', backgroundColor: '#332' }}>Department Name</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', color: 'white', backgroundColor: '#332' }}>Department Names</TableCell>
                             <TableCell style={{ textAlign: 'center', fontWeight: 'bold', color: 'white', backgroundColor: '#332' }}>Update Supervisor Details</TableCell>
                             <TableCell style={{ fontWeight: 'bold', color: 'white', backgroundColor: '#332' }}>Delete Details</TableCell>
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
-                        {supervisorData.map(supervisor => (
+                        {currentItems.map((supervisor, index) => (
                             <TableRow key={supervisor.supervisorID}>
                                 <TableCell>{supervisor.supervisorID}</TableCell>
                                 <TableCell>{supervisor.supervisorName}</TableCell>
-
-                                {/* This the common error */}
                                 <TableCell>
-                                    {supervisor.department ? supervisor.department.departmentName || 'No Department' : 'No Department'}
+                                    {supervisor.departmentNames.length > 0 ?
+                                        supervisor.departmentNames.join(", ") : "No department"}
                                 </TableCell>
 
-                                {/* <TableCell>{supervisor.department.departmentName}</TableCell> */}
                                 <TableCell style={{ backgroundColor: 'whitesmoke' }}>
                                     <form style={{ display: 'flex' }}>
-                                        <input
-                                            style={{
-                                                width: '160px',
-                                                height: '35px',
-                                                borderRadius: '5px',
-                                                backgroundColor: 'white',
-                                                marginRight: '10px' // Added margin for spacing between inputs
-                                            }}
+                                        <TextField
+                                            style={{ width: '160px', marginRight: '10px' }}
                                             placeholder="Update Supervisor"
-                                            value={updateSupervisorNameInput}
-                                            onChange={(e) => setupdateSupervisorNameInput(e.target.value)}
+                                            value={supervisor.supervisorName}
+                                            onChange={(e) => handleUpdateData(supervisor.supervisorID, e.target.value)}
                                         />
-                                        <input
-                                            style={{
-                                                width: '160px',
-                                                height: '35px',
-                                                borderRadius: '5px',
-                                                backgroundColor: 'white',
-                                                marginRight: '10px' // Added margin for spacing between inputs
-                                            }}
-                                            placeholder="Update Department"
-                                            value={updateDepartmentNameInput}
-                                            onChange={(e) => setupdateDepartmentNameInput(e.target.value)}
-                                        />
-                                        <Button
-                                            style={{
-                                                height: '35px',
-                                                borderRadius: '5px',
-                                                backgroundColor: '#1976d2',
-                                                color: 'white',
-                                                fontWeight: 'bolder',
-                                                padding: '0 15px'
-                                            }}
-                                            onClick={() => handleUpdateData(supervisor.supervisorID,
-                                                updateDepartmentNameInput, updateSupervisorNameInput)}
-                                            variant="contained"
-                                            startIcon={<EditIcon />}
-                                        >
-                                            Edit
-                                        </Button>
                                     </form>
                                 </TableCell>
-
 
                                 <TableCell style={{ backgroundColor: 'white' }}>
                                     <Button
                                         style={{ marginTop: '-25px', color: 'red', backgroundColor: 'white', fontWeight: 'bolder' }}
-                                        onClick={() => handleAddDelete(supervisor.supervisorID)}
-                                        variant="contained" color="secondary"
-                                        startIcon={<DeleteIcon style={{ color: 'red' }} />}>
+                                        onClick={() => handleDelete(supervisor.supervisorID)}
+                                        variant="contained"
+                                        color="secondary"
+                                        startIcon={<DeleteIcon style={{ color: 'red' }} />}
+                                    >
                                         Delete
                                     </Button>
                                 </TableCell>
@@ -303,6 +249,24 @@ const NewsDetails = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <Button
+                    disabled={currentPage === 1}
+                    onClick={() => paginate(currentPage - 1)}
+                    variant="contained"
+                    style={{ marginRight: '10px' }}
+                >
+                    Previous
+                </Button>
+                <Button
+                    disabled={currentItems.length < itemsPerPage}
+                    onClick={() => paginate(currentPage + 1)}
+                    variant="contained"
+                >
+                    Next
+                </Button>
+            </div>
         </div>
     );
 };

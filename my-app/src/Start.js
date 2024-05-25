@@ -15,10 +15,9 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import CopyrightFooter from "./Footer";
-import RegistrationForm from "./RegistrationForm";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ConfirmationNumberSharp, Email, GitHub, NewReleases, Phone, ShareLocation, Support, Twitter } from "@mui/icons-material";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Email, GitHub, NewReleases, Phone, ShareLocation, Support, Twitter } from "@mui/icons-material";
 
 
 const Start = () => {
@@ -140,26 +139,6 @@ const Start = () => {
                         </Box>
                         <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
 
-                        {/* HEADER LOGO */}
-                        {/* <Typography
-                            variant="h6"
-                            noWrap
-                            component="a"
-                            href="#app-bar-with-responsive-menu"
-                            sx={{
-                                mr: 2,
-                                display: { xs: 'flex', md: 'none' },
-                                flexGrow: 1,
-                                fontFamily: 'monospace',
-                                fontWeight: 700,
-                                letterSpacing: '.3rem',
-                                color: 'inherit',
-                                textDecoration: 'none',
-                            }}
-                        >
-                            LOGO
-                        </Typography> */}
-
                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                             {pages.map((page) => (
                                 <Button
@@ -171,36 +150,6 @@ const Start = () => {
                                 </Button>
                             ))}
                         </Box>
-
-                        {/* <Box sx={{ flexGrow: 0 }}>
-                            <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                                </IconButton>
-                            </Tooltip>
-                            <Menu
-                                sx={{ mt: '45px' }}
-                                id="menu-appbar"
-                                anchorEl={anchorElUser}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
-                            >
-                                {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                        <Typography textAlign="center">{setting}</Typography>
-                                    </MenuItem>
-                                ))}
-                            </Menu>
-                        </Box> */}
 
                     </Toolbar>
                 </Container>
@@ -216,35 +165,19 @@ const Start = () => {
                             <div className="intro">
                                 <div className="overlay">
                                     <div className="container">
-                                        <div className="row" style={{ margin: 'auto' }}>
-                                            <div>
-                                                <h1 style={{
-                                                    color: 'black',
-                                                    fontSize: '40px',
-                                                    fontFamily: 'consolas'
-                                                }}>University Cleaners Management System</h1>
-                                                <br />
-                                                <p style={{
-                                                    color: 'white',
-                                                    fontWeight: 'bolder',
-                                                    fontSize: '14px',
-                                                    fontFamily: 'consolas'
-                                                }}>Welcome to the University Cleaners Management System!
-                                                    We revolutionize the way academic institutions maintain their cleanliness and hygiene standards. Our innovative approach merges cutting-edge technology with meticulous attention to detail,
-                                                    ensuring that universities uphold pristine environments conducive to learning and well-being.</p>
-
-
-                                                <a href="#registion_section"
-                                                    className="btn btn-custom btn-lg page-scrol"
-                                                    style={{
-                                                        fontWeight: 'bolder',
-                                                        backgroundColor: 'white',
-                                                        color: 'black',
-                                                    }}>
-                                                    <button> Register Here</button>
-                                                </a>
+                                        <header className="text-center" id="header">
+                                            <div className="intro bg-light p-5 rounded">
+                                                <div className="overlay">
+                                                    <h1>University Cleaners Management System</h1>
+                                                    <p>Welcome to the University Cleaners Management System!
+                                                        We revolutionize the way academic institutions maintain their cleanliness and hygiene standards.
+                                                        Our innovative approach merges cutting-edge technology with meticulous attention to detail,
+                                                        ensuring that universities uphold pristine environments conducive to learning and well-being.
+                                                    </p>
+                                                    <a href="#registration" className="btn btn-primary btn-lg">Register Here</a>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </header>
                                     </div>
                                 </div>
                             </div>
@@ -252,51 +185,30 @@ const Start = () => {
 
                         {/* HOME SECTION */}
 
-                        <section id="home">
-                            {/* <h1>Home Section</h1> */}
-                            {/* Content for the home section */}
+                        <section id="home" className="mt-5">
                             <div className="homeSection">
-                                <div className="homeText">
-                                    <p style={{ fontSize: '15px', color: 'green', justifyContent: 'center', fontFamily: 'consolas' }}>
-                                        We understand the pivotal role cleanliness plays in fostering a conducive educational atmosphere. Our comprehensive suite of services is
-                                        designed to cater specifically to the diverse needs of universities,
-                                        addressing everything from routine janitorial tasks to specialized cleaning requirements across campuses
-                                        With a team of <b>highly-trained professionals.</b>
-                                    </p>
-                                </div>
+                                <p className="lead text-center text-success">We understand the pivotal role cleanliness plays in fostering a conducive educational atmosphere. Our comprehensive suite of services is designed to cater specifically to the diverse needs of universities, addressing everything from routine janitorial tasks to specialized cleaning requirements across campuses. With a team of <b>highly-trained professionals.</b></p>
                                 <div className="twoImages">
-                                    <img src="https://images.pexels.com/photos/4920270/pexels-photo-4920270.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Image 1" />
-                                    <img src="https://images.pexels.com/photos/5027619/pexels-photo-5027619.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Image 2" />
-                                    <img src="https://th.bing.com/th/id/OIG.Y2l0Wjxe3O5KPnt1VIxn?w=173&h=173&c=6&r=0&o=5&dpr=1.3&pid=ImgGn" alt="Image 2" />
-                                    <img src="https://images.pexels.com/photos/5231044/pexels-photo-5231044.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Image 2" />
+                                    <img src="https://images.pexels.com/photos/4920270/pexels-photo-4920270.jpeg?auto=compress&cs=tinysrgb&w=600" className="img-fluid m-2" alt="Image 1" />
+                                    <img src="https://images.pexels.com/photos/5027619/pexels-photo-5027619.jpeg?auto=compress&cs=tinysrgb&w=600" className="img-fluid m-2" alt="Image 2" />
+                                    <img src="https://th.bing.com/th/id/OIG.Y2l0Wjxe3O5KPnt1VIxn?w=173&h=173&c=6&r=0&o=5&dpr=1.3&pid=ImgGn" className="img-fluid m-2" alt="Image 3" />
+                                    <img src="https://images.pexels.com/photos/5231044/pexels-photo-5231044.jpeg?auto=compress&cs=tinysrgb&w=600" className="img-fluid m-2" alt="Image 4" />
                                 </div>
-                                <div className="about-desc">
-                                    <p style={{ fontFamily: 'consolas' }}>Our commitment extends beyond mere cleaning; we aim to contribute to the health, safety, and productivity of students and staf.</p>
-                                    <p style={{ fontFamily: 'consolas' }}>Join us in maintaining an immaculate learning environment that reflects the dedication and excellence of your esteemed institution.</p>
+                                <div className="about-desc text-center">
+                                    <p>Our commitment extends beyond mere cleaning; we aim to contribute to the health, safety, and productivity of students and staff.</p>
+                                    <p>Join us in maintaining an immaculate learning environment that reflects the dedication and excellence of your esteemed institution.</p>
                                 </div>
                             </div>
                         </section>
 
                         {/* DETAILS SECTION */}
 
-                        <section id="details">
-                            <div>
-                                <br />
-                                <div className="text-container" style={{
-                                    backgroundColor: '',
-                                    height: '150px',
-                                    margin: 'auto',
-                                    textAlign: 'center',
-                                    padding: '50px'
-                                }}>
-                                    <p style={{
-                                        textAlign: 'center',
-                                        fontSize: '20px',
-                                        color: 'green',
-                                    }}>{texts[index]}</p>
-                                </div>
+                        <section id="details" className="mt-5">
+                            <div className="text-container text-center">
+                                <p className="lead text-success">{texts[index]}</p>
                             </div>
                         </section>
+
                     </Typography>
                 </Box>
 
@@ -304,20 +216,13 @@ const Start = () => {
 
                 <Box my={4} id="services">
                     <Typography variant="h4" component="h2" gutterBottom>
-                        <section id="services">
-                            {/* <h1>Services Section</h1> */}
-                            {/* Content for the services section */}
-                            <div className="col-md-10 col-md-offset-1 section-title text-center" style={
-                                {
-                                    backgroundColor: 'white'
-                                }
-                            }>
+                        <section id="services" className="mt-5">
+                            <div className="text-center">
                                 <h2>Our Services</h2>
-                                <hr style={{ height: '4px', width: '160px', margin: 'auto' }} /><br /><br />
-                                <p style={{ fontFamily: 'consolas' }}>We recognize that each institution has distinct requirements, and our diverse offerings cater to those specific needs, ensuring a hygienic and welcoming environment across the campus.</p>
-                                <p style={{ fontFamily: 'consolas' }}>Join us in maintaining learning environment that reflects the dedication and excellence of your institution.</p>
-                                <p style={{ fontFamily: 'consolas' }}>Our comprehensive range of services at University Cleaners Management System is tailored to meet the unique cleaning and sanitation demands of modern universities. </p>
-                                <br /><br /><br /><br /><br />
+                                <hr className="my-4" />
+                                <p>We recognize that each institution has distinct requirements, and our diverse offerings cater to those specific needs, ensuring a hygienic and welcoming environment across the campus.</p>
+                                <p>Join us in maintaining a learning environment that reflects the dedication and excellence of your institution.</p>
+                                <p>Our comprehensive range of services at University Cleaners Management System is tailored to meet the unique cleaning and sanitation demands of modern universities.</p>
                             </div>
                             <div className="container">
                                 <div className="threeCards">
@@ -344,9 +249,7 @@ const Start = () => {
                                     </div>
                                 </div>
                             </div>
-
                         </section>
-
                     </Typography>
                     <br /><br /><br />
                 </Box>
@@ -355,9 +258,9 @@ const Start = () => {
 
                 <Box my={4} id="contact">
                     <Typography variant="h4" component="h2" gutterBottom>
-                        <div id="contact_us">
-                            <div className="subscriber_mid">
-                                <div className="first_para">
+                        <div id="contact_us" className="mt-5">
+                            <div className="subscriber_mid text-center bg-light p-5 rounded">
+                                <div className="row">
                                     <div className="footer_logo">
                                         {/* <h1>LOGO</h1> */}
                                         <div style={{ width: '175px', height: '105px', backgroundColor: 'white', fontWeight: 'bolder' }}>
@@ -377,23 +280,21 @@ const Start = () => {
 
                                 <div className="middle_para">
                                     <div className="footer_About">
-                                        <h6 className="footer_About_para"><NewReleases /><a className="footer_About_head" href="#" style={changeLinks.color}>News</a></h6>
-                                        <h6 className="footer_About_para"><a className="footer_About_links" href="#" style={changeLinks.color}>Terms of use</a></h6>
-                                        {/* <h6 className="footer_About_para"><a className="footer_About_links" href="#" style={changeLinks.color}>Privacy Policy</a></h6> */}
-                                        <h6 className="footer_About_para"><a className="footer_About_links" href="https://github.com/AbdulrahmanShaibu"><GitHub /></a>gitHub</h6>
-
+                                        <h6 ><NewReleases /><a href="#" style={changeLinks.color}>News</a></h6>
+                                        <h6 ><a href="#" style={changeLinks.color}>Terms of use</a></h6>
+                                        <h6 ><a href="https://github.com/AbdulrahmanShaibu"><GitHub /></a>gitHub</h6>
                                     </div>
 
                                     <div className="footer_About">
-                                        <h6 className="footer_About_para"><Phone /><a className="footer_About_head" href="#">0675704982</a></h6>
-                                        <h6 className="footer_About_para"><Email /><a className="footer_About_links" href="https://mail.google.com/mail/u/0/#sent?compose=new">kheria048@gmail.com</a></h6>
-                                        <h6 className="footer_About_para"><ShareLocation /><a className="footer_About_links" href="https://www.google.com/maps/place/State+University+of+Zanzibar/@-6.197625,39.3057128,17z/data=!4m6!3m5!1s0x185cd86f80e1becd:0x670d4c8e55b47d57!8m2!3d-6.1985316!4d39.3074509!16s%2Fg%2F1pp2x6ky1?entry=ttu">Zanzibar,Tanzania</a></h6>
+                                        <h6 ><Phone /><a href="#">0675704982</a></h6>
+                                        <h6 ><Email /><a href="https://mail.google.com/mail/u/0/#sent?compose=new">kheria048@gmail.com</a></h6>
+                                        <h6 ><ShareLocation /><a href="https://www.google.com/maps/place/State+University+of+Zanzibar/@-6.197625,39.3057128,17z/data=!4m6!3m5!1s0x185cd86f80e1becd:0x670d4c8e55b47d57!8m2!3d-6.1985316!4d39.3074509!16s%2Fg%2F1pp2x6ky1?entry=ttu">Zanzibar,Tanzania</a></h6>
                                     </div>
                                     <div className="footer_About">
-                                        <h6 className="footer_About_para"><Support /><a className="footer_About_head" href="#" style={changeLinks.color}>Support</a></h6>
-                                        {/* <h6 className="footer_About_para"><a className="footer_About_links" href="#" style={changeLinks.color}>Sponsors</a></h6> */}
-                                        <h6 className="footer_About_para"><a className="footer_About_links" href="#" style={changeLinks.color}>Members</a></h6>
-                                        <h6 className="footer_About_para"><a className="footer_About_links" href="#"><Twitter />twitter</a></h6>
+                                        <h6 ><Support /><a href="#" style={changeLinks.color}>Support</a></h6>
+                                        {/* <h6 ><a  href="#" style={changeLinks.color}>Sponsors</a></h6> */}
+                                        <h6 ><a href="#" style={changeLinks.color}>Members</a></h6>
+                                        <h6 ><a href="#"><Twitter />twitter</a></h6>
 
                                     </div>
                                 </div>
@@ -421,22 +322,10 @@ const Start = () => {
                 </Box>
 
                 {/* DOCUMENTATION SECTION */}
+                <Box my={4}></Box>
 
-                <Box my={4}>
-                    {/* id="documentation" */}
-                    {/* <Typography variant="h4" component="h2" gutterBottom>
-                        Documentation
-                    </Typography>
-                    <Typography>This is the Documentation section.</Typography> */}
-                </Box>
                 {/* REGISTRATION SECTION */}
-
-                <Box my={4} id="registration">
-                    {/* <Typography variant="h4" component="h2" gutterBottom>
-                        Get Registered
-                    </Typography>
-                    <Typography>This is the Get Registered section.</Typography> */}
-                </Box>
+                <Box my={4} id="registration"></Box>
 
             </Container>
         </div>

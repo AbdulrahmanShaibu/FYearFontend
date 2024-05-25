@@ -1,5 +1,5 @@
 /* Global styles */
-/* @import url('https://fonts.googleapis.com/css?family=Bubbler+One|Fredoka+One'); */
+@import url('https://fonts.googleapis.com/css?family=Bubbler+One|Fredoka+One');
 
 body {
     font-family: Arial, sans-serif;
@@ -107,9 +107,7 @@ h1 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 10px;
-    /* background-color: #f8f8f8; */
     border-radius: 8px;
-    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 /* Style for the text within the home section */
@@ -130,7 +128,6 @@ h1 {
 
 .twoImages img {
     width: 25%;
-    /* Adjust this width as needed */
     border-radius: 15px;
 }
 
@@ -163,8 +160,6 @@ button {
 button:hover {
     background-color: #0056b3;
 }
-
-
 
 
 /* Services Section */
@@ -214,7 +209,7 @@ button:hover {
     text-align: justify;
 }
 
-.card-eading{
+.card-eading {
     text-align: center;
 }
 
@@ -227,7 +222,6 @@ button:hover {
     color: green;
     padding: 0px;
     border-radius: 10px;
-    /* font-weight: bold; */
     height: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -257,20 +251,12 @@ button:hover {
     color: #333;
 }
 
-/* .footerSection a:hover {
-    color: #555;
-} */
-
 /* Animation for list items */
 .footerSection ul li {
     margin-bottom: 8px;
     margin: auto;
     padding-top: 0px;
 }
-
-/* .footerSection ul li:hover {
-    color: #f28056;
-} */
 
 .footerSection ul li.animated {
     opacity: 1;
@@ -284,7 +270,6 @@ button:hover {
 .paragraphStyling {
     background-color: rgb(232, 232, 232);
     font-size: medium;
-    /* color: lightsteelblue; */
     font-weight: bold;
     justify-content: space-between;
     transition: ease-in-out;

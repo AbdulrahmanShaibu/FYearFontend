@@ -1,155 +1,251 @@
-import React from "react"
-import Home from "./Home";
-import { Button, TextField, Grid, Paper, Typography, FormControl, Input } from '@mui/material';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import TablePagination from '@mui/material/TablePagination';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import CopyrightFooter from "./Footer";
+import React, { useState, useEffect } from "react";
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Button, TablePagination
+} from '@material-ui/core';
+import './styles/sidebar.css';
+import UpdateClaimModal from "./UpdateClaimModal";
+import Home from "./Home"
 
-const Users = () => {
+const UserDashboard = () => {
 
-  const styles = {
-    tableContainer: {
-      margin: 'auto',
-      maxWidth: '50%', // Adjusted width to fit different screen sizes
-      overflowX: 'auto', // Added for horizontal scrolling on small screens
-    },
-    heading: {
-      fontSize: '24px',
-      color: '#333',
-      backgroundColor: '#f5f5f5',
-      padding: '10px',
-      border: '1px solid #ccc',
-      textAlign: 'center',
-      margin: 'auto',
-      maxWidth: 'fit-content',
-    },
-    addForm: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '10px',
-    },
-    addRow: {
-      display: 'flex',
-      gap: '10px',
-      alignItems: 'center',
+  const [claimType, setClaimType] = useState('staffs');
+  const [claimsDescription, setClaimsDescription] = useState('');
+  const [submissionDate, setSubmissionDate] = useState('');
+  const [cleaners, setCleaners] = useState([]);
+  const [selectedCleaner, setSelectedCleaner] = useState('');
+  const [staffs, setStaffs] = useState([]);
+  const [selectedStaff, setSelectedStaff] = useState('');
+  const [claims, setClaims] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedClaim, setSelectedClaim] = useState(null);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5); // You can change this as per your preference
+
+  const style = {
+    table: {
+      backgroundColor: 'black',
+      color: 'white',
+      fontWeight: 'bold'
     }
+  }
+
+  useEffect(() => {
+    fetchCleaners();
+    fetchStaffs();
+    fetchClaims();
+  }, []);
+
+  const fetchCleaners = () => {
+    fetch('http://localhost:8080/api/v1/list/cleaner')
+      .then(response => response.json())
+      .then(data => {
+        setCleaners(data);
+        console.log(data);
+      })
+      .catch(error => console.error('Error fetching cleaners:', error));
   };
 
-  const styleHeading = {
-    color: 'white',
-    backgroundColor: 'black',
-    fontWeight: 'bold',
-    fontSize: '15px'
-  }
+  const fetchStaffs = () => {
+    fetch('http://localhost:8080/api/v1/list/staff')
+      .then(response => response.json())
+      .then(data => {
+        setStaffs(data);
+        console.log(data);
+      })
+      .catch(error => console.error('Error fetching staffs:', error));
+  };
 
-  const handleAdd = () => {
-    return 'Add functionality';
-  }
-  const handleUpdate = () => {
-    return 'Update functionality';
-  }
-  const handleDelete = () => {
-    return 'Delete functionality';
-  }
+  const fetchClaims = () => {
+    fetch('http://localhost:8080/api/v1/list/claims')
+      .then(response => response.json())
+      .then(data => {
+        setClaims(data);
+        console.log(data);
+      })
+      .catch(error => console.error('Error fetching claims:', error));
+  };
+
+  const saveAPI = 'http://localhost:8080/api/v1/save/claims';
+  const deleteAPI = 'http://localhost:8080/api/v1/delete/claims/';
+  const updateAPI = 'http://localhost:8080/api/v1/update/claims/';
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const data = {
+      claimType: claimType,
+      claimsDescription: claimsDescription,
+      submissionDate: submissionDate,
+      staffs: claimType === 'staffs' ? [{ staffID: selectedStaff }] : [],
+      cleaners: claimType === 'cleaners' ? [{ cleanerID: selectedCleaner }] : []
+    };
+
+    fetch(saveAPI, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then(response => response.json())
+      .then(data => {
+        setClaims([...claims, data]);
+        console.log(data);
+      })
+      .catch(error => console.error('Error saving claims:', error));
+
+    // Reset form fields
+    setClaimType('staffs');
+    setClaimsDescription('');
+    setSubmissionDate('');
+    setSelectedCleaner('');
+    setSelectedStaff('');
+  };
+
+  const handleDelete = (id) => {
+    fetch(deleteAPI + id, {
+      method: 'DELETE',
+    })
+      .then(response => {
+        if (response.ok) {
+          // Remove the deleted claim from the list
+          setClaims(claims.filter(claim => claim.claimID !== id));
+        } else {
+          console.error('Error deleting claim:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Error deleting claim:', error));
+  };
+
+  const handleUpdate = (id, description, date) => {
+    const data = {
+      claimsDescription: description,
+      submissionDate: date,
+      staffs: claimType === 'staffs' ? [{ staffID: selectedStaff }] : [],
+      cleaners: claimType === 'cleaners' ? [{ cleanerID: selectedCleaner }] : []
+    };
+
+    fetch(updateAPI + id, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then(response => {
+        if (response.ok) {
+          // Updated successfully, update the claim in state
+          const updatedClaims = claims.map(claim => {
+            if (claim.claimID === id) {
+              return { ...claim, claimsDescription: description, submissionDate: date };
+            }
+            return claim;
+          });
+          setClaims(updatedClaims);
+          console.log('Claim updated successfully');
+        } else {
+          console.error('Error updating claim:', response.statusText);
+        }
+      })
+      .catch(error => console.error('Error updating claim:', error));
+  };
+
+  const handleOpenModal = (claim) => {
+    setSelectedClaim(claim);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
-    <div style={{ margin: 'auto', padding: '60px', backgroundColor: 'rgba(73, 161, 157, 0.3)' }}>
+    <div style={{ margin: 'auto', marginTop: '80px', width: '950px' }}>
       <Home />
-      <h2 style={styles.heading}>Cleaners Claims List</h2>
-      <TableContainer component={Paper} style={styles.tableContainer}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ ...styleHeading }}>Claims Id</TableCell>
-              <TableCell style={{ ...styleHeading }}>Description</TableCell>
-              <TableCell style={{ ...styleHeading }}>Date Submitted</TableCell>
-              <TableCell style={{ ...styleHeading }}>Cleaners Id</TableCell>
-              {/* <TableCell style={{ ...styleHeading }}>Description</TableCell> */}
-              <TableCell style={{ ...styleHeading }}>Status</TableCell>
-              <TableCell style={{ ...styleHeading }}>Actions</TableCell> {/* Combined action cells */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>
-                {/* <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<EditIcon />}
-                  onClick={handleUpdate} 
-                >
-                  Update
-                </Button> */}
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  startIcon={<DeleteIcon />}
-                  onClick={handleDelete} // Define handleDelete function
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <br />
-      <h2 style={styles.heading}>Staffs Claims List</h2>
-      <TableContainer component={Paper} style={styles.tableContainer}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell style={{ ...styleHeading }}>Claims Id</TableCell>
-              <TableCell style={{ ...styleHeading }}>Description</TableCell>
-              <TableCell style={{ ...styleHeading }}>Date Submitted</TableCell>
-              <TableCell style={{ ...styleHeading }}>Staffs Id</TableCell>
-              {/* <TableCell style={{ ...styleHeading }}>Description</TableCell> */}
-              <TableCell style={{ ...styleHeading }}>Status</TableCell>
-              <TableCell style={{ ...styleHeading }}>Actions</TableCell> {/* Combined action cells */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>Data</TableCell>
-              <TableCell>
-                {/* <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<EditIcon />}
-                  onClick={handleUpdate} 
-                >
-                  Update
-                </Button> */}
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  startIcon={<DeleteIcon />}
-                  onClick={handleDelete} // Define handleDelete function
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {/* <br /> */}
-      <CopyrightFooter />
+      <div>
+        <br /><br />
+        <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
+          <h2 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Submitted Claims</h2>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell style={style.table}>ID</TableCell>
+                  <TableCell style={style.table}>Type</TableCell>
+                  <TableCell style={style.table}>Description</TableCell>
+                  <TableCell style={style.table}>Submission Date</TableCell>
+                  <TableCell style={style.table}>Submitted By</TableCell>
+                  <TableCell style={style.table}>Update</TableCell>
+                  <TableCell style={style.table}>Delete</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {claims.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((claim, index) => (
+                  <TableRow key={claim.claimID}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{claim.claimType}</TableCell>
+                    <TableCell>{claim.claimsDescription}</TableCell>
+                    <TableCell>{claim.submissionDate}</TableCell>
+                    <TableCell>
+                      {claim.claimType === 'staffs' ?
+                        claim.staffs.map(staff => staff.staffName).join(', ') :
+                        claim.cleaners.map(cleaner => cleaner.cleanerName).join(', ')
+                      }
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleOpenModal(claim)}
+                      >
+                        Update
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleDelete(claim.claimID)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]} // You can define more options if needed
+              component="div"
+              count={claims.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+          </TableContainer>
+        </div>
+      </div>
+      {/* Update Claim Modal */}
+      {selectedClaim && <UpdateClaimModal
+        open={openModal}
+        handleClose={handleCloseModal}
+        claim={selectedClaim}
+        handleUpdate={handleUpdate}
+      />}
     </div>
   );
 }
 
-export default Users;
+export default UserDashboard;

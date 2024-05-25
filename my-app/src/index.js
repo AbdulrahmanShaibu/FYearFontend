@@ -26,7 +26,7 @@ import CleaningAreas from './Areas'
 import ViewEmployees from './UserView/ViewEmply';
 import ViewDepartments from './UserView/ViewDeptm';
 import ViewTools from './UserView/ViewTools';
-
+import ErrorPath from './ErrorPage';
 
 
 ReactDOM.render(
@@ -62,7 +62,7 @@ ReactDOM.render(
 
         <Route path='/signout' element={<App />} />
         <Route path='/session-timed-out' element={<SessionPage />} />
-        <Route path="*" element={<p>Path not resolved</p>} />
+        <Route path="*" element={<ErrorPath />} />
 
         {/* Form Routing */}
         {/* <Route path='/edit/supervisor/form'></Route> */}

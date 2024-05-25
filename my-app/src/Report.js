@@ -1,144 +1,96 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles/report.css'; // Import your CSS file for styling
-import { useState } from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Import the autoTable plugin
+import SupervisorReport from './ReportsList/supervisor';
 
 const GenerateReport = () => {
+    const [cleaners, setCleaners] = useState([]);
+    const [tasks, setTasks] = useState([]);
 
-    // Sample data for the summary table (replace this with your actual data)
-    const [summaryData, setSummaryData] = useState([
-        { category: 'Category A', total: 20, resolved: 15, unresolved: 5 },
-        { category: 'Category B', total: 30, resolved: 25, unresolved: 5 },
-        // Add more rows as needed with your actual data
-    ]);
+    useEffect(() => {
+        // Fetch data from APIs
+        fetchCleaners();
+        fetchTasks();
+    }, []);
 
-    // Function to update the summary data (simulated for demonstration)
-    const updateSummaryData = () => {
-        // Simulated updated data
-        const updatedData = [
-            { category: 'Category A', total: 25, resolved: 20, unresolved: 5 },
-            { category: 'Category B', total: 35, resolved: 30, unresolved: 5 },
-            // Updated or additional rows with your actual data
+    const fetchCleaners = () => {
+        // Fetch cleaners data from API
+        // Example: fetch('cleanersAPI')
+        //     .then(response => response.json())
+        //     .then(data => setCleaners(data));
+        // For demonstration purpose, let's use dummy data
+        const dummyCleaners = [
+            { name: 'John Doe', position: 'Senior Cleaner', tasksAssigned: 10, claimsSubmitted: 3 },
+            { name: 'Jane Smith', position: 'Junior Cleaner', tasksAssigned: 8, claimsSubmitted: 1 }
         ];
-
-        setSummaryData(updatedData);
+        setCleaners(dummyCleaners);
     };
 
-    const [sectionContents, setSectionContents] = useState({
-        executiveSummary: 'Executive summary content...',
-        introduction: 'Introduction content...',
-        methodology: 'Methodology content...',
-        complaintAnalysis: 'Analysis content...',
-        systemPerformance: 'Performance content...',
-        recommendations: 'Recommendations content...',
-        conclusion: 'Conclusion content...',
-        appendix: 'Appendix content...',
-    });
+    const fetchTasks = () => {
+        // Fetch tasks data from API
+        // Example: fetch('tasksAPI')
+        //     .then(response => response.json())
+        //     .then(data => setTasks(data));
+        // For demonstration purpose, let's use dummy data
+        const dummyTasks = [
+            { name: 'Clean classroom 101', assignedTo: 'John Doe', status: 'In Progress' },
+            { name: 'Clean lab 201', assignedTo: 'Jane Smith', status: 'Completed' }
+        ];
+        setTasks(dummyTasks);
+    };
 
     const handleDownload = () => {
-        // Create a new jsPDF instance
         const doc = new jsPDF();
 
-        // Loop through sections and add their content to the PDF
-        Object.keys(sectionContents).forEach((section) => {
-            doc.text(`${section} Section`, 15, 15); // Add section title
-            doc.text(sectionContents[section], 15, 25); // Add section content
-            doc.addPage(); // Add a new page for each section
+        // Add title
+        doc.setFontSize(22);
+        doc.setTextColor(40);
+        doc.text('University Cleaners Management System Report', 14, 22);
+
+        // Add some spacing
+        doc.setFontSize(12);
+        doc.text('', 14, 30);
+
+        // Add content for each section
+        doc.setFontSize(18);
+        doc.text('Cleaners', 14, 40);
+        doc.setFontSize(12);
+        cleaners.forEach((cleaner, index) => {
+            doc.text(`${index + 1}. ${cleaner.name} - ${cleaner.position}`, 20, 50 + index * 20);
+            doc.text(`   - Tasks Assigned: ${cleaner.tasksAssigned}`, 25, 55 + index * 20);
+            doc.text(`   - Claims Submitted: ${cleaner.claimsSubmitted}`, 25, 60 + index * 20);
         });
 
-        // Add content to the PDF
-        doc.text('Tittle Street Complaint Management System Report', 15, 15);
-
-        // Add summary table to the PDF
-        let yPos = 30;
-        doc.autoTable({
-            startY: yPos,
-            head: [['Category', 'Total', 'Resolved', 'Unresolved']],
-            body: summaryData.map((data) => [data.category, data.total, data.resolved, data.unresolved]),
+        doc.setFontSize(18);
+        doc.text('Tasks', 14, 100);
+        doc.setFontSize(12);
+        tasks.forEach((task, index) => {
+            doc.text(`${index + 1}. ${task.name}`, 20, 110 + index * 30);
+            doc.text(`   - Assigned to: ${task.assignedTo}`, 25, 115 + index * 30);
+            doc.text(`   - Status: ${task.status}`, 25, 120 + index * 30);
         });
 
-        // Save the PDF when the "Download" button is clicked
-        doc.save('ComplaintManagementReport.pdf');
+        // Now adding supervisor report
+        const supervisorReport = new jsPDF();
+        supervisorReport.text("Supervisor Report", 20, 10);
+        supervisorReport.autoTable({ html: '#supervisor-table' });
+        doc.addPage();
+        doc.addImage(supervisorReport.output('datauri'), 'JPEG', 10, 140, 190, 0);
+
+        // Save the PDF
+        doc.save('system_report.pdf');
     };
 
     return (
-        <div className="report-container">
-            <h1>Tittle Street Complaint Management System Report</h1>
-            <hr />
-
-            <section className="section">
-                <h2>Executive Summary</h2>
-                <p>Executive summary content...</p>
-            </section>
-
-            <section className="section">
-                <h2>Introduction</h2>
-                <p>Introduction content...</p>
-            </section>
-
-            <section className="section">
-                <h2>Methodology</h2>
-                <p>Methodology content...</p>
-            </section>
-
-            <section className="section">
-                <h2>Complaint Analysis</h2>
-                <p>Analysis content...</p>
-            </section>
-
-            <section className="section">
-                <h2>System Performance</h2>
-                <p>Performance content...</p>
-            </section>
-
-            <section className="section">
-                <h2>Recommendations</h2>
-                <p>Recommendations content...</p>
-            </section>
-
-            <section className="section">
-                <h2>Conclusion</h2>
-                <p>Conclusion content...</p>
-            </section>
-
-            <section className="section">
-                <h2>Appendix</h2>
-                <p>Appendix content...</p>
-            </section>
-
-            <section className="section">
-                <h2>Summary Table</h2>
-                <table className="summary-table">
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Total</th>
-                            <th>Resolved</th>
-                            <th>Unresolved</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {summaryData.map((data, index) => (
-                            <tr key={index}>
-                                <td>{data.category}</td>
-                                <td>{data.total}</td>
-                                <td>{data.resolved}</td>
-                                <td>{data.unresolved}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                <button onClick={updateSummaryData} className="update-button">
-                    Update Summary Data
-                </button>
-
-                <button onClick={handleDownload} style={{ backgroundColor: 'green' }}>
-                    Dowload
-                </button>
-
-            </section>
+        <div className="system-report-container">
+            <h2>System Report</h2>
+            <div className="generate-button-container">
+                <button className="generate-button" onClick={handleDownload}>Generate Report</button>
+            </div>
+            <div id="supervisor-table" style={{ display: 'none' }}>
+                <SupervisorReport />
+            </div>
         </div>
     );
 };
