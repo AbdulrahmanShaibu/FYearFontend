@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Home from "./Home";
-import '../styles/form.css'
+import '../styles/form.css';
 import {
     Button, Container, Grid, Table, TableRow, TableCell, TextField, Select, MenuItem, TableHead, TableBody, TablePagination, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar
 } from '@mui/material';
@@ -24,6 +24,7 @@ const ClientOrganisation = () => {
         id: []
     });
     const [feedbackMessage, setFeedbackMessage] = useState(null);
+    const [formErrors, setFormErrors] = useState({});
 
     // Fetch initial data on component mount
     useEffect(() => {
@@ -48,13 +49,40 @@ const ClientOrganisation = () => {
         }));
     };
 
-    // Handle selection of company staff for client organisation
-    const handleStaffChange = (e) => {
-        const { value } = e.target;
-        setClientOrganisation(prevState => ({
+    // Handle form input change for updated client organisation
+    const handleUpdateInputChange = (e) => {
+        const { name, value } = e.target;
+        setUpdatedClientOrganisation(prevState => ({
             ...prevState,
-            id: [...prevState.id, value]
+            [name]: value
         }));
+    };
+
+    // Validate form inputs
+    const validate = () => {
+        let errors = {};
+        if (!clientOrganisation.name) {
+            errors.name = "Client Organisation Name is required";
+        }
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    // Handle form submission for new client organisation
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+
+        axios.post('http://localhost:8080/api/v1/save/ClientOrganisation', clientOrganisation)
+            .then(response => {
+                setClientOrganisations([...clientOrganisations, response.data]);
+                setClientOrganisation({ name: '', id: [] }); // Clear the form after submission
+                setFeedbackMessage("Client organisation added successfully.");
+            })
+            .catch(error => {
+                console.log('Error adding client organisation:', error);
+                setFeedbackMessage("Failed to add client organisation. Please try again.");
+            });
     };
 
     // Handle deletion of client organisation
@@ -83,24 +111,6 @@ const ClientOrganisation = () => {
         setOpenModal(false);
     };
 
-    // Handle input change for updated client organisation data
-    const handleUpdateInputChange = (e) => {
-        const { name, value } = e.target;
-        setUpdatedClientOrganisation(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
-    // Handle selection of company staff for updated client organisation
-    const handleUpdateStaffChange = (e) => {
-        const { value } = e.target;
-        setUpdatedClientOrganisation(prevState => ({
-            ...prevState,
-            id: [...prevState.id, value]
-        }));
-    };
-
     // Submit updated client organisation data
     const handleUpdateSubmit = () => {
         axios.put(`http://localhost:8080/api/v1/update/ClientOrganisation/${selectedClientOrganisationId}`, updatedClientOrganisation)
@@ -121,21 +131,6 @@ const ClientOrganisation = () => {
             });
     };
 
-    // Submit new client organisation data
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        axios.post('http://localhost:8080/api/v1/save/ClientOrganisation', clientOrganisation)
-            .then(response => {
-                setClientOrganisations([...clientOrganisations, response.data]);
-                setClientOrganisation({ name: '', id: [] }); // Clear the form after submission
-                setFeedbackMessage("Client organisation added successfully.");
-            })
-            .catch(error => {
-                console.log('Error adding client organisation:', error);
-                setFeedbackMessage("Failed to add client organisation. Please try again.");
-            });
-    };
-
     // Handle page change in pagination
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -147,10 +142,24 @@ const ClientOrganisation = () => {
         setPage(0);
     };
 
+    // Open the form modal
+    const handleOpenForm = () => {
+        setOpenModal(true);
+    };
+
     return (
         <Container>
             <Home />
             <br /> <br /> <br /> <br />
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpenForm}
+                startIcon={<Add />}
+            >
+                Add New Client Organisation
+            </Button>
+            <br /> <br />
             <Paper elevation={2}>
                 <Grid container style={{ display: 'flex' }}>
                     <Grid item xs={12} md={6}>
@@ -165,6 +174,8 @@ const ClientOrganisation = () => {
                                         value={clientOrganisation.name}
                                         onChange={handleInputChange}
                                         margin="normal"
+                                        error={!!formErrors.name}
+                                        helperText={formErrors.name}
                                     />
                                 </FormControl>
 
@@ -234,9 +245,9 @@ const ClientOrganisation = () => {
                     </Grid>
                 </Grid>
             </Paper>
-            {/* Update Client Organisation Modal */}
+            {/* Add/Edit Client Organisation Modal */}
             <Dialog open={openModal} onClose={handleCloseModal}>
-                <DialogTitle>Edit Client Organisation</DialogTitle>
+                <DialogTitle>{selectedClientOrganisationId ? 'Edit' : 'Add'} Client Organisation</DialogTitle>
                 <DialogContent>
                     <form>
                         <FormControl fullWidth>
@@ -245,16 +256,18 @@ const ClientOrganisation = () => {
                                 label="Client Organisation Name"
                                 variant="outlined"
                                 name="name"
-                                value={updatedClientOrganisation.name}
-                                onChange={handleUpdateInputChange}
+                                value={selectedClientOrganisationId ? updatedClientOrganisation.name : clientOrganisation.name}
+                                onChange={selectedClientOrganisationId ? handleUpdateInputChange : handleInputChange}
                                 margin="normal"
+                                error={!!formErrors.name}
+                                helperText={formErrors.name}
                             />
                         </FormControl>
                     </form>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseModal} color="secondary">Cancel</Button>
-                    <Button onClick={handleUpdateSubmit} color="primary">Update</Button>
+                    <Button onClick={selectedClientOrganisationId ? handleUpdateSubmit : handleSubmit} color="primary">{selectedClientOrganisationId ? 'Update' : 'Add'}</Button>
                 </DialogActions>
             </Dialog>
             {/* Snackbar for feedback */}
@@ -269,4 +282,3 @@ const ClientOrganisation = () => {
 };
 
 export default ClientOrganisation;
-
