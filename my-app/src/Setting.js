@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Home from './Home';
+import Home from './UCMS/Home';
 import {
     Paper, Typography, List, ListItem, ListItemText,
     Drawer, Divider, Button, TextField

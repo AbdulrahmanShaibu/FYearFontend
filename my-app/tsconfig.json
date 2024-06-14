@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-, "src/App.js", "src/UserView"  ]
+, "src/App.js", "src/UserView", "src/UCMS/Tools.js", "UCMS"  ]
 }

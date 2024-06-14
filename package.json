@@ -2,6 +2,17 @@
   "dependencies": {
     "jquery": "^3.7.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.0.0",
+    "styled-components": "^5.3.3",
+    "react-accessible-accordion": "^3.3.4",
+    "react-countup": "^5.2.0",
+    "@mui/material": "^5.0.0",
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0"
+  },
+  "devDependencies": {
+    "postcss": "^8.3.6",
+    "postcss-loader": "^6.1.1"
   }
 }

@@ -7,7 +7,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { DialogTitle, Typography } from "@mui/material";
+import {Select,FormControl, InputLabel
+} from '@mui/material';
+import { DialogTitle, Typography, Menu, MenuItem } from "@mui/material";
+
 
 const CleanersFormComponent = () => {
 
@@ -38,32 +41,34 @@ const CleanersFormComponent = () => {
                         Cleaners Form
                     </Typography>
                 </DialogTitle>
-                <DialogContent style={{ backgroundColor: '#f9f9f9', width: '260px', padding: '20px' }}>
+                <DialogContent style={{ backgroundColor: '#f9f9f9', width: '400px', padding: '20px', borderRadius: '0px' }}>
                     <form>
-                        <Grid container spacing={2}>
+                        <Grid container spacing={5}>
                             <Grid item xs={12}>
-                                <TextField label="Cleaner Name" type="text" fullWidth required />
+                                <TextField label="Cleaner Name" fullWidth variant="outlined" />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField label="Gender" type="text" fullWidth required />
+                                <FormControl fullWidth variant="outlined">
+                                    <InputLabel id="department-label">Department ID</InputLabel>
+                                    <Select labelId="department-label" label="Department ID">
+                                        <MenuItem value={1}>1</MenuItem>
+                                        <MenuItem value={2}>2</MenuItem>
+                                    </Select>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField label="Department ID" type="number" fullWidth required />
+                                <FormControl fullWidth variant="outlined">
+                                    <InputLabel id="tools-label">Tools ID</InputLabel>
+                                    <Select labelId="tools-label" label="Tools ID">
+                                        <MenuItem value={1}>1</MenuItem>
+                                        <MenuItem value={2}>2</MenuItem>
+                                    </Select>
+                                </FormControl>
                             </Grid>
-                            <Grid item xs={12}>
-                                <TextField label="Tool ID" type="number" fullWidth required />
-                            </Grid>
-                            <Grid item xs={12} container justifyContent="center" spacing={2}>
-                                <Grid item>
-                                    <Button variant="contained" color="primary" onClick={saveData}>
-                                        Save
-                                    </Button>
-                                </Grid>
-                                <Grid item>
-                                    <Button variant="outlined" color="default" onClick={closeForm}>
-                                        Close
-                                    </Button>
-                                </Grid>
+                            <Grid item xs={12} textAlign="right">
+                                <Button onClick={saveData} variant="contained" color="primary">
+                                    Save
+                                </Button>
                             </Grid>
                         </Grid>
                     </form>

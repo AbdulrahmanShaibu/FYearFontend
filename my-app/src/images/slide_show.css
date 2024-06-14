@@ -1,0 +1,21 @@
+@keyframes slideshow {
+    0% {
+        background-color: whitesmoke;
+        /* Light grey */
+    }
+
+    50% {
+        background-color: #f0f0f0;
+        /* Darker grey */
+    }
+
+    100% {
+        background-color: #d3d3d3;
+        /* Even darker grey */
+    }
+}
+
+.slideshow {
+    background-size: cover;
+    background-position: center;
+}

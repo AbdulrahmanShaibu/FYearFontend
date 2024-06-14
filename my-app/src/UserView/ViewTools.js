@@ -1,5 +1,5 @@
 import React from "react";
-import Home from "../Home";
+import Home from "../UCMS/Home";
 import { useState } from 'react';
 import {  Paper } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';

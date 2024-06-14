@@ -3,31 +3,60 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
 import App from './App';
-import UserForm from './Form';
-import Events from './Events';
-import Users from './Users';
-import Venues from './Venues';
-import Organisers from './Organisers';
-import News from './News';
+import UserForm from './UCMS/Form';
+import Events from './UCMS/Tools';
+import Users from './UCMS/StaffComplain';
+import Venues from './UCMS/ClientOrganisor';
+import Organisers from './UCMS/ClaimsType';
+import News from './UCMS/CompanyStaffs';
 import Setting from './Setting';
-import Welcome from './Welcome';
-import AuthDashboard from './AuthDashboard';
+import Welcome from './UCMS/Welcome';
+import AuthDashboard from './UCMS/AuthDashboard';
 import FetchPersonalDetails from './Personal_Info';
 import AccountSetting from './Account';
-import UserDashboard from './UserDashboard';
+import UserDashboard from './UserView/UserDashboard';
 import SessionPage from './SessionPage';
-import RegistrationForm from './RegistrationForm';
-import GenerateReport from './Report';
+import RegistrationForm from './UCMS/RegistrationForm';
+import GenerateReport from './UCMS/Report';
 import SystemDocumentation from './Documentation';
-import Start from './Start';
-import Departments from './Departments'
-import Employees from './Employees'
-import CleaningAreas from './Areas'
+import Start from './UCMS/Start';
+import Departments from './UCMS/ClientSites'
+import Employees from './UCMS/Staffs'
+import CleaningAreas from './UCMS/Attachements'
 import ViewEmployees from './UserView/ViewEmply';
 import ViewDepartments from './UserView/ViewDeptm';
 import ViewTools from './UserView/ViewTools';
 import ErrorPath from './ErrorPage';
 
+
+import About from "./pages/About";
+import Contact from './pages/Contact';
+import Faq from './pages/Faq';
+import Services from './pages/Services';
+import Project from './pages/Project';
+import Blog from './pages/Blogs';
+import Error from './pages/Error';
+import ServiceDetails from './pages/ServiceDetails';
+import ProjectDetails from './pages/ProjectDetails';
+import BlogDetails from './pages/BlogDetails';
+
+//CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './assets/css/default.css';
+import './assets/css/main.css';
+import './assets/css/responsive.css';
+import './assets/vendor/modal-video/modal-video.min.css';
+import './assets/vendor/slick/slick.css';
+import Tools from './UCMS/Tools';
+import CompanyStaffs from './UCMS/CompanyStaffs';
+import ClientOrganisor from './UCMS/ClientOrganisor';
+import ClientSites from './UCMS/ClientSites';
+import StaffComplain from './UCMS/StaffComplain';
+import ClaimType from './UCMS/ClaimsType';
+import Attachements from './UCMS/Attachements';
+import ClientOrganisation from './UCMS/ClientOrganisor';
+import Staffs from './UCMS/Staffs';
+import CleaningCompany from './UCMS/CleaningCompany';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -38,20 +67,21 @@ ReactDOM.render(
         <Route path='/register' element={<RegistrationForm />} />
         <Route path='/university_events/dashboard_view' element={<Welcome />} />
         <Route path='/login/auth/admin' element={<AuthDashboard />} />
-        <Route path='/events' element={<Events />} />
-        <Route path='/registered_users' element={<Users />} />
-        <Route path='/available_venues' element={<Venues />} />
-        <Route path='/organisers_list' element={<Organisers />} />
-        <Route path='/latest_news' element={<News />} />
+        <Route path='/tools' element={<Tools />} />
+        <Route path='/staff_complain' element={<StaffComplain />} />
+        <Route path='/client_organisation' element={<ClientOrganisation />} />
+        <Route path='/claim_type' element={<ClaimType />} />
+        <Route path='/company_staffs' element={<CompanyStaffs />} />
         <Route path='/user_setting' element={<Setting />} />
         <Route path='/personal_details' element={<FetchPersonalDetails />} />
         <Route path='/user_account_setting' element={<AccountSetting />} />
         <Route path='/generated_report' element={<GenerateReport />} />
         <Route path='/system/doc' element={<SystemDocumentation />} />
         <Route path='/home' element={<Start />} />
-        <Route path='/departments' element={<Departments />} />
-        <Route path='/employees' element={<Employees />} />
-        <Route path='/cleaning_areas' element={<CleaningAreas />} />
+        <Route path='/client_sites' element={<ClientSites />} />
+        <Route path='/staffs' element={<Staffs />} />
+        <Route path='/attachements' element={<Attachements />} />
+        <Route path='/cleaning_company' element={<CleaningCompany />} />
 
         {/* To be fixed letter with UserDashboard...*/}
         <Route path="/user_dashboard_view" element={<UserDashboard />} />
@@ -66,6 +96,17 @@ ReactDOM.render(
 
         {/* Form Routing */}
         {/* <Route path='/edit/supervisor/form'></Route> */}
+
+        {/* Website Routing */}
+        <Route path="/about" exact element={<About />} />
+        <Route path="/services" exact element={<Services />} />
+        <Route path="/service-details" exact element={<ServiceDetails />} />
+        <Route path="/projects" exact element={<Project />} />
+        <Route path="/project-details" exact element={<ProjectDetails />} />
+        <Route path="/blogs" exact element={<Blog />} />
+        <Route path="/blog-details" exact element={<BlogDetails />} />
+        <Route path="/faq" exact element={<Faq />} />
+        <Route path="/contact" exact element={<Contact />} />
 
       </Routes>
     </Router>

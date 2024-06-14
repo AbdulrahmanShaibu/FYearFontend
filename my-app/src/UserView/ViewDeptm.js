@@ -6,7 +6,7 @@ import {
     Table, TableHead, TableBody,
     TableRow, TableCell, Paper
 } from '@mui/material';
-import Home from "../Home";
+import Home from "../UCMS/Home";
 
 const ViewDepartments = () => {
 

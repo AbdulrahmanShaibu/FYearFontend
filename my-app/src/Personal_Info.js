@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Home from "./Home";
+import Home from "./UCMS/Home";
 import './styles/event_form.css';
 import { Button, Paper } from "@mui/material";
 import { useLocation } from 'react-router-dom';
