@@ -160,9 +160,9 @@ const ClientOrganisation = () => {
                 Add New Client Organisation
             </Button>
             <br /> <br />
-            <Paper elevation={2}>
-                <Grid container style={{ display: 'flex' }}>
-                    <Grid item xs={12} md={6}>
+            <Paper elevation={1} style={{ width: '90%', height: '100%'}}>
+                <Grid container>
+                    {/* <Grid item xs={12} md={6}>
                         <Paper style={{ padding: '20px', height: '110%', width: '55%' }}>
                             <form onSubmit={handleSubmit}>
                                 <FormControl fullWidth>
@@ -191,9 +191,9 @@ const ClientOrganisation = () => {
                                 </Button>
                             </form>
                         </Paper>
-                    </Grid>
+                    </Grid> */}
                     <Grid style={{ width: '50%', height: '100%' }}>
-                        <div style={{ marginLeft: '-255px' }}>
+                        <div style={{ margin: 'auto' }}>
                             <Table>
                                 <TableHead className="thead-dark">
                                     <TableRow>
@@ -261,6 +261,7 @@ const ClientOrganisation = () => {
                                 margin="normal"
                                 error={!!formErrors.name}
                                 helperText={formErrors.name}
+                                style={{width:'350px'}}
                             />
                         </FormControl>
                     </form>

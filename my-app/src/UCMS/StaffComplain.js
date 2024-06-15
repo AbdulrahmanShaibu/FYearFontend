@@ -9,12 +9,8 @@ import Home from "./Home"
 
 const StaffComplain = () => {
 
-  const [claimType, setClaimType] = useState('staffs');
   const [claimsDescription, setClaimsDescription] = useState('');
   const [submissionDate, setSubmissionDate] = useState('');
-  const [cleaners, setCleaners] = useState([]);
-  const [selectedCleaner, setSelectedCleaner] = useState('');
-  const [staffs, setStaffs] = useState([]);
   const [selectedStaff, setSelectedStaff] = useState('');
   const [claims, setClaims] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -32,54 +28,30 @@ const StaffComplain = () => {
   }
 
   useEffect(() => {
-    fetchCleaners();
-    fetchStaffs();
-    fetchClaims();
+    fetchComplains();
   }, []);
 
-  const fetchCleaners = () => {
-    fetch('http://localhost:8080/api/v1/list/cleaner')
-      .then(response => response.json())
-      .then(data => {
-        setCleaners(data);
-        console.log(data);
-      })
-      .catch(error => console.error('Error fetching cleaners:', error));
-  };
 
-  const fetchStaffs = () => {
-    fetch('http://localhost:8080/api/v1/list/staff')
-      .then(response => response.json())
-      .then(data => {
-        setStaffs(data);
-        console.log(data);
-      })
-      .catch(error => console.error('Error fetching staffs:', error));
-  };
-
-  const fetchClaims = () => {
-    fetch('http://localhost:8080/api/v1/list/claims')
+  const fetchComplains = () => {
+    fetch('http://localhost:8080/api/v1/list/StaffComplain')
       .then(response => response.json())
       .then(data => {
         setClaims(data);
         console.log(data);
       })
-      .catch(error => console.error('Error fetching claims:', error));
+      .catch(error => console.error('Error fetching complains:', error));
   };
 
-  const saveAPI = 'http://localhost:8080/api/v1/save/claims';
-  const deleteAPI = 'http://localhost:8080/api/v1/delete/claims/';
-  const updateAPI = 'http://localhost:8080/api/v1/update/claims/';
+  const saveAPI = 'http://localhost:8080/api/v1/save/StaffComplain';
+  const deleteAPI = 'http://localhost:8080/api/v1/delete/StaffComplain';
+  const updateAPI = 'http://localhost:8080/api/v1/update/StaffComplain';
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const data = {
-      claimType: claimType,
       claimsDescription: claimsDescription,
       submissionDate: submissionDate,
-      staffs: claimType === 'staffs' ? [{ staffID: selectedStaff }] : [],
-      cleaners: claimType === 'cleaners' ? [{ cleanerID: selectedCleaner }] : []
     };
 
     fetch(saveAPI, {
@@ -94,13 +66,11 @@ const StaffComplain = () => {
         setClaims([...claims, data]);
         console.log(data);
       })
-      .catch(error => console.error('Error saving claims:', error));
+      .catch(error => console.error('Error saving complains:', error));
 
     // Reset form fields
-    setClaimType('staffs');
     setClaimsDescription('');
     setSubmissionDate('');
-    setSelectedCleaner('');
     setSelectedStaff('');
   };
 
@@ -113,18 +83,16 @@ const StaffComplain = () => {
           // Remove the deleted claim from the list
           setClaims(claims.filter(claim => claim.claimID !== id));
         } else {
-          console.error('Error deleting claim:', response.statusText);
+          console.error('Error deleting complain:', response.statusText);
         }
       })
-      .catch(error => console.error('Error deleting claim:', error));
+      .catch(error => console.error('Error deleting complain:', error));
   };
 
   const handleUpdate = (id, description, date) => {
     const data = {
       claimsDescription: description,
       submissionDate: date,
-      staffs: claimType === 'staffs' ? [{ staffID: selectedStaff }] : [],
-      cleaners: claimType === 'cleaners' ? [{ cleanerID: selectedCleaner }] : []
     };
 
     fetch(updateAPI + id, {
@@ -146,10 +114,10 @@ const StaffComplain = () => {
           setClaims(updatedClaims);
           console.log('Claim updated successfully');
         } else {
-          console.error('Error updating claim:', response.statusText);
+          console.error('Error updating complain:', response.statusText);
         }
       })
-      .catch(error => console.error('Error updating claim:', error));
+      .catch(error => console.error('Error updating complain:', error));
   };
 
   const handleOpenModal = (claim) => {
@@ -176,33 +144,26 @@ const StaffComplain = () => {
       <div>
         <br /><br />
         <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
-          <h2 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Submitted Claims</h2>
+          <h4 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Submitted Complains</h4>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell style={style.table}>ID</TableCell>
-                  <TableCell style={style.table}>Type</TableCell>
+                  <TableCell style={style.table}>S/N</TableCell>
                   <TableCell style={style.table}>Description</TableCell>
-                  <TableCell style={style.table}>Submission Date</TableCell>
-                  <TableCell style={style.table}>Submitted By</TableCell>
+                  <TableCell style={style.table}>Date Submitted</TableCell>
+                  <TableCell style={style.table}>Staff Name</TableCell>
                   <TableCell style={style.table}>Update</TableCell>
                   <TableCell style={style.table}>Delete</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {claims.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((claim, index) => (
-                  <TableRow key={claim.claimID}>
+                  <TableRow key={claim.complainID}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{claim.claimType}</TableCell>
-                    <TableCell>{claim.claimsDescription}</TableCell>
+                    <TableCell>{claim.description}</TableCell>
                     <TableCell>{claim.submissionDate}</TableCell>
-                    <TableCell>
-                      {claim.claimType === 'staffs' ?
-                        claim.staffs.map(staff => staff.staffName).join(', ') :
-                        claim.cleaners.map(cleaner => cleaner.cleanerName).join(', ')
-                      }
-                    </TableCell>
+                    <TableCell>{claim.staffs.StaffName}</TableCell>
                     <TableCell>
                       <Button
                         variant="contained"
@@ -226,7 +187,7 @@ const StaffComplain = () => {
               </TableBody>
             </Table>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25]} // You can define more options if needed
+              rowsPerPageOptions={[5, 10, 25]}
               component="div"
               count={claims.length}
               rowsPerPage={rowsPerPage}
@@ -237,7 +198,7 @@ const StaffComplain = () => {
           </TableContainer>
         </div>
       </div>
-      {/* Update Claim Modal */}
+      {/* Update Complain Modal */}
       {selectedClaim && <UpdateClaimModal
         open={openModal}
         handleClose={handleCloseModal}

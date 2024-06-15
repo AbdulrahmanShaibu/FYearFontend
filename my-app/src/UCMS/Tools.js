@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Button, TextField, Grid, Paper, Typography, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, FormControl, TablePagination
+  TableContainer, TableHead, TableRow, FormControl, TablePagination, Select, MenuItem
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,7 +15,9 @@ const Tools = () => {
   const [tools, setTools] = useState({
     toolType: '',
     quantity: '',
+    id: '' // Add this field
   });
+  const [clientSites, setClientSites] = useState([]); // Add this state
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -25,9 +27,11 @@ const Tools = () => {
   const COUNT_API = 'http://localhost:8080/api/v1/count/tools';
   const DELETE_API = 'http://localhost:8080/api/v1/delete/tools';
   const UPDATE_API = 'http://localhost:8080/api/v1/update/tools';
+  const CLIENT_SITES_API = 'http://localhost:8080/api/v1/get/client-sites'; // Add this
 
   useEffect(() => {
     fetchData();
+    fetchClientSites(); // Fetch client sites
   }, []);
 
   const fetchData = async () => {
@@ -44,6 +48,16 @@ const Tools = () => {
     }
   };
 
+  const fetchClientSites = async () => {
+    try {
+      const response = await axios.get(CLIENT_SITES_API);
+      setClientSites(response.data);
+      console.log('Client Sites:', response.data);
+    } catch (error) {
+      console.error('Error fetching client sites:', error);
+    }
+  };
+
   const handleAddData = async () => {
     try {
       const response = await axios.post(ADD_API, tools);
@@ -51,24 +65,20 @@ const Tools = () => {
       setTools({
         toolType: '',
         quantity: '',
+        id: '' // Reset this field
       });
       console.log('Tools saved successfully:', response.data);
     } catch (error) {
       console.error('Error while saving tools:', error);
     }
   };
-
   const handleUpdateData = async (toolID, updatedTool) => {
     try {
-      // Make PUT request to the update API
       const response = await axios.put(`${UPDATE_API}/${toolID}`, updatedTool);
-
-      // Update the toolsData state
       const updatedToolsData = toolsData.map(tool =>
         tool.toolID === toolID ? { ...tool, ...response.data } : tool
       );
       setToolsData(updatedToolsData);
-
       console.log('Tool updated successfully:', response.data);
     } catch (error) {
       console.error('Error while updating tool:', error);
@@ -101,14 +111,12 @@ const Tools = () => {
   return (
     <div style={{ margin: 'auto', width: '80%', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Home />
-
       <Grid container spacing={3} style={{ margin: 'auto' }}>
         <Grid style={{ margin: 'auto' }}>
           <Paper elevation={2} style={{
             padding: '20px',
             display: 'flex',
           }}>
-
             <div>
               <form style={{ backgroundColor: 'whitesmoke', padding: '20px', borderRadius: '4px', width: '100%' }}>
                 <Typography variant="body1"
@@ -141,6 +149,24 @@ const Tools = () => {
                   style={{ marginBottom: '15px' }}
                   InputProps={{ style: { borderRadius: '4px', border: '1px solid #ccc' } }}
                 />
+                <FormControl fullWidth margin="normal" style={{ marginBottom: '15px' }}>
+                  <Select
+                    name="id"
+                    value={tools.id}
+                    onChange={handleInputChange}
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Without label' }}
+                  >
+                    <MenuItem value="" disabled={true}>
+                      Select Client Site
+                    </MenuItem>
+                    {clientSites.map((site) => (
+                      <MenuItem key={site.id} value={site.id}>
+                        {site.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
                 <Button
                   onClick={handleAddData}
@@ -161,6 +187,7 @@ const Tools = () => {
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Tool Id</TableCell>
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Tool Type</TableCell>
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Quantity</TableCell>
+                    <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Client Site</TableCell>
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Update</TableCell>
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Delete</TableCell>
                   </TableRow>
@@ -171,12 +198,13 @@ const Tools = () => {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{tool.toolType}</TableCell>
                       <TableCell>{tool.quantity}</TableCell>
+                      <TableCell>{tool.clientSite ? tool.clientSite.name : 'N/A'}</TableCell>
                       <TableCell>
                         <Button
                           variant="outlined"
                           color="primary"
                           startIcon={<EditIcon />}
-                          onClick={() => handleUpdateData(tool.toolID, { toolType: tool.toolType, quantity: tool.quantity })}
+                          onClick={() => handleUpdateData(tool.toolID, { toolType: tool.toolType, quantity: tool.quantity, id: tool.id })}
                           style={{ marginRight: '5px' }}
                         >
                           Update
