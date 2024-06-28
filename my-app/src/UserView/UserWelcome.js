@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Home from './Home';
 import { Card, Table, TableHead, TableCell, Typography } from '@material-ui/core';
 import { Grid, Box, CardContent, TableBody, Paper } from '@mui/material';
+import UserHome from '../UserView/UserHome';
 
 
-const Welcome = () => {
+const UserWelcome = () => {
     const countAPI = 'http://localhost:8080/api/v1/count/cleaning/company';
     const countCleaners = 'http://localhost:8080/api/v1/count/ClientOrganisations';
     const countClaims = 'http://localhost:8080/api/v1/count/client-site';
@@ -37,7 +37,7 @@ const Welcome = () => {
 
         <Box mt={5}>
             <Box mt={5}>
-                <Home />
+                <UserHome/>
                 <Grid container justifyContent="center" style={{ marginTop: '150px' }}>
                     <Grid>
                         <Grid item md={12}>
@@ -141,4 +141,4 @@ const Welcome = () => {
     );
 };
 
-export default Welcome;
+export default UserWelcome;

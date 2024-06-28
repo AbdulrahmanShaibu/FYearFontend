@@ -21,14 +21,14 @@ const UserDashboard = () => {
     const [selectedStaff, setSelectedStaff] = useState('');
     const [claims, setClaims] = useState([]);
 
-    const style={
-        table:{
-          backgroundColor:'black',
-          color:'white',
-          fontWeight:'bold'
+    const style = {
+        table: {
+            backgroundColor: 'black',
+            color: 'white',
+            fontWeight: 'bold'
         }
-      }
-      
+    }
+
     useEffect(() => {
         fetchCleaners();
         fetchStaffs();
@@ -108,13 +108,13 @@ const UserDashboard = () => {
                     <h2 style={{ fontSize: '24px', marginBottom: '15px', color: 'green', fontWeight: 'bold' }}>Congratulations!</h2>
                     <p style={{ fontSize: '18px', marginBottom: '10px', color: '#555' }}>Welcome, {firstname}!</p>
                     <p style={{ fontSize: '18px', marginBottom: '10px', color: '#555' }}>Email: {email}</p>
-                    <span style={{ fontSize: '14px', color: '#777', fontWeight: 'bold' }}>Any Claim from {firstname}! Please report 🤗</span>
+                    {/* <span style={{ fontSize: '14px', color: '#777', fontWeight: 'bold' }}>Any Claim from {firstname}! Please report 🤗</span> */}
                 </div>
 
                 <br /><br />
 
                 <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
-                    <h2 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Submit Claims</h2>
+                    <h2 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Submit Complains</h2>
                     <div style={{ margin: 'auto' }}>
                         <form onSubmit={handleSubmit} style={{ marginBottom: '20px', backgroundColor: '#f0f0f0', padding: '20px', borderRadius: '8px' }}>
                             <FormControl component="fieldset">

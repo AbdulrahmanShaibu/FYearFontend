@@ -10,12 +10,10 @@ const UserForm = () => {
             maxWidth: "450px",
             margin: "0 auto",
             padding: "10px",
-            borderRadius: "1px",
             backgroundColor: "#fff",
             fontFamily: "'Arial', sans-serif"
         },
         card: {
-            borderRadius: "10px",
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)"
         },
         cardHeader: {
@@ -24,7 +22,6 @@ const UserForm = () => {
             borderBottom: "none",
             fontSize: "2rem",
             fontWeight: 700,
-            borderRadius: "8px 8px 0 0",
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             padding: "10px"
         },
@@ -111,6 +108,9 @@ const UserForm = () => {
         <div>
             <div className="slideshow" style={styles.slideshow}></div>
             <div className="container mt-5" style={styles.container}>
+                <div align="center">
+                    <img src="cleaning-logo.webp" style={{ margin: 'auto', width: '45%' }} />
+                </div>
                 <div className="row justify-content-center">
                     <div className="col-md-12">
                         <div className="card shadow-sm" style={styles.card}>

@@ -1,124 +1,96 @@
-
-import CopyrightFooter from '../Footer';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
-
+import { Container, Box, Typography, Card, CardContent, Avatar, Grid, Paper } from '@mui/material';
+import { Padding } from '@mui/icons-material';
 
 const Dashboard = () => {
-
   const profileImageURL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEg09MmHvC-78aaRxyd52HabsZqI1-u8R6-w&usqp=CAU';
 
-  //refer line 42 from registration form
   const location = useLocation();
   const { state } = location;
-  const {
-    admin_username,
-    admin_email,
-    admin_phone
-  } = state || {}; // Destructure form data from state
+  const { admin_username, admin_email, admin_phone } = state || {};
+
+  const style = {
+    fontWeight: 'bolder', textAlign: 'center',
+    backgroundColor: 'white'
+  }
 
   return (
+    <Container style={{marginTop:'55px', backgroundColor:'white'}}>
+      <Box sx={{ backgroundColor: 'white', margin: 'auto', py: 8 }}>
+        <Box sx={{ textAlign: 'center', mb: 5 }}>
+          <Typography variant="h5" component="h5" color="primary" fontWeight="bold">
+            Welcome {admin_username}! 👏
+          </Typography>
+          {/* <hr /> */}
+        </Box>
 
-    <div>
-
-      <aside></aside>
-
-      <main style={{ backgroundColor: 'rgba(73, 161, 157, 0.3)' }}>
-        <div style={{ fontFamily: 'Arial, sans-serif', textAlign: 'center', margin: '0 auto', maxWidth: '500px', paddingTop: '95px' }}>
-          <div style={{ backgroundColor: 'rgb(240, 241, 242)' }}>
-            <div style={{ backgroundColor: 'white' }}>
-              <h3 style={{ color: 'green', fontWeight: 'bolder', margin: 'auto', textAlign: 'center' }}>Welcome {admin_username}! 👏</h3>
-              <hr />
-            </div>
-            <div
-              style={{
-                maxWidth: '370px',
-                height: 'auto',
-                margin: 'auto',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                borderRadius: '700px'
-              }}
-            >
-              <div
-                style={{
-                  backgroundImage: `url('${profileImageURL}')`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  height: '250px',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  justifyContent: 'center',
-                  position: 'relative',
-                }}
-              >
-                <div
-                  style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                    color: '#ffffff',
-                    padding: '20px',
+        <Paper container justifyContent="center" elevation={5}
+          style={{ width: '40%', margin: 'auto' }}>
+          <Grid item xs={6} sm={4} md={3}>
+            <Card sx={{ mb: 4 }}>
+              <Box sx={{ position: 'relative', height: 400 }}>
+                <Avatar
+                  alt={admin_username}
+                  src={profileImageURL}
+                  sx={{
                     width: '100%',
+                    height: '100%',
+                    borderRadius: '50%',
+                  }}
+                />
+                <Box
+                  sx={{
                     position: 'absolute',
-                    bottom: '0',
-                    boxSizing: 'border-box',
+                    bottom: 0,
+                    width: '100%',
+                    bgcolor: 'rgba(0, 0, 0, 0.6)',
+                    color: 'white',
+                    p: 2,
                   }}
                 >
-                  <ul style={{ listStyle: 'none', padding: '0' }}>
-                    <li>Email: {admin_email}</li>
-                    <li>Phone: {admin_phone}</li>
-                    {/* Add more items as needed */}
-                  </ul>
-                </div>
-              </div>
-              <div className='AdminBox' style={{ backgroundColor: 'wheat', padding: '20px' }}>
-                <h4></h4>
-                <ul style={{ listStyle: 'none', padding: '0' }}>
-                  <li>Display Other Admin details</li>
-                  <li>Display Other Admin details</li>
-                </ul>
+                  <Typography variant="h6" style={{ ...style }}>Username: {admin_username}</Typography>
+                  <Typography variant="h6" style={{ ...style }}>Email: {admin_email}</Typography>
+                </Box>
+              </Box>
+              {/* <CardContent>
+                <Typography variant="h6" component="h2"
+                style={{textAlign:'center'}}
+                >
+                  Contact: {admin_phone}
+                </Typography>
+              </CardContent> */}
+            </Card>
 
-
-              </div>
-            </div>
-
-            <div style={
-              {
-                backgroundColor: 'rgb(100, 200, 200)',
-                maxWidth: '500px',
-                height: '100px',
-                display: 'flex',
-                margin: 'auto',
-                // display: 'flex'
-              }
-            }>
-              <div style={{
-                color: 'white', fontSize: '14.5px',
-                fontWeight: 'bolder', maxWidth: '500px', textAlign: 'center'
-              }}
-              >Admin Email: {admin_email}</div>
-              <div style={{
-                color: 'white', fontSize: '14.5px',
-                fontWeight: 'bolder', maxWidth: '500px', textAlign: 'center'
-              }}>
-                Admin Name: {admin_username}</div>
-              <div style={{
-                color: 'white', fontSize: '14.5px',
-                fontWeight: 'bolder', maxWidth: '500px', textAlign: 'center'
-              }}>
-                Admin Role: Super Admin</div>
-              <div style={{
-                color: 'white', fontSize: '14.5px',
-                fontWeight: 'bolder', maxWidth: '500px', textAlign: 'center'
-              }}>
-                Admin Contact: {admin_phone}</div>
-
-            </div>
-          </div>
-        </div>
-      </main>
-      {/* <br /><br /><br /> */}
+            <Card sx={{ backgroundColor: 'rgb(100, 200, 200)', p: 2 }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" color="white" fontWeight="bold">
+                    Admin Email: {admin_email}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" color="white" fontWeight="bold">
+                    Admin Name: {admin_username}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" color="white" fontWeight="bold">
+                    Role: Super Admin
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" color="white" fontWeight="bold">
+                    Admin Contact: {admin_phone}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Card>
+          </Grid>
+        </Paper>
+      </Box>
       {/* <CopyrightFooter /> */}
-    </div>
+    </Container>
   );
 };
 

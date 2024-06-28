@@ -13,6 +13,7 @@ const StaffComplain = () => {
   const [submissionDate, setSubmissionDate] = useState('');
   const [selectedStaff, setSelectedStaff] = useState('');
   const [claims, setClaims] = useState([]);
+  const [staffs, setStaffs] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
@@ -29,8 +30,8 @@ const StaffComplain = () => {
 
   useEffect(() => {
     fetchComplains();
+    fetchStaffs();
   }, []);
-
 
   const fetchComplains = () => {
     fetch('http://localhost:8080/api/v1/list/StaffComplain')
@@ -40,6 +41,15 @@ const StaffComplain = () => {
         console.log(data);
       })
       .catch(error => console.error('Error fetching complains:', error));
+  };
+  const fetchStaffs = () => {
+    fetch('http://localhost:8080/api/v1/staffs/list')
+      .then(response => response.json())
+      .then(data => {
+        setStaffs(data);
+        console.log(data);
+      })
+      .catch(error => console.error('Error fetching staffs:', error));
   };
 
   const saveAPI = 'http://localhost:8080/api/v1/save/StaffComplain';
@@ -163,7 +173,7 @@ const StaffComplain = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{claim.description}</TableCell>
                     <TableCell>{claim.submissionDate}</TableCell>
-                    <TableCell>{claim.staffs.StaffName}</TableCell>
+                    <TableCell>{claim.staffs ? claim.staffs.StaffName : 'N/A'}</TableCell>
                     <TableCell>
                       <Button
                         variant="contained"
