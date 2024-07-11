@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from "react";
 import {
   Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Button, TablePagination
+  TableHead, TableRow, Paper, Button, TablePagination,
+  Dialog, DialogActions, DialogContent, DialogTitle,
+  TextField, MenuItem, CircularProgress
 } from '@material-ui/core';
 import '../styles/sidebar.css';
 import UpdateClaimModal from "../UpdateClaimModal";
-// import Home from "./Home"
 import UserHome from "./UserHome";
 
 const UserStaffComplain = () => {
-
   const [claimsDescription, setClaimsDescription] = useState('');
   const [submissionDate, setSubmissionDate] = useState('');
   const [selectedStaff, setSelectedStaff] = useState('');
   const [claims, setClaims] = useState([]);
   const [staffs, setStaffs] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [openFormModal, setOpenFormModal] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
-
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5); // You can change this as per your preference
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const style = {
     table: {
@@ -27,108 +28,75 @@ const UserStaffComplain = () => {
       color: 'white',
       fontWeight: 'bold'
     }
-  }
+  };
 
   useEffect(() => {
     fetchComplains();
     fetchStaffs();
   }, []);
 
-  const fetchComplains = () => {
-    fetch('http://localhost:8080/api/v1/list/StaffComplain')
-      .then(response => response.json())
-      .then(data => {
-        setClaims(data);
-        console.log(data);
-      })
-      .catch(error => console.error('Error fetching complains:', error));
-  };
-  const fetchStaffs = () => {
-    fetch('http://localhost:8080/api/v1/staffs/list')
-      .then(response => response.json())
-      .then(data => {
-        setStaffs(data);
-        console.log(data);
-      })
-      .catch(error => console.error('Error fetching staffs:', error));
+  const fetchComplains = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/list/StaffComplain');
+      const data = await response.json();
+      setClaims(data);
+    } catch (error) {
+      console.error('Error fetching complains:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const saveAPI = 'http://localhost:8080/api/v1/save/StaffComplain';
-  const deleteAPI = 'http://localhost:8080/api/v1/delete/StaffComplain';
-  const updateAPI = 'http://localhost:8080/api/v1/update/StaffComplain';
+  const fetchStaffs = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/staffs/list');
+      const data = await response.json();
+      setStaffs(data);
+    } catch (error) {
+      console.error('Error fetching staffs:', error);
+    }
+  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!claimsDescription || !submissionDate || !selectedStaff) {
+      alert('All fields are required');
+      return;
+    }
+
     const data = {
-      claimsDescription: claimsDescription,
-      submissionDate: submissionDate,
+      claimsDescription,
+      submissionDate,
+      staffID: selectedStaff
     };
 
-    fetch(saveAPI, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then(response => response.json())
-      .then(data => {
-        setClaims([...claims, data]);
-        console.log(data);
-      })
-      .catch(error => console.error('Error saving complains:', error));
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/save/StaffComplain', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      setClaims([...claims, result]);
+      handleCloseFormModal();
+    } catch (error) {
+      console.error('Error saving complain:', error);
+    }
 
-    // Reset form fields
     setClaimsDescription('');
     setSubmissionDate('');
     setSelectedStaff('');
   };
 
-  const handleDelete = (id) => {
-    fetch(deleteAPI + id, {
-      method: 'DELETE',
-    })
-      .then(response => {
-        if (response.ok) {
-          // Remove the deleted claim from the list
-          setClaims(claims.filter(claim => claim.claimID !== id));
-        } else {
-          console.error('Error deleting complain:', response.statusText);
-        }
-      })
-      .catch(error => console.error('Error deleting complain:', error));
+  const handleOpenFormModal = () => {
+    setOpenFormModal(true);
   };
 
-  const handleUpdate = (id, description, date) => {
-    const data = {
-      claimsDescription: description,
-      submissionDate: date,
-    };
-
-    fetch(updateAPI + id, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then(response => {
-        if (response.ok) {
-          // Updated successfully, update the claim in state
-          const updatedClaims = claims.map(claim => {
-            if (claim.claimID === id) {
-              return { ...claim, claimsDescription: description, submissionDate: date };
-            }
-            return claim;
-          });
-          setClaims(updatedClaims);
-          console.log('Claim updated successfully');
-        } else {
-          console.error('Error updating complain:', response.statusText);
-        }
-      })
-      .catch(error => console.error('Error updating complain:', error));
+  const handleCloseFormModal = () => {
+    setOpenFormModal(false);
   };
 
   const handleOpenModal = (claim) => {
@@ -149,10 +117,18 @@ const UserStaffComplain = () => {
     setPage(0);
   };
 
+  if (loading) {
+    return <CircularProgress />;
+  }
+
   return (
     <div style={{ margin: 'auto', marginTop: '80px', width: '950px' }}>
       <UserHome />
       <div>
+        <br /><br />
+        <Button variant="contained" color="primary" onClick={handleOpenFormModal}>
+          Add Complain
+        </Button>
         <br /><br />
         <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
           <h4 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Create form to submit complain</h4>
@@ -164,8 +140,6 @@ const UserStaffComplain = () => {
                   <TableCell style={style.table}>Description</TableCell>
                   <TableCell style={style.table}>Date Submitted</TableCell>
                   <TableCell style={style.table}>Staff Name</TableCell>
-                  {/* <TableCell style={style.table}>Update</TableCell>
-                  <TableCell style={style.table}>Delete</TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -174,25 +148,7 @@ const UserStaffComplain = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{claim.description}</TableCell>
                     <TableCell>{claim.submissionDate}</TableCell>
-                    <TableCell>{claim.staffs ? claim.staffs.StaffName : 'N/A'}</TableCell>
-                    {/* <TableCell>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleOpenModal(claim)}
-                      >
-                        Update
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => handleDelete(claim.claimID)}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell> */}
+                    <TableCell>{claim.staffs ? claim.staffs.staffName : 'N/A'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -203,21 +159,70 @@ const UserStaffComplain = () => {
               count={claims.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </TableContainer>
         </div>
       </div>
-      {/* Update Complain Modal */}
-      {selectedClaim && <UpdateClaimModal
-        open={openModal}
-        handleClose={handleCloseModal}
-        claim={selectedClaim}
-        handleUpdate={handleUpdate}
-      />}
+      <Dialog open={openFormModal} onClose={handleCloseFormModal}>
+        <DialogTitle>Add New Complain</DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              margin="dense"
+              label="Description"
+              type="text"
+              fullWidth
+              value={claimsDescription}
+              onChange={(e) => setClaimsDescription(e.target.value)}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Date Submitted"
+              type="date"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              value={submissionDate}
+              onChange={(e) => setSubmissionDate(e.target.value)}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Select Staff"
+              select
+              fullWidth
+              value={selectedStaff}
+              onChange={(e) => setSelectedStaff(e.target.value)}
+              required
+            >
+              {staffs.map((staff) => (
+                <MenuItem key={staff.staffID} value={staff.staffID}>
+                  {staff.staffName}
+                </MenuItem>
+              ))}
+            </TextField>
+            <DialogActions>
+              <Button onClick={handleCloseFormModal} color="secondary">
+                Cancel
+              </Button>
+              <Button type="submit" color="primary">
+                Submit
+              </Button>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {selectedClaim && (
+        <UpdateClaimModal
+          open={openModal}
+          handleClose={handleCloseModal}
+          claim={selectedClaim}
+        />
+      )}
     </div>
   );
-}
+};
 
 export default UserStaffComplain;
