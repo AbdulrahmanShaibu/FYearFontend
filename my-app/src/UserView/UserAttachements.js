@@ -5,10 +5,11 @@ import {
     FormControl, Select, MenuItem
 } from '@material-ui/core';
 import { Edit, Delete } from "@mui/icons-material";
-import Home from "./Home";
+// import Home from "./Home";
 import axios from "axios";
+import UserHome from "./UserHome";
 
-const Attachments = () => {
+const UserAttachments = () => {
     const [attachments, setAttachments] = useState([]);
     const [file, setFile] = useState(null);
     const [staffId, setStaffId] = useState('');
@@ -88,15 +89,9 @@ const Attachments = () => {
         fetchAttachments();
     };
 
-    const getStaffNameById = (id) => {
-        const staff = staffs.find(staff => staff.StaffID === id);
-        return staff ? staff.StaffName : 'N/A';
-    };
-
     return (
         <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '950px' }}>
-            <Home />
-            <h5>Submitted Attachements</h5>
+          <UserHome/>
             <form onSubmit={handleSubmit}>
                 <input type="file" onChange={handleFileChange} required />
                 <FormControl fullWidth>
@@ -111,7 +106,7 @@ const Attachments = () => {
                         ))}
                     </Select>
                 </FormControl>
-                <Button type="submit">{editing ? 'Update' : 'Upload'}</Button>
+                <Button type="submit">{editing ? 'Update' : 'Attach Complain'}</Button>
             </form>
             {foundStaff && (
                 <div>
@@ -154,7 +149,7 @@ const Attachments = () => {
                             <TableCell>File Name</TableCell>
                             <TableCell>Image</TableCell>
                             <TableCell>Staff</TableCell>
-                            <TableCell>Actions</TableCell>
+                            {/* <TableCell>Actions</TableCell> */}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -165,11 +160,11 @@ const Attachments = () => {
                                 <TableCell>
                                     <img src={`http://localhost:8080/api/v1/images/${attachment.id}`} alt={attachment.fileName} style={{ width: '100px', height: '100px' }} />
                                 </TableCell>
-                                <TableCell>{getStaffNameById(attachment.staffId)}</TableCell>
-                                <TableCell>
+                                <TableCell>{attachment.staffs ? attachment.staffs.StaffName : 'N/A'}</TableCell>
+                                {/* <TableCell>
                                     <Button onClick={() => handleEdit(attachment)}><Edit /></Button>
                                     <Button onClick={() => handleDelete(attachment.id)}><Delete /></Button>
-                                </TableCell>
+                                </TableCell> */}
                             </TableRow>
                         ))}
                     </TableBody>
@@ -179,4 +174,4 @@ const Attachments = () => {
     );
 };
 
-export default Attachments;
+export default UserAttachments;

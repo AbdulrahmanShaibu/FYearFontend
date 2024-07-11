@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Home from './Home';
-import { Card, Table, TableHead, TableCell, Typography } from '@material-ui/core';
-import { Grid, Box, CardContent, TableBody, Paper } from '@mui/material';
-
+import { Card, Table, TableHead, TableCell, Typography, TableRow, TableBody, Box, Grid, CardContent, Paper } from '@mui/material';
 
 const Welcome = () => {
     const countAPI = 'http://localhost:8080/api/v1/count/cleaning/company';
@@ -34,109 +32,97 @@ const Welcome = () => {
     }, []);
 
     return (
-
-        <Box mt={5}>
-            <Box mt={5}>
-                <Home />
-                <Grid container justifyContent="center" style={{ marginTop: '150px' }}>
-                    <Grid>
-                        <Grid item md={12}>
-                            <Card mb={4}>
-                                {/* <Typography variant="h5" gutterBottom style={
-                                    { textAlign: 'center' }
-                                }>Overview</Typography> */}
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Cleaning Companies</Typography>
-                                                <Typography variant="body1">{cleanersCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Client Organisations</Typography>
-                                                <Typography variant="body1">{count}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Client Sites</Typography>
-                                                <Typography variant="body1">{claimsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Company Staffs</Typography>
-                                                <Typography variant="body1">{staffsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={6}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Staffs</Typography>
-                                                <Typography variant="body1">{supervisorsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={6}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Staffs Complain</Typography>
-                                                <Typography variant="body1">{toolsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    {/* <Grid item xs={12} sm={6} md={6}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Tools</Typography>
-                                                <Typography variant="body1">{tasksCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid> */}
-                                </Grid>
+        <Box mt={5} p={2}>
+            <Home />
+            <Grid container spacing={3} justifyContent="center" mt={5}>
+                <Grid item xs={12} md={8}>
+                    <Typography variant="h4" gutterBottom align="center" color="primary">Overview</Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Cleaning Companies</Typography>
+                                    <Typography variant="h6" color="textPrimary">{cleanersCount}</Typography>
+                                </CardContent>
                             </Card>
                         </Grid>
-
-                        <Card className="card">
-                            <Card className="card-body">
-                                {/* <Typography variant="h5" gutterBottom>Details List</Typography> */}
-                                <Paper elevation={5}>
-                                    <Table>
-                                        <TableHead>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Client Organisations</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Cleaning Companies</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Client Sites</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Tools</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Staffs</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>Staffs Complain</TableCell>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableCell>{cleanersCount}</TableCell>
-                                            <TableCell>{count}</TableCell>
-                                            <TableCell>{claimsCount}</TableCell>
-                                            <TableCell>{tasksCount}</TableCell>
-                                            <TableCell>{toolsCount}</TableCell>
-                                            <TableCell>{supervisorsCount} (reported)</TableCell>
-                                        </TableBody>
-                                    </Table>
-                                </Paper>
-                                <div className="text-center mt-4">
-                                    <Link to="/generated_report" className="btn btn-success btn-lg" style={{ borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', fontWeight: 'bold' }}>Generate Report</Link>
-                                </div>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Client Organisations</Typography>
+                                    <Typography variant="h6" color="textPrimary">{count}</Typography>
+                                </CardContent>
                             </Card>
-                        </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Client Sites</Typography>
+                                    <Typography variant="h6" color="textPrimary">{claimsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Company Staffs</Typography>
+                                    <Typography variant="h6" color="textPrimary">{staffsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Staffs</Typography>
+                                    <Typography variant="h6" color="textPrimary">{supervisorsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Staffs Complain</Typography>
+                                    <Typography variant="h6" color="textPrimary">{toolsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
                     </Grid>
                 </Grid>
-            </Box>
+                <Grid item xs={12} md={8}>
+                    <Paper elevation={4} sx={{ p: 2 }}>
+                        <Typography variant="h5" gutterBottom align="center" color="primary">Details List</Typography>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Client Organisations</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Cleaning Companies</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Client Sites</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Tools</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Staffs</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Staffs Complain</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>{cleanersCount}</TableCell>
+                                    <TableCell>{count}</TableCell>
+                                    <TableCell>{claimsCount}</TableCell>
+                                    <TableCell>{tasksCount}</TableCell>
+                                    <TableCell>{toolsCount}</TableCell>
+                                    <TableCell>{supervisorsCount} (reported)</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </Paper>
+                    <Box textAlign="center" mt={4}>
+                        <Link to="/generated_report" style={{ textDecoration: 'none' }}>
+                            <Typography variant="button" className="btn btn-success btn-lg" sx={{
+                                borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', fontWeight: 'bold', padding: '10px 20px', backgroundColor: '#28a745', color: 'white'
+                            }}>Generate Report</Typography>
+                        </Link>
+                    </Box>
+                </Grid>
+            </Grid>
         </Box>
     );
 };

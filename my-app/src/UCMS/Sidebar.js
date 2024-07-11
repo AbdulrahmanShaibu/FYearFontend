@@ -1,6 +1,6 @@
 // Sidebar.js
 import React from 'react';
-import { Drawer, List, ListItem, ListItemText, IconButton, Container, Paper } from '@mui/material';
+import { Drawer, List, ListItem, ListItemText, IconButton, Container, Paper, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
@@ -44,15 +44,11 @@ const Sidebar = ({ open, toggleSidebar }) => {
                         <ListItem button>
                             <ListItemText>
                                 <Link className="flex items-center space-x-2 py-1 group hover:bg-gray-100 hover:text-indigo-700" to="/university_events/dashboard_view">
-                                    <div style={{
-                                        backgroundColor: '#0077B6',
-                                        color: 'white',
-                                        padding: '8px 15px',
-                                        borderRadius: '5px',
-                                        fontWeight: 'bold',
-                                        textTransform: 'uppercase',
-                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                                    }}>UCMS</div>
+                                    <div style={{ padding: '16px', backgroundColor: '#0077B6', color: 'white', textAlign: 'center' }}>
+                                        <Typography variant="h5" component="div" style={{ fontWeight: 'bold' }}>
+                                            UCMS
+                                        </Typography>
+                                    </div>
                                     <br />
                                     <DashboardIcon style={styles.icon} />
                                     <span style={styles.text}>Home</span>

@@ -1,25 +1,56 @@
-import { AppBar, Container, CssBaseline, IconButton, Toolbar, Typography } from "@mui/material";
+import {
+    AppBar,
+    Container,
+    CssBaseline,
+    IconButton,
+    Toolbar,
+    Typography,
+    Badge,
+    Menu,
+    MenuItem,
+    Switch,
+    FormControlLabel,
+    InputBase
+} from "@mui/material";
 import { useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import SearchIcon from '@mui/icons-material/Search';
+import { styled, alpha } from '@mui/material/styles';
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 
-
 const Home = () => {
-    const message = 'new';
-
-    const [Opensidebar, setOpenSidebar] = useState(false);
+    const [openSidebar, setOpenSidebar] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [darkMode, setDarkMode] = useState(false);
 
     const sidebarToggle = () => {
-        setOpenSidebar(!Opensidebar);
+        setOpenSidebar(!openSidebar);
     };
+
+    const handleProfileMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleProfileMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleThemeChange = () => {
+        setDarkMode(!darkMode);
+    };
+
+    const isMenuOpen = Boolean(anchorEl);
+
     const styles = {
         appBar: {
-            backgroundColor: '#1976d2', // Set your desired background color
-            // boxShadow: '0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)', // Add a subtle shadow
+            backgroundColor: darkMode ? '#333333' : 'lightBlue',
+            // #00796B
         },
         menuButton: {
-            marginRight: '16px', // Adjust as per your design
+            marginRight: '16px',
         },
         title: {
             flexGrow: 1,
@@ -43,11 +74,40 @@ const Home = () => {
                     <Typography variant="h6" style={styles.title}>
                         Dashboard
                     </Typography>
+                    <IconButton color="inherit">
+                        <Badge badgeContent={4} color="secondary">
+                            <NotificationsIcon />
+                        </Badge>
+                    </IconButton>
+                    <IconButton
+                        edge="end"
+                        color="inherit"
+                        aria-label="account of current user"
+                        aria-haspopup="true"
+                        onClick={handleProfileMenuOpen}
+                    >
+                        <AccountCircle />
+                    </IconButton>
+                    <Menu
+                        anchorEl={anchorEl}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        keepMounted
+                        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        open={isMenuOpen}
+                        onClose={handleProfileMenuClose}
+                    >
+                        <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem>
+                        <MenuItem onClick={handleProfileMenuClose}>My account</MenuItem>
+                    </Menu>
+                    <FormControlLabel
+                        control={<Switch checked={darkMode} onChange={handleThemeChange} />}
+                        label="Dark Mode"
+                    />
                 </Toolbar>
             </AppBar>
-            <Sidebar open={Opensidebar} sidebarToggle={sidebarToggle} />
+            <Sidebar open={openSidebar} sidebarToggle={sidebarToggle} />
+            <Outlet />
         </div>
     );
-
 }
 export default Home;

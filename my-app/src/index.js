@@ -50,6 +50,8 @@ import ViewCleaningCompany from './UserView/ViewCleaningComp';
 import Admin from './UCMS/Admin'
 import ViewCompanyStaffs from './UserView/ViewCompStaffs';
 import UserHome from './UserView/UserHome';
+import UserAttachments from './UserView/UserAttachements';
+import UserStaffComplain from './UserView/UserStaffsComplains';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -59,7 +61,7 @@ ReactDOM.render(
         <Route path="/login" element={<UserForm />} />
         <Route path='/register' element={<RegistrationForm />} />
         <Route path='/admin-login' element={<Admin />}></Route>
-        <Route path='/university_events/dashboard_view' element={<Welcome/>} />
+        <Route path='/university_events/dashboard_view' element={<Welcome />} />
         <Route path='/login/auth/admin' element={<AuthDashboard />} />
         <Route path='/tools' element={<Tools />} />
         <Route path='/staff_complain' element={<StaffComplain />} />
@@ -84,6 +86,8 @@ ReactDOM.render(
         <Route path='view_cleaning-company' element={<ViewCleaningCompany />}></Route>
         <Route path='view_company-staffs' element={<ViewCompanyStaffs />}></Route>
         <Route path='view_client-organisation' element={<ViewTools />}></Route>
+        <Route path='/user_attachments' element={<UserAttachments />}></Route>
+        <Route path='/user_staffs/complains' element={<UserStaffComplain />}></Route>
 
         <Route path='/signout' element={<App />} />
         <Route path='/session-timed-out' element={<SessionPage />} />
