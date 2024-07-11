@@ -10,17 +10,19 @@ import UpdateClaimModal from "../UpdateClaimModal";
 import UserHome from "./UserHome";
 
 const UserStaffComplain = () => {
-  const [claimsDescription, setClaimsDescription] = useState('');
-  const [submissionDate, setSubmissionDate] = useState('');
-  const [selectedStaff, setSelectedStaff] = useState('');
-  const [claims, setClaims] = useState([]);
-  const [staffs, setStaffs] = useState([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [openFormModal, setOpenFormModal] = useState(false);
-  const [selectedClaim, setSelectedClaim] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [state, setState] = useState({
+    description: '',
+    submissionDate: '',
+    selectedStaff: '',
+    claims: [],
+    staffs: [],
+    openModal: false,
+    openFormModal: false,
+    selectedClaim: null,
+    loading: true,
+    page: 0,
+    rowsPerPage: 5
+  });
 
   const style = {
     table: {
@@ -39,11 +41,11 @@ const UserStaffComplain = () => {
     try {
       const response = await fetch('http://localhost:8080/api/v1/list/StaffComplain');
       const data = await response.json();
-      setClaims(data);
+      setState(prevState => ({ ...prevState, claims: data }));
     } catch (error) {
       console.error('Error fetching complains:', error);
     } finally {
-      setLoading(false);
+      setState(prevState => ({ ...prevState, loading: false }));
     }
   };
 
@@ -51,7 +53,7 @@ const UserStaffComplain = () => {
     try {
       const response = await fetch('http://localhost:8080/api/v1/staffs/list');
       const data = await response.json();
-      setStaffs(data);
+      setState(prevState => ({ ...prevState, staffs: data }));
     } catch (error) {
       console.error('Error fetching staffs:', error);
     }
@@ -60,15 +62,17 @@ const UserStaffComplain = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!claimsDescription || !submissionDate || !selectedStaff) {
+    const { description, submissionDate, selectedStaff, claims } = state;
+
+    if (!description || !submissionDate || !selectedStaff) {
       alert('All fields are required');
       return;
     }
 
     const data = {
-      claimsDescription,
+      description,
       submissionDate,
-      staffID: selectedStaff
+      StaffID: selectedStaff
     };
 
     try {
@@ -80,42 +84,49 @@ const UserStaffComplain = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      setClaims([...claims, result]);
+      setState(prevState => ({ ...prevState, claims: [...claims, result] }));
       handleCloseFormModal();
     } catch (error) {
       console.error('Error saving complain:', error);
     }
 
-    setClaimsDescription('');
-    setSubmissionDate('');
-    setSelectedStaff('');
+    setState(prevState => ({
+      ...prevState,
+      description: '',
+      submissionDate: '',
+      selectedStaff: ''
+    }));
   };
 
   const handleOpenFormModal = () => {
-    setOpenFormModal(true);
+    setState(prevState => ({ ...prevState, openFormModal: true }));
   };
 
   const handleCloseFormModal = () => {
-    setOpenFormModal(false);
+    setState(prevState => ({ ...prevState, openFormModal: false }));
   };
 
   const handleOpenModal = (claim) => {
-    setSelectedClaim(claim);
-    setOpenModal(true);
+    setState(prevState => ({ ...prevState, selectedClaim: claim, openModal: true }));
   };
 
   const handleCloseModal = () => {
-    setOpenModal(false);
+    setState(prevState => ({ ...prevState, openModal: false }));
   };
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+    setState(prevState => ({ ...prevState, page: newPage }));
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setState(prevState => ({
+      ...prevState,
+      rowsPerPage: parseInt(event.target.value, 10),
+      page: 0
+    }));
   };
+
+  const { description, submissionDate, selectedStaff, claims, staffs, openFormModal, openModal, selectedClaim, loading, page, rowsPerPage } = state;
 
   if (loading) {
     return <CircularProgress />;
@@ -131,7 +142,6 @@ const UserStaffComplain = () => {
         </Button>
         <br /><br />
         <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
-          <h4 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Create form to submit complain</h4>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -148,7 +158,7 @@ const UserStaffComplain = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{claim.description}</TableCell>
                     <TableCell>{claim.submissionDate}</TableCell>
-                    <TableCell>{claim.staffs ? claim.staffs.staffName : 'N/A'}</TableCell>
+                    <TableCell>{claim.staffs ? claim.staffs.StaffName : 'N/A'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -174,8 +184,8 @@ const UserStaffComplain = () => {
               label="Description"
               type="text"
               fullWidth
-              value={claimsDescription}
-              onChange={(e) => setClaimsDescription(e.target.value)}
+              value={description}
+              onChange={(e) => setState(prevState => ({ ...prevState, description: e.target.value }))}
               required
             />
             <TextField
@@ -185,7 +195,7 @@ const UserStaffComplain = () => {
               fullWidth
               InputLabelProps={{ shrink: true }}
               value={submissionDate}
-              onChange={(e) => setSubmissionDate(e.target.value)}
+              onChange={(e) => setState(prevState => ({ ...prevState, submissionDate: e.target.value }))}
               required
             />
             <TextField
@@ -194,12 +204,12 @@ const UserStaffComplain = () => {
               select
               fullWidth
               value={selectedStaff}
-              onChange={(e) => setSelectedStaff(e.target.value)}
+              onChange={(e) => setState(prevState => ({ ...prevState, selectedStaff: e.target.value }))}
               required
             >
               {staffs.map((staff) => (
-                <MenuItem key={staff.staffID} value={staff.staffID}>
-                  {staff.staffName}
+                <MenuItem key={staff.StaffID} value={staff.StaffID}>
+                  {staff.StaffName}
                 </MenuItem>
               ))}
             </TextField>
