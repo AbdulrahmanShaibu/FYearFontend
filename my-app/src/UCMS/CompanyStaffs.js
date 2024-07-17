@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem } from '@mui/material';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { Form, FormGroup, Label, Input, FormFeedback } from 'reactstrap';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -30,6 +29,9 @@ const CompanyStaffs = () => {
   const [errors, setErrors] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortColumn, setSortColumn] = useState('username');
 
   useEffect(() => {
     fetchStaffData();
@@ -49,7 +51,7 @@ const CompanyStaffs = () => {
   };
 
   const fetchRoles = () => {
-    axios.get('http://localhost:8080/api/v1/users/list') // Adjust API endpoint based on your backend
+    axios.get('http://localhost:8080/api/v1/users/list') // Adjusted API endpoint
       .then(response => {
         setRoles(response.data);
       })
@@ -59,7 +61,7 @@ const CompanyStaffs = () => {
   };
 
   const fetchCleaningCompanies = () => {
-    axios.get('http://localhost:8080/api/v1/list') // Adjust API endpoint based on your backend
+    axios.get('http://localhost:8080/api/v1/list') // Adjusted API endpoint
       .then(response => {
         setCleaningCompanies(response.data);
       })
@@ -139,7 +141,7 @@ const CompanyStaffs = () => {
   };
 
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:8080/api/v1/delete/user/${id}`) // Adjust API endpoint based on your backend
+    axios.delete(`http://localhost:8080/api/v1/delete/user/${id}`) // Adjusted API endpoint
       .then(response => {
         setStaffData(staffData.filter(s => s.id !== id));
         showNotification('Staff deleted successfully', 'success');
@@ -189,7 +191,24 @@ const CompanyStaffs = () => {
     }));
   };
 
-  const paginatedData = staffData.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  };
+
+  const handleSort = (column) => {
+    const direction = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
+    setSortColumn(column);
+    setSortDirection(direction);
+  };
+
+
+  const filteredData = staffData.filter(staff => staff.username.toLowerCase().includes(searchTerm));
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;   //Returns -1 to sort a before b
+    if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+  const paginatedData = sortedData.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   if (loading) {
     return <div>Loading resources...</div>;
@@ -209,14 +228,29 @@ const CompanyStaffs = () => {
       </Snackbar>
 
       <div style={{ marginBottom: '20px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <Button style={{ width: '200px', height: '40px', fontWeight: 'bold' }} onClick={handleOpenDialog} variant="contained" startIcon={<AddIcon />}>
+        <Button
+          style={{ width: '200px', height: '40px', fontWeight: 'bold', backgroundColor: '#4CAF50' }}
+          onClick={handleOpenDialog}
+          variant="contained"
+          startIcon={<AddIcon />}
+        >
           Add Staff
         </Button>
       </div>
 
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <TextField
+          label="Search by Username"
+          variant="outlined"
+          value={searchTerm}
+          onChange={handleSearch}
+          style={{ width: '300px' }}
+        />
+      </div>
+
       <Dialog open={dialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>{isEditing ? 'Update Staff' : 'Add New Staff'}</DialogTitle>
-        <DialogContent style={{width:'450px'}}>
+        <DialogContent style={{ width: '450px' }}>
           <TextField
             label="Username"
             fullWidth
@@ -226,47 +260,43 @@ const CompanyStaffs = () => {
             error={!!errors.username}
             helperText={errors.username}
           />
-
-          <Form>
-            <FormGroup>
-              <Label for="roleSelect">Role</Label>
-              <Input
-                type="select"
+          <form>
+            <FormControl fullWidth margin="normal" error={!!errors.role}>
+              <InputLabel id="role-select-label">Role</InputLabel>
+              <Select
+                labelId="role-select-label"
                 id="roleSelect"
                 value={staff.role}
                 onChange={(e) => handleRoleChange(e.target.value)}
-                invalid={!!errors.role}
               >
-                <option value="" disabled>Select a role</option>
+                <MenuItem value="" disabled>Select a role</MenuItem>
                 {roles.map((role) => (
-                  <option key={role.id} value={role.id}>
+                  <MenuItem key={role.id} value={role.id}>
                     {role.role}
-                  </option>
+                  </MenuItem>
                 ))}
-              </Input>
-              {errors.role && <FormFeedback>{errors.role}</FormFeedback>}
-            </FormGroup>
+              </Select>
+              {errors.role && <FormHelperText>{errors.role}</FormHelperText>}
+            </FormControl>
 
-            <FormGroup>
-              <Label for="companySelect">Cleaning Company</Label>
-              <Input
-                type="select"
+            <FormControl fullWidth margin="normal" error={!!errors.companyId}>
+              <InputLabel id="company-select-label">Cleaning Company</InputLabel>
+              <Select
+                labelId="company-select-label"
                 id="companySelect"
                 value={staff.companyId}
                 onChange={(e) => handleCleaningCompanyChange(e.target.value)}
-                invalid={!!errors.companyId}
               >
-                <option value="" disabled>Select a company</option>
+                <MenuItem value="" disabled>Select a company</MenuItem>
                 {cleaningCompanies.map((company) => (
-                  <option key={company.id} value={company.id}>
+                  <MenuItem key={company.companyId} value={company.companyId}>
                     {company.companyName}
-                  </option>
+                  </MenuItem>
                 ))}
-              </Input>
-              {errors.companyId && <FormFeedback>{errors.companyId}</FormFeedback>}
-            </FormGroup>
-          </Form>
-          {/* Additional fields for clientOrganisations as needed */}
+              </Select>
+              {errors.companyId && <FormHelperText>{errors.companyId}</FormHelperText>}
+            </FormControl>
+          </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
@@ -282,10 +312,9 @@ const CompanyStaffs = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>S/N</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Cleaning Company</TableCell>
-              <TableCell>Role</TableCell>
+              <TableCell onClick={() => handleSort('username')}>Username</TableCell>
+              <TableCell onClick={() => handleSort('cleaningCompany')}>Cleaning Company</TableCell>
+              <TableCell onClick={() => handleSort('role')}>Role</TableCell>
               <TableCell>Edit</TableCell>
               <TableCell>Delete</TableCell>
             </TableRow>
