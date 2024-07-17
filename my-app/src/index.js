@@ -4,11 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import UserForm from './UCMS/Form';
-import Events from './UCMS/Tools';
-import Users from './UCMS/StaffComplain';
-import Venues from './UCMS/ClientOrganisor';
-import Organisers from './UCMS/ClaimsType';
-import News from './UCMS/CompanyStaffs';
 import Setting from './Setting';
 import Welcome from './UCMS/Welcome';
 import AuthDashboard from './UCMS/AuthDashboard';
@@ -20,12 +15,8 @@ import RegistrationForm from './UCMS/RegistrationForm';
 import GenerateReport from './UCMS/Report';
 import SystemDocumentation from './Documentation';
 import Start from './UCMS/Start';
-import Departments from './UCMS/ClientSites'
-import Employees from './UCMS/Staffs'
-import CleaningAreas from './UCMS/Attachements'
-import ViewEmployees from './UserView/ViewEmply';
-import ViewDepartments from './UserView/ViewDeptm';
-import ViewTools from './UserView/ViewTools';
+import UserWelcome from './UserView/UserWelcome';
+import ViewTools from './UserView/ViewClientOrganisations';
 import ErrorPath from './ErrorPage';
 
 
@@ -35,7 +26,6 @@ import Faq from './pages/Faq';
 import Services from './pages/Services';
 import Project from './pages/Project';
 import Blog from './pages/Blogs';
-import Error from './pages/Error';
 import ServiceDetails from './pages/ServiceDetails';
 import ProjectDetails from './pages/ProjectDetails';
 import BlogDetails from './pages/BlogDetails';
@@ -49,7 +39,6 @@ import './assets/vendor/modal-video/modal-video.min.css';
 import './assets/vendor/slick/slick.css';
 import Tools from './UCMS/Tools';
 import CompanyStaffs from './UCMS/CompanyStaffs';
-import ClientOrganisor from './UCMS/ClientOrganisor';
 import ClientSites from './UCMS/ClientSites';
 import StaffComplain from './UCMS/StaffComplain';
 import ClaimType from './UCMS/ClaimsType';
@@ -57,6 +46,10 @@ import Attachements from './UCMS/Attachements';
 import ClientOrganisation from './UCMS/ClientOrganisor';
 import Staffs from './UCMS/Staffs';
 import CleaningCompany from './UCMS/CleaningCompany';
+import ViewCleaningCompany from './UserView/ViewCleaningComp';
+import Admin from './UCMS/Admin'
+import ViewCompanyStaffs from './UserView/ViewCompStaffs';
+import UserHome from './UserView/UserHome';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -65,7 +58,8 @@ ReactDOM.render(
         <Route path="/" element={<App />} />
         <Route path="/login" element={<UserForm />} />
         <Route path='/register' element={<RegistrationForm />} />
-        <Route path='/university_events/dashboard_view' element={<Welcome />} />
+        <Route path='/admin-login' element={<Admin />}></Route>
+        <Route path='/university_events/dashboard_view' element={<Welcome/>} />
         <Route path='/login/auth/admin' element={<AuthDashboard />} />
         <Route path='/tools' element={<Tools />} />
         <Route path='/staff_complain' element={<StaffComplain />} />
@@ -84,11 +78,12 @@ ReactDOM.render(
         <Route path='/cleaning_company' element={<CleaningCompany />} />
 
         {/* To be fixed letter with UserDashboard...*/}
+        <Route path='/user/dashboard' element={<UserWelcome />} />
         <Route path="/user_dashboard_view" element={<UserDashboard />} />
-
-        <Route path='view_employees' element={<ViewEmployees />}></Route>
-        <Route path='view_departments' element={<ViewDepartments />}></Route>
-        <Route path='view_tools' element={<ViewTools />}></Route>
+        <Route path="/user_home" element={<UserHome />}></Route>
+        <Route path='view_cleaning-company' element={<ViewCleaningCompany />}></Route>
+        <Route path='view_company-staffs' element={<ViewCompanyStaffs />}></Route>
+        <Route path='view_client-organisation' element={<ViewTools />}></Route>
 
         <Route path='/signout' element={<App />} />
         <Route path='/session-timed-out' element={<SessionPage />} />

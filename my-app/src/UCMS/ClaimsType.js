@@ -11,287 +11,138 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import {
     DialogTitle, Typography, Paper, Table, TableHead,
-    TableBody, TableRow, TableCell, InputLabel, Select,
-    Container, MenuItem, FormControl, TablePagination,
-    Snackbar, Alert
+    TableBody, TableRow, TableCell, Container, Snackbar, Alert
 } from "@mui/material";
 
 const ClaimType = () => {
-    const [isFormOpen, setFormOpen] = useState(false);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [cleaners, setCleaners] = useState([]);
-    const [tools, setTools] = useState([]);
-    const [departments, setDepartments] = useState([]);
-    const [newCleaner, setNewCleaner] = useState({ cleanerName: '', gender: '', departmentName: '', toolId: '' });
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentCleanerId, setCurrentCleanerId] = useState(null);
-    const [error, setError] = useState(null); // State for error handling
-
-    // Snackbar state
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [claimTypes, setClaimTypes] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [currentClaimType, setCurrentClaimType] = useState({ id: '', type: '' });
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     useEffect(() => {
-        fetchCleaners();
-        fetchDepartments();
-        fetchTools();
+        fetchClaimTypes();
     }, []);
 
-    const fetchCleaners = async () => {
+    const fetchClaimTypes = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/v1/list/cleaner');
-            setCleaners(response.data);
+            const response = await axios.get('http://localhost:8080/api/v1/list/claim-type');
+            setClaimTypes(response.data);
         } catch (error) {
-            setError('Error fetching cleaners');
+            console.error("There was an error fetching the claim types!", error);
         }
     };
 
-    const fetchDepartments = async () => {
+    const handleDialogOpen = (claimType = { id: '', type: '' }) => {
+        setCurrentClaimType(claimType);
+        setOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setOpen(false);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentClaimType({ ...currentClaimType, [name]: value });
+    };
+
+    const handleSave = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/v1/list/department');
-            setDepartments(response.data);
-        } catch (error) {
-            setError('Error fetching departments');
-        }
-    };
-
-    const fetchTools = async () => {
-        try {
-            const response = await axios.get('http://localhost:8080/api/v1/list/tools');
-            setTools(response.data);
-        } catch (error) {
-            setError('Error fetching tools');
-        }
-    };
-
-    const openForm = () => {
-        setFormOpen(true);
-    };
-
-    const closeForm = () => {
-        setFormOpen(false);
-        setNewCleaner({ cleanerName: '', gender: '', departmentName: '', toolId: '' });
-        setIsEditing(false);
-        setCurrentCleanerId(null);
-        setError(null); // Clear error on form close
-    };
-
-    const saveCleaner = async () => {
-        try {
-            if (!newCleaner.cleanerName || !newCleaner.gender || !newCleaner.departmentName || !newCleaner.toolId) {
-                setError('All fields are required');
-                return;
-            }
-            if (isEditing) {
-                await axios.put(`http://localhost:8080/api/v1/update/cleaner/${currentCleanerId}`, newCleaner);
-                setSnackbarMessage('Cleaner updated successfully');
+            if (currentClaimType.id) {
+                await axios.put(`http://localhost:8080/api/v1/update/list/claim-type/${currentClaimType.id}`, currentClaimType);
             } else {
-                await axios.post('http://localhost:8080/api/v1/save/cleaner', newCleaner);
-                setSnackbarMessage('Cleaner saved successfully');
+                await axios.post('http://localhost:8080/api/v1/post/claim-type', currentClaimType);
             }
-            fetchCleaners();
-            closeForm();
-            setSnackbarSeverity('success');
-            setSnackbarOpen(true);
+            setSnackbar({ open: true, message: 'Claim Type saved successfully', severity: 'success' });
+            fetchClaimTypes();
+            handleDialogClose();
         } catch (error) {
-            setError('Error saving cleaner');
-            setSnackbarMessage('Error saving cleaner');
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
+            setSnackbar({ open: true, message: 'Failed to save Claim Type', severity: 'error' });
+            console.error("There was an error saving the claim type!", error);
         }
     };
 
-    const deleteCleaner = async (id) => {
+    const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://localhost:8080/api/v1/delete/cleaner/${id}`);
-            fetchCleaners();
-            setSnackbarMessage('Cleaner deleted successfully');
-            setSnackbarSeverity('success');
-            setSnackbarOpen(true);
+            await axios.delete(`http://localhost:8080/api/v1/delete/claim-type/${id}`);
+            setSnackbar({ open: true, message: 'Claim Type deleted successfully', severity: 'success' });
+            fetchClaimTypes();
         } catch (error) {
-            setError('Error deleting cleaner');
-            setSnackbarMessage('Error deleting cleaner');
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
+            setSnackbar({ open: true, message: 'Failed to delete Claim Type', severity: 'error' });
+            console.error("There was an error deleting the claim type!", error);
         }
-    };
-
-    const editCleaner = (cleaner) => {
-        setNewCleaner({
-            cleanerName: cleaner.cleanerName,
-            gender: cleaner.gender,
-            departmentName: cleaner.department ? cleaner.department.departmentName : '',
-            toolId: cleaner.tool ? cleaner.tool.toolId : '',
-        });
-        setCurrentCleanerId(cleaner.cleanerID);
-        setIsEditing(true);
-        setFormOpen(true);
-    };
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
-    const handleSnackbarClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setSnackbarOpen(false);
     };
 
     return (
-        <div>
+        <Container>
             <Home />
-
-            <Container sx={{ mt: 10, backgroundColor: 'whitesmoke', borderRadius: 2, p: 2 }}>
-                <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 'bold', color: 'green', p: 2, borderBottom: 1 }}>
-                    Cleaners List
-                </Typography>
-                <Button variant="contained" color="primary" onClick={openForm}>
-                    Add Cleaner
-                </Button>
-                <Paper sx={{ overflowX: 'auto', p: 2 }}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ backgroundColor: 'black', color: 'white' }}>Cleaner ID</TableCell>
-                                <TableCell sx={{ backgroundColor: 'black', color: 'white' }}>Cleaner Name</TableCell>
-                                <TableCell sx={{ backgroundColor: 'black', color: 'white' }}>Gender</TableCell>
-                                <TableCell sx={{ backgroundColor: 'black', color: 'white' }}>Department Name</TableCell>
-                                <TableCell sx={{ backgroundColor: 'black', color: 'white' }}>Tool Name</TableCell>
-                                <TableCell sx={{ backgroundColor: 'black', color: 'white' }}>Update Details</TableCell>
-                                <TableCell sx={{ backgroundColor: 'black', color: 'white' }}>Delete Data</TableCell>
+            <Typography variant="h4" gutterBottom>
+                Claim Types
+            </Typography>
+            <Button variant="contained" color="primary" onClick={() => handleDialogOpen()}>
+                Add Claim Type
+            </Button>
+            <Paper>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>ID</TableCell>
+                            <TableCell>Type</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {claimTypes.map((claimType) => (
+                            <TableRow key={claimType.id}>
+                                <TableCell>{claimType.id}</TableCell>
+                                <TableCell>{claimType.type}</TableCell>
+                                <TableCell>
+                                    <IconButton onClick={() => handleDialogOpen(claimType)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton onClick={() => handleDelete(claimType.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {cleaners.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((cleaner, index) => (
-                                <TableRow key={cleaner.cleanerID}>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{cleaner.cleanerName}</TableCell>
-                                    <TableCell>{cleaner.gender}</TableCell>
-                                    <TableCell>{cleaner.department ? cleaner.department.departmentName : 'N/A'}</TableCell>
-                                    <TableCell>{cleaner.tool ? cleaner.tool.toolName : 'N/A'}</TableCell>
-                                    <TableCell>
-                                        <IconButton color="primary" onClick={() => editCleaner(cleaner)}>
-                                            <EditIcon /><Typography variant="caption">Edit</Typography>
-                                        </IconButton>
-                                    </TableCell>
-                                    <TableCell>
-                                        <IconButton color="error" onClick={() => deleteCleaner(cleaner.cleanerID)}>
-                                            <DeleteIcon /><Typography variant="caption">Delete</Typography>
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={cleaners.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                </Paper>
-            </Container>
-
-            <Dialog open={isFormOpen} onClose={closeForm} maxWidth="sm" fullWidth>
-                <DialogTitle>{isEditing ? "Edit Cleaner Details" : "Add Cleaner Details"}</DialogTitle>
+                        ))}
+                    </TableBody>
+                </Table>
+            </Paper>
+            <Dialog open={open} onClose={handleDialogClose}>
+                <DialogTitle>{currentClaimType.id ? 'Edit Claim Type' : 'Add Claim Type'}</DialogTitle>
                 <DialogContent>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
-                                label="Cleaner Name"
+                                autoFocus
+                                margin="dense"
+                                name="type"
+                                label="Type"
                                 fullWidth
-                                variant="outlined"
-                                required
-                                value={newCleaner.cleanerName}
-                                onChange={(e) => setNewCleaner({ ...newCleaner, cleanerName: e.target.value })}
-                                error={error && !newCleaner.cleanerName}
-                                helperText={error && !newCleaner.cleanerName && error}
+                                value={currentClaimType.type}
+                                onChange={handleInputChange}
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <FormControl variant="outlined" fullWidth required>
-                                <InputLabel>Gender</InputLabel>
-                                <Select
-                                    value={newCleaner.gender}
-                                    onChange={(e) => setNewCleaner({ ...newCleaner, gender: e.target.value })}
-                                    error={error && !newCleaner.gender}
-                                    label="Gender"
-                                >
-                                    <MenuItem value="Male">Male</MenuItem>
-                                    <MenuItem value="Female">Female</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl variant="outlined" fullWidth required>
-                                <InputLabel>Department</InputLabel>
-                                <Select
-                                    value={newCleaner.departmentName}
-                                    onChange={(e) => setNewCleaner({ ...newCleaner, departmentName: e.target.value })}
-                                    error={error && !newCleaner.departmentName}
-                                    label="Department"
-                                >
-                                    {departments.map((dept) => (
-                                        <MenuItem key={dept.departmentID} value={dept.departmentName}>
-                                            {dept.departmentName}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormControl variant="outlined" fullWidth required>
-                                <label>Tool</label>
-                                <select
-                                    style={{ height: '50px' }}
-                                    value={newCleaner.toolId}
-                                    onChange={(e) => setNewCleaner({ ...newCleaner, toolId: e.target.value })}
-                                    error={error && !newCleaner.toolId}
-                                    label="Tool"
-                                >
-                                    {tools.map((tool) => (
-                                        <option key={tool.toolId} value={tool.toolId}>{tool.toolName}</option>
-                                    ))}
-                                </select>
-                            </FormControl>
-                        </Grid>
-                        <Grid item xs={12} style={{ textAlign: 'right' }}>
-                            <Button onClick={saveCleaner} variant="contained" color="primary">
+                            <Button onClick={handleSave} color="primary" variant="contained">
                                 Save
+                            </Button>
+                            <Button onClick={handleDialogClose} color="secondary" variant="outlined">
+                                Cancel
                             </Button>
                         </Grid>
                     </Grid>
                 </DialogContent>
             </Dialog>
-
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={handleSnackbarClose}
-            >
-                <Alert
-                    onClose={handleSnackbarClose}
-                    severity={snackbarSeverity}
-                    sx={{ width: '100%' }}
-                >
-                    {snackbarMessage}
+            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>
+                    {snackbar.message}
                 </Alert>
             </Snackbar>
-        </div>
+        </Container>
     );
 };
 
 export default ClaimType;
-

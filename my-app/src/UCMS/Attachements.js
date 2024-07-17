@@ -1,127 +1,117 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, FormControl,
-    Select, MenuItem, Button
+    TableHead, TableRow, Paper, Button,
+    TextField, MenuItem, FormControl, Select
 } from '@material-ui/core';
-import Edit from "@mui/icons-material/Edit";
-import Home from "./Home"
-import { TextField } from "@mui/material";
-import { DeleteForever, DeleteOutline } from "@mui/icons-material";
-import Delete from "@mui/icons-material/Delete";
+import { Edit, Delete } from "@mui/icons-material";
+import Home from "./Home";
+import axios from "axios";
 
-const Attachements = () => {
+const Attachments = () => {
+    const [attachments, setAttachments] = useState([]);
+    const [file, setFile] = useState(null);
+    const [staffId, setStaffId] = useState('');
+    const [staffs, setStaffs] = useState([]);
+    const [editing, setEditing] = useState(false);
+    const [currentId, setCurrentId] = useState(null);
 
-    const [selectedCode, setSelectedCode] = useState('');
+    useEffect(() => {
+        fetchAttachments();
+        fetchStaffs();
+    }, []);
 
-    const handleCodeChange = (event) => {
-        setSelectedCode(event.target.value);
+    const fetchAttachments = async () => {
+        const response = await axios.get('http://localhost:8080/api/v1/get/attachments');
+        setAttachments(response.data);
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        // Handle form submission here
-        console.log('Selected code:', selectedCode);
+    const fetchStaffs = async () => {
+        const response = await axios.get('http://localhost:8080/api/v1/staffs/list');
+        setStaffs(response.data);
     };
 
-    const colorHeading = {
-        decorate: {
-            color: 'white',
-            fontWeight: 'bolder',
-            backgroundColor: '#333',
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    };
 
-        },
-        styleButtons: {
-            color: 'white',
-            backgroundColor: 'green',
-            width: '10px',
-            fontWeight: 'bolder',
+    const handleStaffChange = (e) => {
+        setStaffId(e.target.value);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('staffId', staffId);
+
+        if (editing) {
+            await axios.put(`http://localhost:8080/api/v1/update/attachments/${currentId}`, formData);
+            setEditing(false);
+            setCurrentId(null);
+        } else {
+            await axios.post('http://localhost:8080/api/v1/upload', formData);
         }
-    }
+
+        setFile(null);
+        setStaffId('');
+        fetchAttachments();
+    };
+
+    const handleEdit = (attachment) => {
+        setEditing(true);
+        setCurrentId(attachment.id);
+        setStaffId(attachment.staffs.id);
+    };
+
+    const handleDelete = async (id) => {
+        await axios.delete(`http://localhost:8080/api/v1/delete/attachments/${id}`);
+        fetchAttachments();
+    };
 
     return (
-        <div style={{
-            display: 'block',
-            margin: 'auto',
-            marginTop: '150px',
-            width: '950px'
-        }}>
+        <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '950px' }}>
             <Home />
-
-            <div>
-                <TableContainer component={Paper}>
-                    {/* <h4 style={{ margin: "auto", textAlign: 'center', fontWeight: 'bolder', color: 'black' }}>Cleaning Areas</h4><br /> */}
-                    <Table>
-                        <TableHead>
-                            <TableRow >
-                                <TableCell style={{ ...colorHeading.decorate }}>Area Id</TableCell>
-                                <TableCell style={{ ...colorHeading.decorate }}>Area Name</TableCell>
-                                <TableCell style={{ ...colorHeading.decorate }}>Location</TableCell>
-                                <TableCell style={{ ...colorHeading.styleButtons }}>Add Details</TableCell>
-                                <TableCell style={{ ...colorHeading.styleButtons }}>Update</TableCell>
-                                <TableCell style={{ ...colorHeading.styleButtons }}>Delete</TableCell>
+            <form onSubmit={handleSubmit}>
+                <input type="file" onChange={handleFileChange} required />
+                <FormControl fullWidth>
+                    <Select value={staffId} onChange={handleStaffChange} required>
+                        {staffs.map(staff => (
+                            <MenuItem key={staff.id} value={staff.id}>
+                                {staff.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <Button type="submit">{editing ? 'Update' : 'Upload'}</Button>
+            </form>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>ID</TableCell>
+                            <TableCell>File Name</TableCell>
+                            <TableCell>Staff</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {attachments.map((attachment) => (
+                            <TableRow key={attachment.id}>
+                                <TableCell>{attachment.id}</TableCell>
+                                <TableCell>{attachment.fileName}</TableCell>
+                                <TableCell>{attachment.staffs ? attachment.staffs.StaffName : 'N/A'}</TableCell>
+                                <TableCell>
+                                    <Button onClick={() => handleEdit(attachment)}><Edit /></Button>
+                                    <Button onClick={() => handleDelete(attachment.id)}><Delete /></Button>
+                                </TableCell>
                             </TableRow>
-                        </TableHead>
-
-                        <TableBody>
-
-                            <TableRow>
-                                <TableCell>Data</TableCell>
-                                <TableCell>Data</TableCell>
-                                <TableCell>Data</TableCell>
-                                <TableCell>
-                                    <form onSubmit={handleSubmit} style={{ display: 'flex' }}>
-                                        <div style={{ display: 'grid', gap: '5px' }}>
-                                            <input
-                                                placeholder='area id'
-                                                type="number"
-                                            //style={{ width: '75px' }}
-                                            />
-                                            <input
-                                                placeholder='area name'
-                                                type="text"
-                                            // style={{ width: '75px' }}
-                                            />
-                                        </div>
-                                        <div style={{ display: 'grid', gap: '5px' }}>
-                                            <Select
-                                                value={selectedCode}
-                                                onChange={handleCodeChange}
-                                            >
-                                                <MenuItem value="code1">Location 1</MenuItem>
-                                                <MenuItem value="code2">Location 2</MenuItem>
-                                                <MenuItem value="code3">Location 3</MenuItem>
-                                            </Select>
-
-                                            <Button
-                                                type="submit"
-                                                variant="contained"
-                                                style={{ height: '25px', fontWeight: 'bolder' }}
-                                                color="primary">Add</Button>
-                                        </div>
-                                    </form>
-                                </TableCell>
-
-                                <TableCell>
-                                    <Button
-                                        style={{
-                                            color: 'white', backgroundColor: 'green',
-                                            fontWeight: 'bold'
-                                        }}><Edit />Update</Button>
-                                </TableCell>
-                                <TableCell>
-                                    <Button
-                                        style={{ color: 'red', backgroundColor: 'whitesmoke', fontWeight: 'bolder' }}>
-                                        <Delete />Delete</Button>
-                                </TableCell>
-
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </div>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
-    )
-}
-export default Attachements
+    );
+};
+
+export default Attachments;

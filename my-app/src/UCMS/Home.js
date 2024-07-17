@@ -2,15 +2,16 @@ import { AppBar, Container, CssBaseline, IconButton, Toolbar, Typography } from 
 import { useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from "./Sidebar";
+import { Outlet } from "react-router-dom";
 
 
 const Home = () => {
     const message = 'new';
 
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [Opensidebar, setOpenSidebar] = useState(false);
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
+    const sidebarToggle = () => {
+        setOpenSidebar(!Opensidebar);
     };
     const styles = {
         appBar: {
@@ -26,7 +27,7 @@ const Home = () => {
     };
 
     return (
-        <div className="App" style={{ display: 'flex'}}>
+        <div className="App" style={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar position="fixed" style={styles.appBar}>
                 <Toolbar>
@@ -35,7 +36,7 @@ const Home = () => {
                         color="inherit"
                         aria-label="menu"
                         style={styles.menuButton}
-                        onClick={toggleSidebar}
+                        onClick={sidebarToggle}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -44,8 +45,7 @@ const Home = () => {
                     </Typography>
                 </Toolbar>
             </AppBar>
-            <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar} />
-
+            <Sidebar open={Opensidebar} sidebarToggle={sidebarToggle} />
         </div>
     );
 
