@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Table, TableHead, TableCell, Typography } from '@material-ui/core';
@@ -6,6 +7,12 @@ import { Grid, Box, CardContent, TableBody, Paper } from '@mui/material';
 import UserHome from '../UserView/UserHome';
 
 
+=======
+import axios from 'axios';
+import { Card, Table, TableHead, TableCell, TableRow, TableBody, Typography, Box, Grid, Paper, CardContent } from '@mui/material';
+import UserHome from '../UserView/UserHome';
+
+>>>>>>> e7c16460ae96db764c331a70d48a65f361ffde1e
 const UserWelcome = () => {
     const countAPI = 'http://localhost:8080/api/v1/count/cleaning/company';
     const countCleaners = 'http://localhost:8080/api/v1/count/ClientOrganisations';
@@ -34,6 +41,7 @@ const UserWelcome = () => {
     }, []);
 
     return (
+<<<<<<< HEAD
 
         <Box mt={5}>
             <Box mt={5}>
@@ -137,6 +145,92 @@ const UserWelcome = () => {
                     </Grid>
                 </Grid>
             </Box>
+=======
+        <Box mt={5} p={2}>
+            <UserHome />
+            <Grid container spacing={3} justifyContent="center" mt={5}>
+                <Grid item xs={12} md={8}>
+                    <Typography variant="h4" gutterBottom align="center" color="primary">Overview</Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Cleaning Companies</Typography>
+                                    <Typography variant="h6" color="textPrimary">{cleanersCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Client Organisations</Typography>
+                                    <Typography variant="h6" color="textPrimary">{count}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Client Sites</Typography>
+                                    <Typography variant="h6" color="textPrimary">{claimsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Company Staffs</Typography>
+                                    <Typography variant="h6" color="textPrimary">{staffsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Staffs</Typography>
+                                    <Typography variant="h6" color="textPrimary">{supervisorsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={4}>
+                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1" color="textSecondary">Staffs Complain</Typography>
+                                    <Typography variant="h6" color="textPrimary">{toolsCount}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Grid item xs={12} md={8}>
+                    <Paper elevation={4} sx={{ p: 2 }}>
+                        <Typography variant="h5" gutterBottom align="center" color="primary">Details List</Typography>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Client Organisations</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Cleaning Companies</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Client Sites</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Tools</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Staffs</TableCell>
+                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Staffs Complain</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell>{cleanersCount}</TableCell>
+                                    <TableCell>{count}</TableCell>
+                                    <TableCell>{claimsCount}</TableCell>
+                                    <TableCell>{tasksCount}</TableCell>
+                                    <TableCell>{toolsCount}</TableCell>
+                                    <TableCell>{supervisorsCount} (reported)</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </Paper>
+                </Grid>
+            </Grid>
+>>>>>>> e7c16460ae96db764c331a70d48a65f361ffde1e
         </Box>
     );
 };
