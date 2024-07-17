@@ -20,25 +20,14 @@ import SearchIcon from '@mui/icons-material/Search';
 import { styled, alpha } from '@mui/material/styles';
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
-<<<<<<< HEAD
-
-=======
->>>>>>> e7c16460ae96db764c331a70d48a65f361ffde1e
 
 const Home = () => {
     const [openSidebar, setOpenSidebar] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [darkMode, setDarkMode] = useState(false);
 
-<<<<<<< HEAD
-    const [Opensidebar, setOpenSidebar] = useState(false);
-
-    const sidebarToggle = () => {
-        setOpenSidebar(!Opensidebar);
-=======
     const sidebarToggle = () => {
         setOpenSidebar(!openSidebar);
->>>>>>> e7c16460ae96db764c331a70d48a65f361ffde1e
     };
 
     const handleProfileMenuOpen = (event) => {
@@ -116,12 +105,8 @@ const Home = () => {
                     />
                 </Toolbar>
             </AppBar>
-<<<<<<< HEAD
-            <Sidebar open={Opensidebar} sidebarToggle={sidebarToggle} />
-=======
             <Sidebar open={openSidebar} sidebarToggle={sidebarToggle} />
             <Outlet />
->>>>>>> e7c16460ae96db764c331a70d48a65f361ffde1e
         </div>
     );
 }

@@ -32,106 +32,6 @@ const Welcome = () => {
     }, []);
 
     return (
-<<<<<<< HEAD
-
-        <Box mt={5}>
-            <Box mt={5}>
-                <Home />
-                <Grid container justifyContent="center" style={{ marginTop: '150px' }}>
-                    <Grid>
-                        <Grid item md={12}>
-                            <Card mb={4}>
-                                {/* <Typography variant="h5" gutterBottom style={
-                                    { textAlign: 'center' }
-                                }>Overview</Typography> */}
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Cleaning Companies</Typography>
-                                                <Typography variant="body1">{cleanersCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Client Organisations</Typography>
-                                                <Typography variant="body1">{count}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Client Sites</Typography>
-                                                <Typography variant="body1">{claimsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Company Staffs</Typography>
-                                                <Typography variant="body1">{staffsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={6}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Staffs</Typography>
-                                                <Typography variant="body1">{supervisorsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={6}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Staffs Complain</Typography>
-                                                <Typography variant="body1">{toolsCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                    {/* <Grid item xs={12} sm={6} md={6}>
-                                        <Card variant="outlined" style={{ backgroundColor: '#f5f5f5' }}>
-                                            <CardContent>
-                                                <Typography variant="subtitle2" color="textSecondary">Tools</Typography>
-                                                <Typography variant="body1">{tasksCount}</Typography>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid> */}
-                                </Grid>
-                            </Card>
-                        </Grid>
-
-                        <Card className="card">
-                            <Card className="card-body">
-                                {/* <Typography variant="h5" gutterBottom>Details List</Typography> */}
-                                <Paper elevation={5}>
-                                    <Table>
-                                        <TableHead>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Client Organisations</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Cleaning Companies</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Client Sites</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Tools</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>All Staffs</TableCell>
-                                            <TableCell style={{ backgroundColor: '#333', color: 'white' }}>Staffs Complain</TableCell>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableCell>{cleanersCount}</TableCell>
-                                            <TableCell>{count}</TableCell>
-                                            <TableCell>{claimsCount}</TableCell>
-                                            <TableCell>{tasksCount}</TableCell>
-                                            <TableCell>{toolsCount}</TableCell>
-                                            <TableCell>{supervisorsCount} (reported)</TableCell>
-                                        </TableBody>
-                                    </Table>
-                                </Paper>
-                                <div className="text-center mt-4">
-                                    <Link to="/generated_report" className="btn btn-success btn-lg" style={{ borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', fontWeight: 'bold' }}>Generate Report</Link>
-                                </div>
-=======
         <Box mt={5} p={2}>
             <Home />
             <Grid container spacing={3} justifyContent="center" mt={5}>
@@ -152,7 +52,6 @@ const Welcome = () => {
                                     <Typography variant="subtitle1" color="textSecondary">Client Organisations</Typography>
                                     <Typography variant="h6" color="textPrimary">{count}</Typography>
                                 </CardContent>
->>>>>>> e7c16460ae96db764c331a70d48a65f361ffde1e
                             </Card>
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
