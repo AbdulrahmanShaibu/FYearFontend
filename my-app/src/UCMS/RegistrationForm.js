@@ -75,7 +75,7 @@ const RegistrationForm = () => {
           }}>
           <Typography variant="h5" align="center"
             style={{ fontWeight: 'bold' }}
-            gutterBottom>UCMS</Typography>
+            gutterBottom>Staff Login</Typography>
           <TextField
             fullWidth
             margin="normal"

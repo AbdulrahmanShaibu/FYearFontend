@@ -59,7 +59,7 @@ const WhyChoseUs = () => {
                     <div className="row position-relative">
                         <div className="col-xl-12">
                             <div className="section-title text-center mb-70">
-                                <span>Why Choose Us</span>
+                                {/* <span>Why Choose Us</span> */}
                                 <h2 className="white-color">Experience the Ultimate Level of Cleanliness & Management</h2>
                             </div>
                         </div>

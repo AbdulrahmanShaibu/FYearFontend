@@ -19,7 +19,7 @@ const Start = () => {
 
     return (
         <div>
-            <HeaderTop />
+            {/* <HeaderTop /> */}
             <HeaderBottomOne />
             <Hero />
             <Feature />
@@ -27,12 +27,12 @@ const Start = () => {
             <HomeAbout />
             <FunFact />
             <Service />
-            <Project />
-            <HowItWork />
-            <Blog />
-            <Subscribe />
-            <Testimonial />
-            <Appointment />
+            {/* <Project /> */}
+            {/* <HowItWork /> */}
+            {/* <Blog /> */}
+            {/* <Subscribe /> */}
+            {/* <Testimonial /> */}
+            {/* <Appointment /> */}
             <Footer />
         </div>
     );

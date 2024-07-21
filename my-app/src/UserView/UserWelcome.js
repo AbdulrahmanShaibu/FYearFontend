@@ -72,7 +72,7 @@ const UserWelcome = () => {
                         <Grid item xs={12} sm={6} md={4}>
                             <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
                                 <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Staffs</Typography>
+                                    <Typography variant="subtitle1" color="textSecondary">Staffs Complain</Typography>
                                     <Typography variant="h6" color="textPrimary">{supervisorsCount}</Typography>
                                 </CardContent>
                             </Card>
@@ -80,7 +80,7 @@ const UserWelcome = () => {
                         <Grid item xs={12} sm={6} md={4}>
                             <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
                                 <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Staffs Complain</Typography>
+                                    <Typography variant="subtitle1" color="textSecondary">Staffs</Typography>
                                     <Typography variant="h6" color="textPrimary">{toolsCount}</Typography>
                                 </CardContent>
                             </Card>

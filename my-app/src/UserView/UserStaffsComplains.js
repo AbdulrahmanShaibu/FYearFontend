@@ -3,10 +3,11 @@ import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Button, TablePagination,
   Dialog, DialogActions, DialogContent, DialogTitle,
-  TextField, MenuItem, CircularProgress
+  TextField, CircularProgress
 } from '@material-ui/core';
 import '../styles/sidebar.css';
 import UpdateClaimModal from "../UpdateClaimModal";
+import { jwtDecode } from 'jwt-decode'; 
 import UserHome from "./UserHome";
 
 const UserStaffComplain = () => {
@@ -21,7 +22,9 @@ const UserStaffComplain = () => {
     selectedClaim: null,
     loading: true,
     page: 0,
-    rowsPerPage: 5
+    rowsPerPage: 5,
+    isAuthenticated: false,
+    userRole: ''
   });
 
   const style = {
@@ -35,7 +38,25 @@ const UserStaffComplain = () => {
   useEffect(() => {
     fetchComplains();
     fetchStaffs();
+    checkAuthentication();
   }, []);
+
+  const checkAuthentication = () => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log('Decoded Token:', decodedToken);
+        setState(prevState => ({
+          ...prevState,
+          isAuthenticated: true,
+          userRole: decodedToken.role
+        }));
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    }
+  };
 
   const fetchComplains = async () => {
     try {
@@ -51,7 +72,7 @@ const UserStaffComplain = () => {
 
   const fetchStaffs = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/staffs/list');
+      const response = await fetch('http://localhost:8080/api/v1/all-jwt-users');
       const data = await response.json();
       setState(prevState => ({ ...prevState, staffs: data }));
     } catch (error) {
@@ -62,10 +83,15 @@ const UserStaffComplain = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { description, submissionDate, selectedStaff, claims } = state;
+    const { description, submissionDate, selectedStaff, claims, isAuthenticated, userRole } = state;
 
-    if (!description || !submissionDate || !selectedStaff) {
+    if (!description || !submissionDate) {
       alert('All fields are required');
+      return;
+    }
+
+    if (!isAuthenticated || userRole !== 'STAFF') {
+      alert('Only authenticated staff can submit a complaint.');
       return;
     }
 
@@ -80,6 +106,7 @@ const UserStaffComplain = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         },
         body: JSON.stringify(data),
       });
@@ -106,14 +133,6 @@ const UserStaffComplain = () => {
     setState(prevState => ({ ...prevState, openFormModal: false }));
   };
 
-  const handleOpenModal = (claim) => {
-    setState(prevState => ({ ...prevState, selectedClaim: claim, openModal: true }));
-  };
-
-  const handleCloseModal = () => {
-    setState(prevState => ({ ...prevState, openModal: false }));
-  };
-
   const handleChangePage = (event, newPage) => {
     setState(prevState => ({ ...prevState, page: newPage }));
   };
@@ -126,7 +145,7 @@ const UserStaffComplain = () => {
     }));
   };
 
-  const { description, submissionDate, selectedStaff, claims, staffs, openFormModal, openModal, selectedClaim, loading, page, rowsPerPage } = state;
+  const { description, submissionDate, selectedStaff, claims, staffs, openFormModal, openModal, selectedClaim, loading, page, rowsPerPage, isAuthenticated, userRole } = state;
 
   if (loading) {
     return <CircularProgress />;
@@ -134,12 +153,14 @@ const UserStaffComplain = () => {
 
   return (
     <div style={{ margin: 'auto', marginTop: '80px', width: '950px' }}>
-      <UserHome />
+      <UserHome/>
       <div>
         <br /><br />
-        <Button variant="contained" color="primary" onClick={handleOpenFormModal}>
-          Add Complain
-        </Button>
+        {isAuthenticated && userRole === 'STAFF' && (
+          <Button variant="contained" color="primary" onClick={handleOpenFormModal}>
+            Add Complain
+          </Button>
+        )}
         <br /><br />
         <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
           <TableContainer component={Paper}>
@@ -158,7 +179,7 @@ const UserStaffComplain = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{claim.description}</TableCell>
                     <TableCell>{claim.submissionDate}</TableCell>
-                    <TableCell>{claim.staffs ? claim.staffs.StaffName : 'N/A'}</TableCell>
+                    <TableCell>{claim.staffs ? claim.staffs.firstName : 'N/A'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -198,21 +219,6 @@ const UserStaffComplain = () => {
               onChange={(e) => setState(prevState => ({ ...prevState, submissionDate: e.target.value }))}
               required
             />
-            <TextField
-              margin="dense"
-              label="Select Staff"
-              select
-              fullWidth
-              value={selectedStaff}
-              onChange={(e) => setState(prevState => ({ ...prevState, selectedStaff: e.target.value }))}
-              required
-            >
-              {staffs.map((staff) => (
-                <MenuItem key={staff.StaffID} value={staff.StaffID}>
-                  {staff.StaffName}
-                </MenuItem>
-              ))}
-            </TextField>
             <DialogActions>
               <Button onClick={handleCloseFormModal} color="secondary">
                 Cancel
@@ -227,7 +233,7 @@ const UserStaffComplain = () => {
       {selectedClaim && (
         <UpdateClaimModal
           open={openModal}
-          handleClose={handleCloseModal}
+          handleClose={handleCloseFormModal}
           claim={selectedClaim}
         />
       )}

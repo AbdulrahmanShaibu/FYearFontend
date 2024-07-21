@@ -6,7 +6,6 @@ import Icon_harvest from '../../assets/images/service/harvest.png';
 import Icon_flower from '../../assets/images/service/flower.png';
 import Icon_tree from '../../assets/images/service/tree.png';
 import Icon_rubbish from '../../assets/images/service/rubbish.png';
-import { FaLongArrowAltRight } from 'react-icons/fa';
 
 const ServiceData = [
     {
@@ -53,58 +52,128 @@ const ServiceData = [
     },
 ];
 
-const ServiceItem = ({ img, heading, description, serviceLink }) => {
+const ServiceItem = ({ img, heading, description }) => {
     return (
-        <>
-            <div className="col-xl-3 col-lg-4 col-md-6">
-                <div className="single-service">
-                    <div className="service-icon">
-                        <img src={img} alt="Service Icon" />
-                    </div>
-                    <h3>{heading}</h3>
-                    <p>{description}</p>
-                    {/* <a href={serviceLink}>Read More <FaLongArrowAltRight /></a> */}
+        <div className="col-xl-4 col-lg-6 col-md-12 mb-4">
+            <div className="single-service" style={serviceItemStyle}>
+                <div className="service-icon" style={iconStyle}>
+                    <img src={img} alt="Service Icon" style={imgStyle} />
                 </div>
+                <h3 style={headingStyle}>{heading}</h3>
+                <p style={descriptionStyle}>{description}</p>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
 const Service = () => {
     return (
-        <>
-            <div className="service-area bg-4 pt-110 pb-110">
-                <div className="container">
-                    <div className="row">
-                        <div className="col-xl-12">
-                            <div className="section-title text-center mb-70">
-                                <span>Our Services</span>
-                                <h2>University Cleaners Management<br />& Ensuring a Clean Environment</h2>
-                            </div>
+        <div className="service-area" style={serviceAreaStyle}>
+            <div className="container">
+                <div className="row">
+                    <div className="col-xl-12 text-center mb-4">
+                        <div className="section-title">
+                            <span style={sectionTitleSpanStyle}>Our Services</span>
+                            <h2 style={sectionTitleH2Style}>
+                                University Cleaners Management<br />& Ensuring a Clean Environment
+                            </h2>
                         </div>
                     </div>
-                    <div className="row">
-                        {ServiceData.map((data) => (
-                            <ServiceItem
-                                key={data.id}
-                                img={data.img}
-                                heading={data.heading}
-                                description={data.description}
-                                serviceLink={data.serviceLink}
-                            />
-                        ))}
-                        <div className="col-xl-6 col-lg-12 col-md-12">
-                            <div className="single-service-large">
-                                <h3>We are dedicated to <span>Maintaining Cleanliness & Safety</span></h3>
-                                <p>Our professional team ensures the university remains clean and safe, addressing all cleaning needs and complaints efficiently.</p>
-                                <a href="/contact" className="l-btn">Contact Us</a>
-                            </div>
+                </div>
+                <div className="row">
+                    {ServiceData.map(data => (
+                        <ServiceItem
+                            key={data.id}
+                            img={data.img}
+                            heading={data.heading}
+                            description={data.description}
+                        />
+                    ))}
+                    <div className="col-xl-12 text-center mt-4">
+                        <div className="single-service-large" style={largeServiceStyle}>
+                            <h3 style={largeHeadingStyle}>
+                                We are dedicated to <span style={highlightStyle}>Maintaining Cleanliness & Safety</span>
+                            </h3>
+                            <p style={largeDescriptionStyle}>
+                                Our professional team ensures the university remains clean and safe, addressing all cleaning needs and complaints efficiently.
+                            </p>
+                            {/* <a href="/contact" className="btn btn-primary">Contact Us</a> */}
                         </div>
                     </div>
                 </div>
             </div>
-        </>
-    )
+        </div>
+    );
 }
+
+// Inline styles
+const serviceAreaStyle = {
+    backgroundColor: '#f9f9f9',
+    padding: '70px 0',
+};
+
+const sectionTitleSpanStyle = {
+    display: 'block',
+    fontSize: '16px',
+    color: '#333',
+    marginBottom: '10px',
+};
+
+const sectionTitleH2Style = {
+    fontSize: '36px',
+    fontWeight: 'bold',
+    color: '#333',
+};
+
+const serviceItemStyle = {
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    padding: '20px',
+    textAlign: 'center',
+    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+    transition: 'transform 0.3s',
+};
+
+const iconStyle = {
+    marginBottom: '15px',
+};
+
+const imgStyle = {
+    maxWidth: '60px',
+};
+
+const headingStyle = {
+    fontSize: '20px',
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: '10px',
+};
+
+const descriptionStyle = {
+    fontSize: '16px',
+    color: '#666',
+};
+
+const largeServiceStyle = {
+    backgroundColor: '#fff',
+    padding: '30px',
+    borderRadius: '8px',
+    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+};
+
+const largeHeadingStyle = {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#333',
+};
+
+const highlightStyle = {
+    color: '#007bff',
+};
+
+const largeDescriptionStyle = {
+    fontSize: '16px',
+    color: '#666',
+};
 
 export default Service;

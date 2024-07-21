@@ -21,9 +21,9 @@ const HomeAbout = () => {
                                     <span>Dedicated to Maintaining Clean Campus Environments</span>
                                     <h2 className="mb-30">20 Years of Excellence in University Cleaning Services</h2>
                                     <p>Our system ensures that all cleaning tasks are efficiently managed and complaints are promptly addressed.
-                                        <br /><br /> With a structured approach, we guarantee a clean and healthy environment for all university departments, supported by a team of skilled supervisors and cleaners. </p>
+                                        <br /> With a structured approach, we guarantee a clean and healthy environment for all university departments, supported by a team of skilled supervisors and cleaners. </p>
                                 </div>
-                                <a href="/contact" className="l-btn">Contact Us</a>
+                                {/* <a href="/contact" className="l-btn">Contact Us</a> */}
                             </div>
                         </div>
                     </div>

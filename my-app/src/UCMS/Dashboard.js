@@ -16,7 +16,7 @@ const Dashboard = () => {
   }
 
   return (
-    <Container style={{marginTop:'55px', backgroundColor:'white'}}>
+    <Container style={{ marginTop: '55px', backgroundColor: 'white' }}>
       <Box sx={{ backgroundColor: 'white', margin: 'auto', py: 8 }}>
         <Box sx={{ textAlign: 'center', mb: 5 }}>
           <Typography variant="h5" component="h5" color="primary" fontWeight="bold">

@@ -1,38 +1,61 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-//import ModalVideo from 'react-modal-video';
-//import { FaPlay } from "react-icons/fa";
 import HeroImg1 from '../../assets/images/hero1.jpg';
-import HeroImg2 from '../../assets/images/hero/1.jpg';
 
 const Hero = () => {
-
     return (
-        <>
-
-            <div className="hero-area height-800 bg-property d-flex align-items-center" data-overlay="black" data-opacity="7" style={{ backgroundImage: `url(${HeroImg1})` }}>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                            <div className="hero-wrapper">
-                                <h1>University Cleaners Management System.</h1>
-                                <p>Efficiently managing cleaners, complaints, tools, departments, supervisors, and tasks.</p>
-                                {/* <Link to="/projects" className="l-btn">Our Solution</Link> */}
-                            </div>
-                        </div>
-                        <div className="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                            <div className="hero-popup-content">
-                                <img src={HeroImg2} alt="" />
-                                <div className="hero-popup-video">
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <section
+            style={{
+                position: 'relative',
+                height: '800px',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff', // Light text color for contrast
+                textAlign: 'center',
+            }}
+        >
+            <img
+                src={HeroImg1}
+                alt="Hero Background"
+                style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: 'blur(5px)', // Blurs the image
+                    zIndex: '-1', // Places image behind text
+                }}
+            />
+            <div
+                style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
+                    padding: '40px',
+                    borderRadius: '8px',
+                    maxWidth: '800px',
+                    margin: '0 auto',
+                }}
+            >
+                <h1 style={{
+                    fontSize: '3rem', // Larger font size for emphasis
+                    marginBottom: '1rem',
+                    fontWeight: '700', // Bold text for prominence
+                    color: 'white'
+                }}>
+                    Welcome to the University Cleaners System
+                </h1>
+                <p style={{
+                    fontSize: '1.5rem', // Slightly larger text for better readability
+                    margin: '0',
+                    fontWeight: '550',
+                }}>
+                    Efficiently managing cleaners, complaints, tools, departments, supervisors, and tasks.
+                </p>
             </div>
-        </>
-    )
-}
+        </section>
+    );
+};
 
 export default Hero;
