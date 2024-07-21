@@ -29,7 +29,7 @@ const UserAttachments = () => {
     };
 
     const fetchStaffs = async () => {
-        const response = await axios.get('http://localhost:8080/api/v1/staffs/list');
+        const response = await axios.get('http://localhost:8080/api/v1/all-jwt-users');
         setStaffs(response.data);
     };
 
@@ -91,7 +91,7 @@ const UserAttachments = () => {
 
     return (
         <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '950px' }}>
-          <UserHome/>
+            <UserHome />
             <form onSubmit={handleSubmit}>
                 <input type="file" onChange={handleFileChange} required />
                 <FormControl fullWidth>
@@ -100,8 +100,8 @@ const UserAttachments = () => {
                             <em>None</em>
                         </MenuItem>
                         {staffs.map(staff => (
-                            <MenuItem key={staff.StaffID} value={staff.StaffID}>
-                                {staff.StaffName}
+                            <MenuItem key={staff.StaffID} value={staff.id}>
+                                {staff.firstName}
                             </MenuItem>
                         ))}
                     </Select>

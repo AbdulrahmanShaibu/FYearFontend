@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import '../styles/sidebar.css';
 import UpdateClaimModal from "../UpdateClaimModal";
-import { jwtDecode } from 'jwt-decode'; 
+import { jwtDecode } from 'jwt-decode';
 import UserHome from "./UserHome";
 
 const UserStaffComplain = () => {
@@ -55,6 +55,8 @@ const UserStaffComplain = () => {
       } catch (error) {
         console.error('Error decoding token:', error);
       }
+    } else {
+      console.error('Token not found');
     }
   };
 
@@ -83,15 +85,16 @@ const UserStaffComplain = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { description, submissionDate, selectedStaff, claims, isAuthenticated, userRole } = state;
+    const { description, submissionDate, selectedStaff, claims } = state;
 
     if (!description || !submissionDate) {
       alert('All fields are required');
       return;
     }
 
-    if (!isAuthenticated || userRole !== 'STAFF') {
-      alert('Only authenticated staff can submit a complaint.');
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert('You must be logged in to submit a complaint.');
       return;
     }
 
@@ -106,10 +109,15 @@ const UserStaffComplain = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
       setState(prevState => ({ ...prevState, claims: [...claims, result] }));
       handleCloseFormModal();
@@ -145,7 +153,7 @@ const UserStaffComplain = () => {
     }));
   };
 
-  const { description, submissionDate, selectedStaff, claims, staffs, openFormModal, openModal, selectedClaim, loading, page, rowsPerPage, isAuthenticated, userRole } = state;
+  const { description, submissionDate, selectedStaff, claims, staffs, openFormModal, openModal, selectedClaim, loading, page, rowsPerPage } = state;
 
   if (loading) {
     return <CircularProgress />;
@@ -153,14 +161,12 @@ const UserStaffComplain = () => {
 
   return (
     <div style={{ margin: 'auto', marginTop: '80px', width: '950px' }}>
-      <UserHome/>
+      <UserHome />
       <div>
         <br /><br />
-        {isAuthenticated && userRole === 'STAFF' && (
-          <Button variant="contained" color="primary" onClick={handleOpenFormModal}>
-            Add Complain
-          </Button>
-        )}
+        <Button variant="contained" color="primary" onClick={handleOpenFormModal}>
+          Add Complain
+        </Button>
         <br /><br />
         <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
           <TableContainer component={Paper}>
@@ -200,6 +206,18 @@ const UserStaffComplain = () => {
         <DialogTitle>Add New Complain</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit}>
+            <select
+              value={selectedStaff}
+              onChange={(e) => setState(prevState => ({ ...prevState, selectedStaff: e.target.value }))}
+              required
+            >
+              <option value="" disabled>Select Staff</option>
+              {staffs.map(staff => (
+                <option key={staff.id} value={staff.id}>
+                  {staff.firstName} {staff.lastName}
+                </option>
+              ))}
+            </select>
             <TextField
               margin="dense"
               label="Description"
