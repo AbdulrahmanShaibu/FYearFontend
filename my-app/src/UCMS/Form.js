@@ -1,7 +1,8 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert } from 'react-bootstrap';
+import { Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import '../images/slide_show.css';
 
 const UserForm = () => {
@@ -69,6 +70,7 @@ const UserForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [alertMessage, setAlertMessage] = useState('');
+    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleSignIn = async (e) => {
@@ -80,10 +82,9 @@ const UserForm = () => {
         try {
             const response = await authRequest(email, password);
             if (response.status === 200) {
-                setAlertMessage('Successfully Signed in with ' + email + '. Welcome!');
-                // Assuming the token is in response.data.token
+                setAlertMessage('Sign-in successful with ' + email + '. Welcome to the University Cleaners Management System! We are delighted to have you on board. Explore our features.');
                 localStorage.setItem('authToken', response.data.token);
-                navigate('/user_dashboard_view');
+                setOpen(true);
             } else {
                 setAlertMessage('Authentication failed. Please check your credentials and try again.');
             }
@@ -102,6 +103,11 @@ const UserForm = () => {
             .catch(error => {
                 throw error;
             });
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        navigate('/user_dashboard_view');
     };
 
     return (
@@ -175,6 +181,17 @@ const UserForm = () => {
                     </div>
                 </div>
             </div>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Success</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <CheckCircleIcon style={{ color: 'green', fontSize: '2rem' }} /> {alertMessage}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">OK</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
+import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -12,6 +10,7 @@ import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { styled, keyframes } from '@mui/system';
+import { Alert, AlertTitle } from "@mui/material";
 
 const RegistrationForm = () => {
   const RegisterApi = 'http://localhost:8080/api/v1/auth/register';
@@ -24,7 +23,7 @@ const RegistrationForm = () => {
   });
 
   const [showAlert, setShowAlert] = useState(false);
-  const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,7 +42,7 @@ const RegistrationForm = () => {
       const response = await axios.post(RegisterApi, formData);
 
       if (response.status === 200) {
-        setShowSuccessSnackbar(true);
+        setShowSuccessModal(true);
       } else {
         console.error('Registration failed');
         setShowAlert(true);
@@ -62,9 +61,22 @@ const RegistrationForm = () => {
   `;
 
   const SuccessIcon = styled(CheckCircleIcon)`
-    animation: ${fireAnimation} 1.5s ease-in-out;
+    animation: ${fireAnimation} 0.5s ease-in-out;
     color: green;
   `;
+
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+    textAlign: 'center',
+  };
 
   return (
     <Box sx={{
@@ -148,17 +160,29 @@ const RegistrationForm = () => {
         </Grid>
       </Grid>
 
-      <Snackbar
-        open={showSuccessSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setShowSuccessSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      <Modal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
       >
-        <Alert onClose={() => setShowSuccessSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-          <SuccessIcon fontSize="inherit" />
-          Thank you for being successfully registered with Username: {formData.firstname}
-        </Alert>
-      </Snackbar>
+        <Box sx={modalStyle}>
+          <SuccessIcon fontSize="large" />
+          <Typography id="modal-title" variant="h6" component="h2" sx={{ mt: 2 }}>
+            Registration Successful!
+          </Typography>
+          <Typography id="modal-description" variant="body1" sx={{ mt: 2 }}>
+            Welcome aboard, {formData.firstname}. Your account has been successfully created.
+          </Typography>
+          <Typography id="modal-instructions" variant="body1" sx={{ mt: 2 }}>
+            You can now log in with the username: {formData.firstname} to submit any complaints or feedback.
+          </Typography>
+          <Button onClick={() => setShowSuccessModal(false)} sx={{ mt: 2 }}>
+            Close
+          </Button>
+        </Box>
+
+      </Modal>
     </Box>
   );
 };
