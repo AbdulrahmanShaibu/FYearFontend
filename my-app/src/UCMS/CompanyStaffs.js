@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, FormControl, InputLabel, Select, FormHelperText } from '@mui/material';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, FormControl, InputLabel, Select, FormHelperText, TablePagination } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,14 +14,14 @@ const CompanyStaffs = () => {
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState('info');
   const [staffData, setStaffData] = useState([]);
-  const [staff, setStaff] = useState({
-    username: '',
-    role: '',
+  const [companyStaffs, setCompanyStaffs] = useState({
     companyId: '',
+    name: '',
+    roles: [],
     clientOrganisations: []
   });
   const [roles, setRoles] = useState([]);
-  const [cleaningCompanies, setCleaningCompanies] = useState([]); // Added this line
+  const [cleaningCompanies, setCleaningCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -31,18 +31,19 @@ const CompanyStaffs = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
-  const [sortColumn, setSortColumn] = useState('username');
+  const [sortColumn, setSortColumn] = useState('name');
 
   useEffect(() => {
     fetchStaffData();
     fetchRoles();
-    fetchCleaningCompanies(); // Added this line
+    fetchCleaningCompanies();
   }, []);
 
   const fetchStaffData = () => {
-    axios.get('http://localhost:8080/api/v1/users/list')
+    axios.get('http://localhost:8080/api/v1/list/users')
       .then(response => {
-        setStaffData(response.data);
+        console.log('Fetched staff data:', response.data);
+        setStaffData(response.data.companyStaffs || []);
         setLoading(false);
       })
       .catch(error => {
@@ -51,9 +52,9 @@ const CompanyStaffs = () => {
   };
 
   const fetchRoles = () => {
-    axios.get('http://localhost:8080/api/v1/users/list') // Adjusted API endpoint
+    axios.get('http://localhost:8080/api/v1/list/roles')
       .then(response => {
-        setRoles(response.data);
+        setRoles(response.data || []);
       })
       .catch(error => {
         console.error('Error fetching roles:', error);
@@ -61,40 +62,41 @@ const CompanyStaffs = () => {
   };
 
   const fetchCleaningCompanies = () => {
-    axios.get('http://localhost:8080/api/v1/list') // Adjusted API endpoint
+    axios.get('http://localhost:8080/api/v1/list')
       .then(response => {
-        setCleaningCompanies(response.data);
+        setCleaningCompanies(response.data || []);
       })
       .catch(error => {
         console.error('Error fetching cleaning companies:', error);
       });
   };
 
-  const validateStaff = (staff) => {
+  const validateStaff = (companyStaffs) => {
     const errors = {};
-    if (!staff.username.trim()) {
-      errors.username = 'Username is required';
+    if (!companyStaffs.name.trim()) {
+      errors.name = 'Name is required';
     }
-    if (!staff.role) {
-      errors.role = 'Role is required';
+    if (companyStaffs.roles.length === 0) {
+      errors.roles = 'Role is required';
     }
-    if (!staff.companyId) {
+    if (!companyStaffs.companyId) {
       errors.companyId = 'Cleaning company is required';
     }
     return errors;
   };
 
   const handleAddStaff = () => {
-    const validationErrors = validateStaff(staff);
+    const validationErrors = validateStaff(companyStaffs);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
-    axios.post('http://localhost:8080/api/v1/users/create', staff)
+    axios.post('http://localhost:8080/api/v1/create/users', companyStaffs)
       .then(response => {
-        setStaffData([...staffData, response.data]);
-        setStaff({ username: '', role: '', companyId: '', clientOrganisations: [] });
+        console.log('Added staff:', response.data);
+        setStaffData(prevData => [...prevData, response.data]);
+        setCompanyStaffs({ name: '', roles: [], companyId: '', clientOrganisations: [] });
         setErrors({});
         showNotification('Staff added successfully', 'success');
         setDialogOpen(false);
@@ -106,29 +108,31 @@ const CompanyStaffs = () => {
   };
 
   const handleEditStaff = (staff) => {
-    setStaff(staff);
+    setCompanyStaffs({
+      name: staff.name,
+      roles: staff.roles.map(role => role.roleName),
+      companyId: staff.companyId,
+      clientOrganisations: staff.clientOrganisations
+    });
     setCurrentStaffId(staff.id);
     setIsEditing(true);
     setDialogOpen(true);
   };
 
   const handleUpdateStaff = () => {
-    const validationErrors = validateStaff(staff);
+    const validationErrors = validateStaff(companyStaffs);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
-    axios.put(`http://localhost:8080/api/v1/update/user/${currentStaffId}`, staff)
+    axios.put(`http://localhost:8080/api/v1/update/user/${currentStaffId}`, companyStaffs)
       .then(response => {
-        const updatedData = staffData.map(s => {
-          if (s.id === currentStaffId) {
-            return { ...s, ...staff };
-          }
-          return s;
-        });
-        setStaffData(updatedData);
-        setStaff({ username: '', role: '', companyId: '', clientOrganisations: [] });
+        console.log('Updated staff:', response.data);
+        setStaffData(prevData =>
+          prevData.map(s => (s.id === currentStaffId ? { ...s, ...companyStaffs } : s))
+        );
+        setCompanyStaffs({ name: '', roles: [], companyId: '', clientOrganisations: [] });
         setErrors({});
         setIsEditing(false);
         setDialogOpen(false);
@@ -141,9 +145,10 @@ const CompanyStaffs = () => {
   };
 
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:8080/api/v1/delete/user/${id}`) // Adjusted API endpoint
+    axios.delete(`http://localhost:8080/api/v1/delete/user/${id}`)
       .then(response => {
-        setStaffData(staffData.filter(s => s.id !== id));
+        console.log('Deleted staff:', response.data);
+        setStaffData(prevData => prevData.filter(s => s.id !== id));
         showNotification('Staff deleted successfully', 'success');
       })
       .catch(error => {
@@ -163,7 +168,7 @@ const CompanyStaffs = () => {
   };
 
   const handleOpenDialog = () => {
-    setStaff({ username: '', role: '', companyId: '', clientOrganisations: [] });
+    setCompanyStaffs({ name: '', roles: [], companyId: '', clientOrganisations: [] });
     setIsEditing(false);
     setDialogOpen(true);
   };
@@ -177,22 +182,22 @@ const CompanyStaffs = () => {
     setCurrentPage(0);
   };
 
-  const handleRoleChange = (selectedRoleId) => {
-    setStaff(prevState => ({
+  const handleRoleChange = (event) => {
+    setCompanyStaffs(prevState => ({
       ...prevState,
-      role: selectedRoleId,
+      roles: event.target.value,
     }));
   };
 
-  const handleCleaningCompanyChange = (selectedCompanyId) => {
-    setStaff(prevState => ({
+  const handleCleaningCompanyChange = (event) => {
+    setCompanyStaffs(prevState => ({
       ...prevState,
-      companyId: selectedCompanyId,
+      companyId: event.target.value,
     }));
   };
 
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value.toLowerCase());
+    setSearchTerm(e.target.value ? e.target.value.toLowerCase() : '');
   };
 
   const handleSort = (column) => {
@@ -201,155 +206,124 @@ const CompanyStaffs = () => {
     setSortDirection(direction);
   };
 
+  const filteredData = (staffData || []).filter(staff =>
+    staff.name ? staff.name.toLowerCase().includes(searchTerm) : false
+  );
 
-  const filteredData = staffData.filter(staff => staff.username.toLowerCase().includes(searchTerm));
   const sortedData = [...filteredData].sort((a, b) => {
-    if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;   //Returns -1 to sort a before b
+    if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
     if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
-  const paginatedData = sortedData.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-
-  if (loading) {
-    return <div>Loading resources...</div>;
-  }
 
   return (
-    <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', padding: '60px' }}>
+    <div style={{ padding: '16px' }}>
       <Home />
-      <div style={{ backgroundColor: 'white', textAlign: 'center', padding: '20px 0', borderRadius: '8px', marginBottom: '20px' }}>
-        <h2 style={{ color: '#333333', fontWeight: 'normal', fontFamily: 'Arial, sans-serif', fontSize: '20px' }}>Company Staff Information</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <TextField label="Search" variant="outlined" value={searchTerm} onChange={handleSearch} />
+        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenDialog}>
+          Add Staff
+        </Button>
       </div>
-
+      <Paper>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell onClick={() => handleSort('name')}>Name {sortColumn === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Cleaning Company</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(rowsPerPage > 0
+                ? sortedData.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage)
+                : sortedData
+              ).map(staff => (
+                <TableRow key={staff.id}>
+                  <TableCell>{staff.name}</TableCell>
+                  <TableCell>{staff.roles.map(role => role.roleName).join(', ')}</TableCell>
+                  <TableCell>{(cleaningCompanies.find(company => company.companyId === staff.companyId) || {}).companyName || ''}</TableCell>
+                  <TableCell>
+                    <Button startIcon={<EditIcon />} onClick={() => handleEditStaff(staff)}>Edit</Button>
+                    <Button startIcon={<DeleteIcon />} onClick={() => handleDelete(staff.id)}>Delete</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={sortedData.length}
+          rowsPerPage={rowsPerPage}
+          page={currentPage}
+          onPageChange={(event, newPage) => setCurrentPage(newPage)}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
+      </Paper>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>{isEditing ? 'Edit Staff' : 'Add Staff'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Name"
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            value={companyStaffs.name}
+            onChange={(e) => setCompanyStaffs({ ...companyStaffs, name: e.target.value })}
+            error={!!errors.name}
+            helperText={errors.name}
+          />
+          <FormControl fullWidth margin="normal" variant="outlined">
+            <InputLabel>Role</InputLabel>
+            <Select
+              multiple
+              value={companyStaffs.roles}
+              onChange={handleRoleChange}
+              label="Role"
+              error={!!errors.roles}
+            >
+              {roles.map(role => (
+                <MenuItem key={role.roleId} value={role.roleName}>
+                  {role.roleName}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{errors.roles}</FormHelperText>
+          </FormControl>
+          <FormControl fullWidth margin="normal" variant="outlined">
+            <InputLabel>Cleaning Company</InputLabel>
+            <Select
+              value={companyStaffs.companyId}
+              onChange={handleCleaningCompanyChange}
+              label="Cleaning Company"
+              error={!!errors.companyId}
+            >
+              {cleaningCompanies.map(company => (
+                <MenuItem key={company.companyId} value={company.companyId}>
+                  {company.companyName}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{errors.companyId}</FormHelperText>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">Cancel</Button>
+          {isEditing
+            ? <Button onClick={handleUpdateStaff} color="primary">Update</Button>
+            : <Button onClick={handleAddStaff} color="primary">Add</Button>
+          }
+        </DialogActions>
+      </Dialog>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity={severity}>
           {message}
         </Alert>
       </Snackbar>
-
-      <div style={{ marginBottom: '20px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-        <Button
-          style={{ width: '200px', height: '40px', fontWeight: 'bold', backgroundColor: '#4CAF50' }}
-          onClick={handleOpenDialog}
-          variant="contained"
-          startIcon={<AddIcon />}
-        >
-          Add Staff
-        </Button>
-      </div>
-
-      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <TextField
-          label="Search by Username"
-          variant="outlined"
-          value={searchTerm}
-          onChange={handleSearch}
-          style={{ width: '300px' }}
-        />
-      </div>
-
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>{isEditing ? 'Update Staff' : 'Add New Staff'}</DialogTitle>
-        <DialogContent style={{ width: '450px' }}>
-          <TextField
-            label="Username"
-            fullWidth
-            margin="normal"
-            value={staff.username}
-            onChange={(e) => setStaff({ ...staff, username: e.target.value })}
-            error={!!errors.username}
-            helperText={errors.username}
-          />
-          <form>
-            <FormControl fullWidth margin="normal" error={!!errors.role}>
-              <InputLabel id="role-select-label">Role</InputLabel>
-              <Select
-                labelId="role-select-label"
-                id="roleSelect"
-                value={staff.role}
-                onChange={(e) => handleRoleChange(e.target.value)}
-              >
-                <MenuItem value="" disabled>Select a role</MenuItem>
-                {roles.map((role) => (
-                  <MenuItem key={role.id} value={role.id}>
-                    {role.role}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.role && <FormHelperText>{errors.role}</FormHelperText>}
-            </FormControl>
-
-            <FormControl fullWidth margin="normal" error={!!errors.companyId}>
-              <InputLabel id="company-select-label">Cleaning Company</InputLabel>
-              <Select
-                labelId="company-select-label"
-                id="companySelect"
-                value={staff.companyId}
-                onChange={(e) => handleCleaningCompanyChange(e.target.value)}
-              >
-                <MenuItem value="" disabled>Select a company</MenuItem>
-                {cleaningCompanies.map((company) => (
-                  <MenuItem key={company.companyId} value={company.companyId}>
-                    {company.companyName}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.companyId && <FormHelperText>{errors.companyId}</FormHelperText>}
-            </FormControl>
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={isEditing ? handleUpdateStaff : handleAddStaff} color="primary">
-            {isEditing ? 'Update' : 'Add'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Paper elevation={5} style={{ margin: 'auto', maxWidth: '950px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', borderRadius: '8px', overflow: 'hidden', justifyContent: 'center' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell onClick={() => handleSort('username')}>Username</TableCell>
-              <TableCell onClick={() => handleSort('cleaningCompany')}>Cleaning Company</TableCell>
-              <TableCell onClick={() => handleSort('role')}>Role</TableCell>
-              <TableCell>Edit</TableCell>
-              <TableCell>Delete</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedData.map((staff, index) => (
-              <TableRow key={staff.id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{staff.username}</TableCell>
-                <TableCell>{staff.cleaningCompany ? staff.cleaningCompany.companyName : 'N/A'}</TableCell>
-                <TableCell>{staff.role}</TableCell>
-                <TableCell>
-                  <Button onClick={() => handleEditStaff(staff)} startIcon={<EditIcon />}>
-                    Edit
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button onClick={() => handleDelete(staff.id)} startIcon={<DeleteIcon />}>
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
-
-      <div style={{ marginTop: '10px', textAlign: 'center' }}>
-        <span>Rows per page: </span>
-        <select value={rowsPerPage} onChange={handleRowsPerPageChange} style={{ marginLeft: '5px' }}>
-          {[5, 10, 25].map(rows => (
-            <option key={rows} value={rows}>{rows}</option>
-          ))}
-        </select>
-      </div>
     </div>
   );
 };

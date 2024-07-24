@@ -8,15 +8,15 @@ import axios from 'axios';
 
 const ClientSites = () => {
     const ListAPI = 'http://localhost:8080/api/v1/get/client-sites';
-    const AddAPI = '  http://localhost:8080/api/v1/post/client-site';
+    const AddAPI = 'http://localhost:8080/api/v1/post/client-site';
     const DeleteAPI = 'http://localhost:8080/api/v1/delete/client-site';
     const UpdateAPI = 'http://localhost:8080/api/v1/update/client-site';
     const ClientOrganisationListAPI = 'http://localhost:8080/api/v1/ClientOrganisation/list';
 
     const [clientSites, setClientSites] = useState([]);
     const [clientOrganisations, setClientOrganisations] = useState([]);
-    const [newClientSite, setNewClientSite] = useState({ name: '', clientOrganisation: { id: '', name: '' } });
-    const [updatedClientSite, setUpdatedClientSite] = useState({ id: '', name: '', clientOrganisation: { id: '', name: '' } });
+    const [newClientSite, setNewClientSite] = useState({ name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
+    const [updatedClientSite, setUpdatedClientSite] = useState({ id: '', name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -42,15 +42,22 @@ const ClientSites = () => {
 
     const handleAddData = () => {
         const selectedOrganisation = clientOrganisations.find(org => org.id === newClientSite.clientOrganisation.id);
+        if (!selectedOrganisation) {
+            console.error('No client organisation selected');
+            return;
+        }
         const dataToSend = {
             name: newClientSite.name,
-            clientOrganisation: selectedOrganisation
+            clientOrganisation: selectedOrganisation,
+            staffs: newClientSite.staffs
         };
+
+        console.log('Sending data:', dataToSend); // Debugging log
 
         axios.post(AddAPI, dataToSend)
             .then(response => {
                 setClientSites([...clientSites, response.data]);
-                setNewClientSite({ name: '', clientOrganisation: { id: '', name: '' } });
+                setNewClientSite({ name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
                 setDialogOpen(false);
             })
             .catch(error => {
@@ -70,11 +77,18 @@ const ClientSites = () => {
 
     const handleUpdate = (id) => {
         const selectedOrganisation = clientOrganisations.find(org => org.id === updatedClientSite.clientOrganisation.id);
+        if (!selectedOrganisation) {
+            console.error('No client organisation selected');
+            return;
+        }
         const dataToSend = {
             id: updatedClientSite.id,
             name: updatedClientSite.name,
-            clientOrganisation: selectedOrganisation
+            clientOrganisation: selectedOrganisation,
+            staffs: updatedClientSite.staffs
         };
+
+        console.log('Sending data:', dataToSend); // Debugging log
 
         axios.put(`${UpdateAPI}/${id}`, dataToSend)
             .then(response => {
@@ -85,7 +99,7 @@ const ClientSites = () => {
                     return site;
                 });
                 setClientSites(updatedData);
-                setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' } });
+                setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
                 setDialogOpen(false);
             })
             .catch(error => {
@@ -116,7 +130,8 @@ const ClientSites = () => {
             setUpdatedClientSite({
                 id: site.id,
                 name: site.name,
-                clientOrganisation: { id: site.clientOrganisation?.id, name: site.clientOrganisation?.name }
+                clientOrganisation: { id: site.clientOrganisation?.id, name: site.clientOrganisation?.name },
+                staffs: site.staffs || []
             });
         }
         setDialogOpen(true);
@@ -124,8 +139,8 @@ const ClientSites = () => {
 
     const handleDialogClose = () => {
         setDialogOpen(false);
-        setNewClientSite({ name: '', clientOrganisation: { id: '', name: '' } });
-        setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' } });
+        setNewClientSite({ name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
+        setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
     };
 
     return (

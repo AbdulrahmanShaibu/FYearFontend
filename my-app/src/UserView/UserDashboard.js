@@ -11,10 +11,7 @@ import axios from 'axios';
 const UserDashboard = () => {
     const location = useLocation();
     const { state } = location;
-    const { email } = state || {}; // Safely destructure email
-
-    console.log('Received props:', state);
-    console.log('Received email:', email);
+    const email = state?.email || '';
 
     const [openDetails, setOpenDetails] = useState(false);
     const [openStatus, setOpenStatus] = useState(false);
@@ -23,10 +20,12 @@ const UserDashboard = () => {
     const [complaints, setComplaints] = useState([]);
     const [status, setStatus] = useState([]);
     const [newComplaint, setNewComplaint] = useState({ description: '', submissionDate: new Date().toISOString().split('T')[0] });
+    const [staffDetails, setStaffDetails] = useState(null);
 
     useEffect(() => {
         fetchRecentComplaints();
         fetchComplaintStatus();
+        fetchStaffDetails();
     }, []);
 
     const fetchRecentComplaints = async () => {
@@ -47,6 +46,17 @@ const UserDashboard = () => {
         }
     };
 
+    const fetchStaffDetails = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/v1/get/staff-details', {
+                params: { email: email },
+            });
+            setStaffDetails(response.data);
+        } catch (error) {
+            console.error('Error fetching staff details:', error);
+        }
+    };
+
     const handleNewComplaintChange = (e) => {
         setNewComplaint({ ...newComplaint, [e.target.name]: e.target.value });
     };
@@ -58,7 +68,10 @@ const UserDashboard = () => {
         }
 
         try {
-            await axios.post('http://localhost:8080/api/v1/save/StaffComplain', { ...newComplaint, email });
+            await axios.post('http://localhost:8080/api/v1/save/staff-complain', null, {
+                params: { email: email },
+                data: newComplaint,
+            });
             fetchRecentComplaints();
             handleCloseIssue();
         } catch (error) {
@@ -78,6 +91,16 @@ const UserDashboard = () => {
     return (
         <Container maxWidth="md" sx={{ mt: 8 }}>
             <UserHome />
+            {staffDetails && (
+                <Card sx={{ mt: 4, p: 4, boxShadow: 3 }}>
+                    <CardContent>
+                        <Typography variant="h6">Staff Details</Typography>
+                        <Typography>Email: {staffDetails.email}</Typography>
+                        <Typography>Name: {staffDetails.name}</Typography>
+                        {/* Add more fields as needed */}
+                    </CardContent>
+                </Card>
+            )}
             <Card sx={{ mt: 4, p: 4, boxShadow: 3 }}>
                 <CardContent>
                     <Grid container spacing={2} sx={{ mt: 4 }}>
@@ -135,13 +158,12 @@ const UserDashboard = () => {
                             complaints.map((complaint, index) => (
                                 <div key={index}>
                                     <Typography><strong>Description:</strong> {complaint.description}</Typography>
-                                    <Typography><strong>Date:</strong> {new Date(complaint.submissionDate).toLocaleDateString()}</Typography>
-                                    <Typography><strong>Submitted By:</strong> {complaint.staffs.email}</Typography>
+                                    <Typography><strong>Submission Date:</strong> {complaint.submissionDate}</Typography>
                                     <hr />
                                 </div>
                             ))
                         ) : (
-                            <Typography>No recent complaints</Typography>
+                            <Typography>No recent complaints found.</Typography>
                         )}
                     </DialogContentText>
                 </DialogContent>
@@ -155,11 +177,14 @@ const UserDashboard = () => {
                 <DialogContent>
                     <DialogContentText>
                         {status.length > 0 ? (
-                            status.map((status, index) => (
-                                <Typography key={index}>{status}</Typography>
+                            status.map((complaintStatus, index) => (
+                                <div key={index}>
+                                    <Typography><strong>Status:</strong> {complaintStatus}</Typography>
+                                    <hr />
+                                </div>
                             ))
                         ) : (
-                            <Typography>No complaint statuses available</Typography>
+                            <Typography>No status available.</Typography>
                         )}
                     </DialogContentText>
                 </DialogContent>
@@ -169,34 +194,30 @@ const UserDashboard = () => {
             </Dialog>
 
             <Dialog open={openIssue} onClose={handleCloseIssue}>
-                <DialogTitle>Report Issue</DialogTitle>
+                <DialogTitle>Report a New Issue</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            name="description"
-                            label="Description"
-                            type="text"
-                            fullWidth
-                            variant="standard"
-                            value={newComplaint.description}
-                            onChange={handleNewComplaintChange}
-                        />
-                        <TextField
-                            margin="dense"
-                            name="submissionDate"
-                            label="Date"
-                            type="date"
-                            fullWidth
-                            variant="standard"
-                            value={newComplaint.submissionDate}
-                            onChange={handleNewComplaintChange}
-                        />
-                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Description"
+                        type="text"
+                        name="description"
+                        fullWidth
+                        value={newComplaint.description}
+                        onChange={handleNewComplaintChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Submission Date"
+                        type="date"
+                        name="submissionDate"
+                        fullWidth
+                        value={newComplaint.submissionDate}
+                        onChange={handleNewComplaintChange}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseIssue} color="primary">Close</Button>
+                    <Button onClick={handleCloseIssue} color="primary">Cancel</Button>
                     <Button onClick={handleSubmitNewComplaint} color="primary">Submit</Button>
                 </DialogActions>
             </Dialog>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Home from "./Home";
 import '../styles/form.css';
 import {
-    Button, Container, Grid, Table, TableRow, TableCell, TextField, Select, MenuItem, TableHead, TableBody, TablePagination, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar
+    Button, Container, Grid, Table, TableRow, TableCell, TextField, TableHead, TableBody, TablePagination, FormControl, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar
 } from '@mui/material';
 import { Add, Edit, Delete } from "@mui/icons-material";
 import { Paper } from "@material-ui/core";
@@ -19,10 +19,6 @@ const ClientOrganisation = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [openModal, setOpenModal] = useState(false);
     const [selectedClientOrganisationId, setSelectedClientOrganisationId] = useState(null);
-    const [updatedClientOrganisation, setUpdatedClientOrganisation] = useState({
-        name: '',
-        id: []
-    });
     const [feedbackMessage, setFeedbackMessage] = useState(null);
     const [formErrors, setFormErrors] = useState({});
 
@@ -52,7 +48,7 @@ const ClientOrganisation = () => {
     // Handle form input change for updated client organisation
     const handleUpdateInputChange = (e) => {
         const { name, value } = e.target;
-        setUpdatedClientOrganisation(prevState => ({
+        setClientOrganisation(prevState => ({
             ...prevState,
             [name]: value
         }));
@@ -76,7 +72,7 @@ const ClientOrganisation = () => {
         axios.post('http://localhost:8080/api/v1/save/ClientOrganisation', clientOrganisation)
             .then(response => {
                 setClientOrganisations([...clientOrganisations, response.data]);
-                setClientOrganisation({ name: '', id: [] }); // Clear the form after submission
+                setClientOrganisation({ name: '' }); // Clear the form after submission
                 setFeedbackMessage("Client organisation added successfully.");
             })
             .catch(error => {
@@ -102,18 +98,20 @@ const ClientOrganisation = () => {
     const handleUpdate = (id) => {
         const organisationToUpdate = clientOrganisations.find(clientOrganisation => clientOrganisation.id === id);
         setSelectedClientOrganisationId(id);
-        setUpdatedClientOrganisation(organisationToUpdate);
+        setClientOrganisation(organisationToUpdate);
         setOpenModal(true);
     };
 
     // Close the update modal
     const handleCloseModal = () => {
         setOpenModal(false);
+        setSelectedClientOrganisationId(null);
+        setClientOrganisation({ name: '' });
     };
 
     // Submit updated client organisation data
     const handleUpdateSubmit = () => {
-        axios.put(`http://localhost:8080/api/v1/update/ClientOrganisation/${selectedClientOrganisationId}`, updatedClientOrganisation)
+        axios.put(`http://localhost:8080/api/v1/update/ClientOrganisation/${selectedClientOrganisationId}`, clientOrganisation)
             .then(response => {
                 const updatedOrganisations = clientOrganisations.map(clientOrganisation => {
                     if (clientOrganisation.id === selectedClientOrganisationId) {
@@ -160,38 +158,8 @@ const ClientOrganisation = () => {
                 Add New Client Organisation
             </Button>
             <br /> <br />
-            <Paper elevation={1} style={{ width: '90%', height: '100%'}}>
+            <Paper elevation={1} style={{ width: '90%', height: '100%' }}>
                 <Grid container>
-                    {/* <Grid item xs={12} md={6}>
-                        <Paper style={{ padding: '20px', height: '110%', width: '55%' }}>
-                            <form onSubmit={handleSubmit}>
-                                <FormControl fullWidth>
-                                    <TextField
-                                        id="name"
-                                        label="Client Organisation Name"
-                                        variant="outlined"
-                                        name="name"
-                                        value={clientOrganisation.name}
-                                        onChange={handleInputChange}
-                                        margin="normal"
-                                        error={!!formErrors.name}
-                                        helperText={formErrors.name}
-                                    />
-                                </FormControl>
-
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    color="primary"
-                                    startIcon={<Add />}
-                                    fullWidth
-                                    style={{ marginTop: 10 }}
-                                >
-                                    Add Client Organisation
-                                </Button>
-                            </form>
-                        </Paper>
-                    </Grid> */}
                     <Grid style={{ width: '50%', height: '100%' }}>
                         <div style={{ margin: 'auto' }}>
                             <Table>
@@ -256,12 +224,12 @@ const ClientOrganisation = () => {
                                 label="Client Organisation Name"
                                 variant="outlined"
                                 name="name"
-                                value={selectedClientOrganisationId ? updatedClientOrganisation.name : clientOrganisation.name}
+                                value={clientOrganisation.name}
                                 onChange={selectedClientOrganisationId ? handleUpdateInputChange : handleInputChange}
                                 margin="normal"
                                 error={!!formErrors.name}
                                 helperText={formErrors.name}
-                                style={{width:'350px'}}
+                                style={{ width: '350px' }}
                             />
                         </FormControl>
                     </form>

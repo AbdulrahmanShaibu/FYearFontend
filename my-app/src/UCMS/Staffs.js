@@ -14,16 +14,18 @@ const Staffs = () => {
     const [staffs, setStaffs] = useState([]);
     const [clientsites, setClientSites] = useState([]);
     const [staffData, setStaffData] = useState({
-        StaffName: '',
-        StaffEmail: '',
-        StaffPhone: '',
-        id: ''
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        role: '',
+        clientSiteId: ''
     });
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
 
-    const ListAPI = 'http://localhost:8080/api/v1/staffs/list';
+    const ListAPI = 'http://localhost:8080/api/v1/all-jwt-users';
     const SaveAPI = 'http://localhost:8080/api/v1/post/staff';
     const UpdateAPI = 'http://localhost:8080/api/v1/update/staff';
     const DeleteAPI = 'http://localhost:8080/api/v1/delete';
@@ -54,12 +56,14 @@ const Staffs = () => {
         if (isUpdate) {
             axios.put(`${UpdateAPI}/${staffData.id}`, staffData)
                 .then(response => {
-                    setStaffs(staffs.map(staff => (staff.StaffID === staffData.id ? response.data : staff)));
+                    setStaffs(staffs.map(staff => (staff.id === staffData.id ? response.data : staff)));
                     setStaffData({
-                        StaffName: '',
-                        StaffEmail: '',
-                        StaffPhone: '',
-                        id: ''
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        password: '',
+                        role: '',
+                        clientSiteId: ''
                     });
                     setOpen(false);
                     setIsUpdate(false);
@@ -73,10 +77,12 @@ const Staffs = () => {
                 .then(response => {
                     setStaffs([...staffs, response.data]);
                     setStaffData({
-                        StaffName: '',
-                        StaffEmail: '',
-                        StaffPhone: '',
-                        id: ''
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        password: '',
+                        role: '',
+                        clientSiteId: ''
                     });
                     setOpen(false);
                 })
@@ -89,10 +95,13 @@ const Staffs = () => {
 
     const handleUpdate = (staff) => {
         setStaffData({
-            StaffName: staff.StaffName,
-            StaffEmail: staff.StaffEmail,
-            StaffPhone: staff.StaffPhone,
-            id: staff.StaffID
+            firstName: staff.firstName,
+            lastName: staff.lastName,
+            email: staff.email,
+            password: staff.password,
+            role: staff.role,
+            clientSiteId: staff.clientSite ? staff.clientSite.id : '',
+            id: staff.id
         });
         setIsUpdate(true);
         setOpen(true);
@@ -102,7 +111,7 @@ const Staffs = () => {
         setLoading(true);
         axios.delete(`${DeleteAPI}/${id}`)
             .then(() => {
-                setStaffs(staffs.filter(staff => staff.StaffID !== id));
+                setStaffs(staffs.filter(staff => staff.id !== id));
             })
             .catch(error => {
                 console.error('Error deleting staff:', error);
@@ -112,10 +121,12 @@ const Staffs = () => {
 
     const handleClickOpen = () => {
         setStaffData({
-            StaffName: '',
-            StaffEmail: '',
-            StaffPhone: '',
-            id: ''
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: '',
+            role: '',
+            clientSiteId: ''
         });
         setIsUpdate(false);
         setOpen(true);
@@ -133,15 +144,15 @@ const Staffs = () => {
             <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <Button
+                        {/* <Button
                             variant="contained"
                             color="primary"
                             startIcon={<Add />}
                             onClick={handleClickOpen}
                             style={{ marginBottom: '16px' }}
                         >
-                            Add Staff
-                        </Button>
+                            Assign Staffs in client Site
+                        </Button> */}
                         <Dialog open={open} onClose={handleClose}>
                             <DialogTitle>
                                 {isUpdate ? 'Edit Staff' : 'Add Staff'}
@@ -158,35 +169,58 @@ const Staffs = () => {
                                     <TextField
                                         type="text"
                                         required
-                                        label="Staff Name"
-                                        name="StaffName"
-                                        value={staffData.StaffName}
+                                        label="First Name"
+                                        name="firstName"
+                                        value={staffData.firstName}
                                         variant="outlined"
                                         fullWidth
                                         margin="normal"
-                                        onChange={(e) => setStaffData({ ...staffData, StaffName: e.target.value })}
+                                        onChange={(e) => setStaffData({ ...staffData, firstName: e.target.value })}
+                                    />
+                                    <TextField
+                                        type="text"
+                                        required
+                                        label="Last Name"
+                                        name="lastName"
+                                        value={staffData.lastName}
+                                        variant="outlined"
+                                        fullWidth
+                                        margin="normal"
+                                        onChange={(e) => setStaffData({ ...staffData, lastName: e.target.value })}
                                     />
                                     <TextField
                                         type="email"
                                         required
-                                        label="Staff Email"
-                                        name="StaffEmail"
-                                        value={staffData.StaffEmail}
+                                        label="Email"
+                                        name="email"
+                                        value={staffData.email}
                                         variant="outlined"
                                         fullWidth
                                         margin="normal"
-                                        onChange={(e) => setStaffData({ ...staffData, StaffEmail: e.target.value })}
+                                        onChange={(e) => setStaffData({ ...staffData, email: e.target.value })}
                                     />
                                     <TextField
-                                        type="tel"
-                                        label="Staff Phone"
-                                        name="StaffPhone"
-                                        value={staffData.StaffPhone}
+                                        type="password"
+                                        required
+                                        label="Password"
+                                        name="password"
+                                        value={staffData.password}
                                         variant="outlined"
                                         fullWidth
                                         margin="normal"
-                                        onChange={(e) => setStaffData({ ...staffData, StaffPhone: e.target.value })}
+                                        onChange={(e) => setStaffData({ ...staffData, password: e.target.value })}
                                     />
+                                    <Select
+                                        value={staffData.role}
+                                        onChange={(e) => setStaffData({ ...staffData, role: e.target.value })}
+                                        fullWidth
+                                        margin="normal"
+                                        displayEmpty
+                                    >
+                                        <MenuItem value="" disabled>Select Role</MenuItem>
+                                        <MenuItem value="ADMIN">Admin</MenuItem>
+                                        <MenuItem value="USER">User</MenuItem>
+                                    </Select>
                                     <Select
                                         value={staffData.clientSiteId}
                                         onChange={(e) => setStaffData({ ...staffData, clientSiteId: e.target.value })}
@@ -220,10 +254,11 @@ const Staffs = () => {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell style={{ fontWeight: 'bold' }}>Id</TableCell>
-                                        <TableCell style={{ fontWeight: 'bold' }}>Name</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }}>First Name</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }}>Last Name</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }}>Email</TableCell>
-                                        <TableCell style={{ fontWeight: 'bold' }}>Phone Number</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }}>Client Site</TableCell>
+                                        <TableCell style={{ fontWeight: 'bold' }}>Role</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }}>Update</TableCell>
                                         <TableCell style={{ fontWeight: 'bold' }}>Delete</TableCell>
                                     </TableRow>
@@ -231,25 +266,28 @@ const Staffs = () => {
                                 <TableBody>
                                     {staffs.map((staff, index) => (
                                         <TableRow key={index}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{staff.StaffName}</TableCell>
-                                            <TableCell>{staff.StaffEmail}</TableCell>
-                                            <TableCell>{staff.StaffPhone}</TableCell>
+                                            <TableCell>{staff.id}</TableCell>
+                                            <TableCell>{staff.firstName}</TableCell>
+                                            <TableCell>{staff.lastName}</TableCell>
+                                            <TableCell>{staff.email}</TableCell>
                                             <TableCell>{staff.clientSite ? staff.clientSite.name : 'N/A'}</TableCell>
+                                            <TableCell>{staff.role}</TableCell>
                                             <TableCell>
                                                 <Button
                                                     onClick={() => handleUpdate(staff)}
                                                     variant="contained"
                                                     color="primary"
                                                     startIcon={<Edit />}
-                                                    style={{ marginRight: 8 }}
+                                                    style={{
+                                                        marginRight: 8
+                                                    }}
                                                 >
                                                     Update
                                                 </Button>
                                             </TableCell>
                                             <TableCell>
                                                 <Button
-                                                    onClick={() => handleDelete(staff.StaffID)}
+                                                    onClick={() => handleDelete(staff.id)}
                                                     variant="contained"
                                                     color="secondary"
                                                     startIcon={<DeleteIcon />}

@@ -28,7 +28,7 @@ const Attachments = () => {
     };
 
     const fetchStaffs = async () => {
-        const response = await axios.get('http://localhost:8080/api/v1/staffs/list');
+        const response = await axios.get('http://localhost:8080/api/v1/all-jwt-users');
         setStaffs(response.data);
     };
 
@@ -105,8 +105,8 @@ const Attachments = () => {
                             <em>None</em>
                         </MenuItem>
                         {staffs.map(staff => (
-                            <MenuItem key={staff.StaffID} value={staff.StaffID}>
-                                {staff.StaffName}
+                            <MenuItem key={staff.StaffID} value={staff.id}>
+                                {staff.fileName}
                             </MenuItem>
                         ))}
                     </Select>
@@ -116,10 +116,10 @@ const Attachments = () => {
             {foundStaff && (
                 <div>
                     <h3>Found Staff Details</h3>
-                    <p>ID: {foundStaff.StaffID}</p>
-                    <p>Name: {foundStaff.StaffName}</p>
-                    <p>Email: {foundStaff.StaffEmail}</p>
-                    <p>Phone: {foundStaff.StaffPhone}</p>
+                    <p>ID: {foundStaff.id}</p>
+                    <p>Name: {foundStaff.fileName}</p>
+                    <p>Email: {foundStaff.email}</p>
+                    <p>Last Name: {foundStaff.lastName}</p>
                     {foundStaff.clientSite && (
                         <div>
                             <h4>Client Site</h4>
