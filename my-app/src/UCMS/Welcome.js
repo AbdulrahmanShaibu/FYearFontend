@@ -41,7 +41,7 @@ const Welcome = () => {
                         <Grid item xs={12} sm={6} md={4}>
                             <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
                                 <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Cleaning Companies</Typography>
+                                    <Typography variant="subtitle1" color="textSecondary">Client Organisations</Typography>
                                     <Typography variant="h6" color="textPrimary">{cleanersCount}</Typography>
                                 </CardContent>
                             </Card>
@@ -49,7 +49,7 @@ const Welcome = () => {
                         <Grid item xs={12} sm={6} md={4}>
                             <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
                                 <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Client Organisations</Typography>
+                                    <Typography variant="subtitle1" color="textSecondary">Cleaning Companies</Typography>
                                     <Typography variant="h6" color="textPrimary">{count}</Typography>
                                 </CardContent>
                             </Card>

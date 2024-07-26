@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, FormControl, InputLabel, Select, FormHelperText, TablePagination } from '@mui/material';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import {
+  Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
+  MenuItem, FormControl, InputLabel, Select, FormHelperText, Paper, Table,
+  TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import Home from './Home';
+
 
 const CompanyStaffs = () => {
   const [open, setOpen] = useState(false);
@@ -17,7 +21,7 @@ const CompanyStaffs = () => {
   const [companyStaffs, setCompanyStaffs] = useState({
     companyId: '',
     name: '',
-    roles: [],
+    roles: [], // Default role
     clientOrganisations: []
   });
   const [roles, setRoles] = useState([]);
@@ -30,8 +34,6 @@ const CompanyStaffs = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [sortColumn, setSortColumn] = useState('name');
 
   useEffect(() => {
     fetchStaffData();
@@ -40,14 +42,14 @@ const CompanyStaffs = () => {
   }, []);
 
   const fetchStaffData = () => {
-    axios.get('http://localhost:8080/api/v1/list/users')
+    axios.get('http://localhost:8080/api/v1/list/company-staffs')
       .then(response => {
-        console.log('Fetched staff data:', response.data);
-        setStaffData(response.data.companyStaffs || []);
+        const companyStaffs = response.data.cleaningCompany ? response.data.cleaningCompany.companyStaffs : [];
+        setStaffData(companyStaffs || []);
         setLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching staff data:', error);
+        console.error('Error fetching company staffs data:', error);
       });
   };
 
@@ -92,20 +94,29 @@ const CompanyStaffs = () => {
       return;
     }
 
-    axios.post('http://localhost:8080/api/v1/create/users', companyStaffs)
+    const payload = {
+      ...companyStaffs,
+      roles: companyStaffs.roles.map(role => ({ roleName: role })),
+      cleaningCompany: { companyId: companyStaffs.companyId }
+    };
+
+    axios.post('http://localhost:8080/api/v1/post/company-staff', payload)
       .then(response => {
-        console.log('Added staff:', response.data);
-        setStaffData(prevData => [...prevData, response.data]);
-        setCompanyStaffs({ name: '', roles: [], companyId: '', clientOrganisations: [] });
+        fetchStaffData();
+        setCompanyStaffs({ name: '', roles: ['Cleaner'], companyId: '', clientOrganisations: [] });
         setErrors({});
         showNotification('Staff added successfully', 'success');
         setDialogOpen(false);
       })
       .catch(error => {
+        if (error.response && error.response.data) {
+          setErrors({ form: error.response.data });
+        }
         showNotification('Error adding staff', 'error');
         console.error('Error adding staff:', error);
       });
   };
+
 
   const handleEditStaff = (staff) => {
     setCompanyStaffs({
@@ -126,13 +137,19 @@ const CompanyStaffs = () => {
       return;
     }
 
-    axios.put(`http://localhost:8080/api/v1/update/user/${currentStaffId}`, companyStaffs)
+    axios.put(`http://localhost:8080/api/v1/update/company-staff/${currentStaffId}`, {
+      ...companyStaffs,
+      roles: companyStaffs.roles.map(role => ({ roleName: role })) // Ensure roles are sent correctly
+    })
       .then(response => {
-        console.log('Updated staff:', response.data);
-        setStaffData(prevData =>
-          prevData.map(s => (s.id === currentStaffId ? { ...s, ...companyStaffs } : s))
-        );
-        setCompanyStaffs({ name: '', roles: [], companyId: '', clientOrganisations: [] });
+        const updatedData = staffData.map(s => {
+          if (s.id === currentStaffId) {
+            return { ...s, ...companyStaffs };
+          }
+          return s;
+        });
+        setStaffData(updatedData);
+        setCompanyStaffs({ name: '', roles: ['Cleaner'], companyId: '', clientOrganisations: [] }); // Reset form with default role
         setErrors({});
         setIsEditing(false);
         setDialogOpen(false);
@@ -144,11 +161,10 @@ const CompanyStaffs = () => {
       });
   };
 
-  const handleDelete = (id) => {
-    axios.delete(`http://localhost:8080/api/v1/delete/user/${id}`)
+  const handleDeleteStaff = (id) => {
+    axios.delete(`http://localhost:8080/api/v1/delete/company-staff/${id}`)
       .then(response => {
-        console.log('Deleted staff:', response.data);
-        setStaffData(prevData => prevData.filter(s => s.id !== id));
+        setStaffData(staffData.filter(staff => staff.id !== id));
         showNotification('Staff deleted successfully', 'success');
       })
       .catch(error => {
@@ -157,24 +173,12 @@ const CompanyStaffs = () => {
       });
   };
 
-  const showNotification = (message, severity) => {
-    setMessage(message);
-    setSeverity(severity);
-    setOpen(true);
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
   };
 
-  const handleCloseSnackbar = () => {
-    setOpen(false);
-  };
-
-  const handleOpenDialog = () => {
-    setCompanyStaffs({ name: '', roles: [], companyId: '', clientOrganisations: [] });
-    setIsEditing(false);
-    setDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
   };
 
   const handleRowsPerPageChange = (event) => {
@@ -182,145 +186,129 @@ const CompanyStaffs = () => {
     setCurrentPage(0);
   };
 
-  const handleRoleChange = (event) => {
-    setCompanyStaffs(prevState => ({
-      ...prevState,
-      roles: event.target.value,
-    }));
+  const showNotification = (message, severity) => {
+    setMessage(message);
+    setSeverity(severity);
+    setOpen(true);
   };
 
-  const handleCleaningCompanyChange = (event) => {
-    setCompanyStaffs(prevState => ({
-      ...prevState,
-      companyId: event.target.value,
-    }));
+  const handleClose = () => {
+    setOpen(false);
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value ? e.target.value.toLowerCase() : '');
-  };
-
-  const handleSort = (column) => {
-    const direction = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
-    setSortColumn(column);
-    setSortDirection(direction);
-  };
-
-  const filteredData = (staffData || []).filter(staff =>
-    staff.name ? staff.name.toLowerCase().includes(searchTerm) : false
+  const filteredData = staffData.filter(staff =>
+    staff.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-    if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
-    return 0;
-  });
+  const paginatedData = filteredData.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage);
 
   return (
-    <div style={{ padding: '16px' }}>
+    <div>
       <Home />
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <TextField label="Search" variant="outlined" value={searchTerm} onChange={handleSearch} />
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenDialog}>
-          Add Staff
-        </Button>
-      </div>
-      <Paper>
-        <TableContainer>
-          <Table>
-            <TableHead>
+      <br /><br /><br />
+      <TextField
+        label="Search"
+        variant="outlined"
+        value={searchTerm}
+        onChange={handleSearch}
+        style={{ marginBottom: '20px' }}
+      />
+      <Button variant="contained" color="primary" onClick={() => setDialogOpen(true)} startIcon={<AddIcon />}>
+        Add Staff
+      </Button>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Roles</TableCell>
+              <TableCell>Company</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
               <TableRow>
-                <TableCell onClick={() => handleSort('name')}>Name {sortColumn === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Cleaning Company</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell colSpan={4}>Loading...</TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {(rowsPerPage > 0
-                ? sortedData.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage)
-                : sortedData
-              ).map(staff => (
+            ) : (
+              paginatedData.map(staff => (
                 <TableRow key={staff.id}>
                   <TableCell>{staff.name}</TableCell>
                   <TableCell>{staff.roles.map(role => role.roleName).join(', ')}</TableCell>
-                  <TableCell>{(cleaningCompanies.find(company => company.companyId === staff.companyId) || {}).companyName || ''}</TableCell>
+                  <TableCell>{staff.cleaningCompany.name}</TableCell>
                   <TableCell>
-                    <Button startIcon={<EditIcon />} onClick={() => handleEditStaff(staff)}>Edit</Button>
-                    <Button startIcon={<DeleteIcon />} onClick={() => handleDelete(staff.id)}>Delete</Button>
+                    <Button onClick={() => handleEditStaff(staff)} startIcon={<EditIcon />}>Edit</Button>
+                    <Button onClick={() => handleDeleteStaff(staff.id)} startIcon={<DeleteIcon />}>Delete</Button>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={sortedData.length}
-          rowsPerPage={rowsPerPage}
-          page={currentPage}
-          onPageChange={(event, newPage) => setCurrentPage(newPage)}
-          onRowsPerPageChange={handleRowsPerPageChange}
-        />
-      </Paper>
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={filteredData.length}
+        rowsPerPage={rowsPerPage}
+        page={currentPage}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>{isEditing ? 'Edit Staff' : 'Add Staff'}</DialogTitle>
         <DialogContent>
           <TextField
+            autoFocus
+            margin="dense"
             label="Name"
+            type="text"
             fullWidth
-            margin="normal"
-            variant="outlined"
+            variant="standard"
             value={companyStaffs.name}
             onChange={(e) => setCompanyStaffs({ ...companyStaffs, name: e.target.value })}
             error={!!errors.name}
             helperText={errors.name}
           />
-          <FormControl fullWidth margin="normal" variant="outlined">
-            <InputLabel>Role</InputLabel>
+          <FormControl fullWidth variant="standard" error={!!errors.roles}>
+            <InputLabel>Roles</InputLabel>
             <Select
-              multiple
-              value={companyStaffs.roles}
-              onChange={handleRoleChange}
-              label="Role"
-              error={!!errors.roles}
+              value={companyStaffs.roles[0] || ''}
+              onChange={(e) => {
+                setCompanyStaffs({ ...companyStaffs, roles: [e.target.value] });
+              }}
             >
-              {roles.map(role => (
-                <MenuItem key={role.roleId} value={role.roleName}>
+              {roles.map((role) => (
+                <MenuItem key={role.id} value={role.id}>
                   {role.roleName}
                 </MenuItem>
               ))}
             </Select>
             <FormHelperText>{errors.roles}</FormHelperText>
           </FormControl>
-          <FormControl fullWidth margin="normal" variant="outlined">
+          <FormControl fullWidth variant="standard" error={!!errors.companyId}>
             <InputLabel>Cleaning Company</InputLabel>
             <Select
               value={companyStaffs.companyId}
-              onChange={handleCleaningCompanyChange}
-              label="Cleaning Company"
-              error={!!errors.companyId}
+              onChange={(e) => setCompanyStaffs({ ...companyStaffs, companyId: e.target.value })}
             >
               {cleaningCompanies.map(company => (
-                <MenuItem key={company.companyId} value={company.companyId}>
-                  {company.companyName}
-                </MenuItem>
+                <MenuItem key={company.companyId} value={company.companyId}>{company.companyName}</MenuItem>
               ))}
             </Select>
             <FormHelperText>{errors.companyId}</FormHelperText>
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">Cancel</Button>
-          {isEditing
-            ? <Button onClick={handleUpdateStaff} color="primary">Update</Button>
-            : <Button onClick={handleAddStaff} color="primary">Add</Button>
-          }
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={isEditing ? handleUpdateStaff : handleAddStaff}>
+            {isEditing ? 'Update' : 'Add'}
+          </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity={severity}>
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity={severity}>
           {message}
         </Alert>
       </Snackbar>
