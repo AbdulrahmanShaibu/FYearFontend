@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Button, TextField, Grid, Paper, Typography, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, FormControl, TablePagination, Select, MenuItem
+  TableContainer, TableHead, TableRow, FormControl, TablePagination, Select, MenuItem,
+  Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,11 +16,20 @@ const Tools = () => {
   const [tools, setTools] = useState({
     toolType: '',
     quantity: '',
-    id: '' // Add this field
+    id: ''
   });
-  const [clientSites, setClientSites] = useState([]); // Add this state
+  const [clientSites, setClientSites] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  // State for modal
+  const [open, setOpen] = useState(false);
+  const [currentTool, setCurrentTool] = useState({
+    toolID: '',
+    toolType: '',
+    quantity: '',
+    id: ''
+  });
 
   // APIs
   const LIST_API = 'http://localhost:8080/api/v1/list/tools';
@@ -27,11 +37,11 @@ const Tools = () => {
   const COUNT_API = 'http://localhost:8080/api/v1/count/tools';
   const DELETE_API = 'http://localhost:8080/api/v1/delete/tools';
   const UPDATE_API = 'http://localhost:8080/api/v1/update/tools';
-  const CLIENT_SITES_API = 'http://localhost:8080/api/v1/get/client-sites'; // Add this
+  const CLIENT_SITES_API = 'http://localhost:8080/api/v1/get/client-sites';
 
   useEffect(() => {
     fetchData();
-    fetchClientSites(); // Fetch client sites
+    fetchClientSites();
   }, []);
 
   const fetchData = async () => {
@@ -65,13 +75,14 @@ const Tools = () => {
       setTools({
         toolType: '',
         quantity: '',
-        id: '' // Reset this field
+        id: ''
       });
       console.log('Tools saved successfully:', response.data);
     } catch (error) {
       console.error('Error while saving tools:', error);
     }
   };
+
   const handleUpdateData = async (toolID, updatedTool) => {
     try {
       const response = await axios.put(`${UPDATE_API}/${toolID}`, updatedTool);
@@ -80,6 +91,7 @@ const Tools = () => {
       );
       setToolsData(updatedToolsData);
       console.log('Tool updated successfully:', response.data);
+      handleClose();
     } catch (error) {
       console.error('Error while updating tool:', error);
     }
@@ -106,6 +118,24 @@ const Tools = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleOpen = (tool) => {
+    setCurrentTool(tool);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleModalInputChange = (event) => {
+    const { name, value } = event.target;
+    setCurrentTool({ ...currentTool, [name]: value });
+  };
+
+  const handleModalUpdate = () => {
+    handleUpdateData(currentTool.toolID, currentTool);
   };
 
   return (
@@ -204,7 +234,7 @@ const Tools = () => {
                           variant="outlined"
                           color="primary"
                           startIcon={<EditIcon />}
-                          onClick={() => handleUpdateData(tool.toolID, { toolType: tool.toolType, quantity: tool.quantity, id: tool.id })}
+                          onClick={() => handleOpen(tool)}
                           style={{ marginRight: '5px' }}
                         >
                           Update
@@ -237,6 +267,60 @@ const Tools = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Update Tool</DialogTitle>
+        <DialogContent>
+          <TextField
+            name="toolType"
+            label="Tool type"
+            type="text"
+            value={currentTool.toolType}
+            onChange={handleModalInputChange}
+            fullWidth
+            margin="normal"
+            style={{ marginBottom: '15px' }}
+            InputProps={{ style: { borderRadius: '4px', border: '1px solid #ccc' } }}
+          />
+          <TextField
+            name="quantity"
+            label="Quantity"
+            type="number"
+            value={currentTool.quantity}
+            onChange={handleModalInputChange}
+            fullWidth
+            margin="normal"
+            style={{ marginBottom: '15px' }}
+            InputProps={{ style: { borderRadius: '4px', border: '1px solid #ccc' } }}
+          />
+          <FormControl fullWidth margin="normal" style={{ marginBottom: '15px' }}>
+            <Select
+              name="id"
+              value={currentTool.id}
+              onChange={handleModalInputChange}
+              displayEmpty
+              inputProps={{ 'aria-label': 'Without label' }}
+            >
+              <MenuItem value="" disabled={true}>
+                Select Client Site
+              </MenuItem>
+              {clientSites.map((site) => (
+                <MenuItem key={site.id} value={site.id}>
+                  {site.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleModalUpdate} color="primary">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Footer />
     </div>
