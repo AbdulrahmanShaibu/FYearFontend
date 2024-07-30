@@ -1,319 +1,171 @@
-import React, { useEffect, useState } from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import {
-  Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
-  MenuItem, FormControl, InputLabel, Select, FormHelperText, Paper, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import React, { useState, useEffect } from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button, Modal, Box, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
 import Home from './Home';
 
-
 const CompanyStaffs = () => {
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [severity, setSeverity] = useState('info');
-  const [staffData, setStaffData] = useState([]);
-  const [companyStaffs, setCompanyStaffs] = useState({
-    companyId: '',
-    name: '',
-    roles: [], // Default role
-    clientOrganisations: []
-  });
-  const [roles, setRoles] = useState([]);
+  const [staffs, setStaffs] = useState([]);
   const [cleaningCompanies, setCleaningCompanies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentStaffId, setCurrentStaffId] = useState(null);
-  const [errors, setErrors] = useState({});
-  const [currentPage, setCurrentPage] = useState(0);
+  const [clientOrganisations, setClientOrganisations] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchStaffData();
-    fetchRoles();
+    fetchStaffs();
     fetchCleaningCompanies();
+    fetchClientOrganisations();
+    fetchRoles();
   }, []);
 
-  const fetchStaffData = () => {
-    axios.get('http://localhost:8080/api/v1/list/company-staffs')
-      .then(response => {
-        const companyStaffs = response.data.cleaningCompany ? response.data.cleaningCompany.companyStaffs : [];
-        setStaffData(companyStaffs || []);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching company staffs data:', error);
-      });
+  const fetchStaffs = async () => {
+    const response = await axios.get('http://localhost:8080/api/v1/list/company-staffs');
+    setStaffs(response.data);
   };
 
-  const fetchRoles = () => {
-    axios.get('http://localhost:8080/api/v1/list/roles')
-      .then(response => {
-        setRoles(response.data || []);
-      })
-      .catch(error => {
-        console.error('Error fetching roles:', error);
-      });
+  const fetchCleaningCompanies = async () => {
+    const response = await axios.get('http://localhost:8080/api/v1/list');
+    setCleaningCompanies(response.data);
   };
 
-  const fetchCleaningCompanies = () => {
-    axios.get('http://localhost:8080/api/v1/list')
-      .then(response => {
-        setCleaningCompanies(response.data || []);
-      })
-      .catch(error => {
-        console.error('Error fetching cleaning companies:', error);
-      });
+  const fetchClientOrganisations = async () => {
+    const response = await axios.get('http://localhost:8080/api/v1/ClientOrganisation/list');
+    setClientOrganisations(response.data);
   };
 
-  const validateStaff = (companyStaffs) => {
-    const errors = {};
-    if (!companyStaffs.name.trim()) {
-      errors.name = 'Name is required';
-    }
-    if (companyStaffs.roles.length === 0) {
-      errors.roles = 'Role is required';
-    }
-    if (!companyStaffs.companyId) {
-      errors.companyId = 'Cleaning company is required';
-    }
-    return errors;
+  const fetchRoles = async () => {
+    const response = await axios.get('http://localhost:8080/api/v1/list/roles');
+    setRoles(response.data);
+    console.log('Roles fetched:', response.data); // Log the roles to check structure
   };
 
-  const handleAddStaff = () => {
-    const validationErrors = validateStaff(companyStaffs);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    const payload = {
-      ...companyStaffs,
-      roles: companyStaffs.roles.map(role => ({ roleName: role })),
-      cleaningCompany: { companyId: companyStaffs.companyId }
-    };
-
-    axios.post('http://localhost:8080/api/v1/post/company-staff', payload)
-      .then(response => {
-        fetchStaffData();
-        setCompanyStaffs({ name: '', roles: ['Cleaner'], companyId: '', clientOrganisations: [] });
-        setErrors({});
-        showNotification('Staff added successfully', 'success');
-        setDialogOpen(false);
-      })
-      .catch(error => {
-        if (error.response && error.response.data) {
-          setErrors({ form: error.response.data });
-        }
-        showNotification('Error adding staff', 'error');
-        console.error('Error adding staff:', error);
-      });
-  };
-
-
-  const handleEditStaff = (staff) => {
-    setCompanyStaffs({
-      name: staff.name,
-      roles: staff.roles.map(role => role.roleName),
-      companyId: staff.companyId,
-      clientOrganisations: staff.clientOrganisations
-    });
-    setCurrentStaffId(staff.id);
-    setIsEditing(true);
-    setDialogOpen(true);
-  };
-
-  const handleUpdateStaff = () => {
-    const validationErrors = validateStaff(companyStaffs);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    axios.put(`http://localhost:8080/api/v1/update/company-staff/${currentStaffId}`, {
-      ...companyStaffs,
-      roles: companyStaffs.roles.map(role => ({ roleName: role })) // Ensure roles are sent correctly
-    })
-      .then(response => {
-        const updatedData = staffData.map(s => {
-          if (s.id === currentStaffId) {
-            return { ...s, ...companyStaffs };
-          }
-          return s;
-        });
-        setStaffData(updatedData);
-        setCompanyStaffs({ name: '', roles: ['Cleaner'], companyId: '', clientOrganisations: [] }); // Reset form with default role
-        setErrors({});
-        setIsEditing(false);
-        setDialogOpen(false);
-        showNotification('Staff updated successfully', 'success');
-      })
-      .catch(error => {
-        showNotification('Error updating staff', 'error');
-        console.error('Error updating staff:', error);
-      });
-  };
-
-  const handleDeleteStaff = (id) => {
-    axios.delete(`http://localhost:8080/api/v1/delete/company-staff/${id}`)
-      .then(response => {
-        setStaffData(staffData.filter(staff => staff.id !== id));
-        showNotification('Staff deleted successfully', 'success');
-      })
-      .catch(error => {
-        showNotification('Error deleting staff', 'error');
-        console.error('Error deleting staff:', error);
-      });
-  };
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage);
-  };
-
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(0);
-  };
-
-  const showNotification = (message, severity) => {
-    setMessage(message);
-    setSeverity(severity);
+  const handleOpen = (staff = null) => {
+    setSelectedStaff(staff);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
+    setSelectedStaff(null);
   };
 
-  const filteredData = staffData.filter(staff =>
-    staff.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-  const paginatedData = filteredData.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage);
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+    data.roles = formData.getAll('roles');
+    if (selectedStaff) {
+      await axios.put(`http://localhost:8080/api/v1/update/company-staff/${selectedStaff.id}`, data);
+    } else {
+      await axios.post('http://localhost:8080/api/v1/post/company-staff', data);
+    }
+    fetchStaffs();
+    handleClose();
+  };
+
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:8080/api/v1/delete/company-staff/${id}`);
+    fetchStaffs();
+  };
 
   return (
-    <div>
+    <Paper sx={{ padding: 25 }}>
       <Home />
-      <br /><br /><br />
-      <TextField
-        label="Search"
-        variant="outlined"
-        value={searchTerm}
-        onChange={handleSearch}
-        style={{ marginBottom: '20px' }}
-      />
-      <Button variant="contained" color="primary" onClick={() => setDialogOpen(true)} startIcon={<AddIcon />}>
-        Add Staff
-      </Button>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Roles</TableCell>
-              <TableCell>Company</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
+      <Box display="flex" justifyContent="center" margin={'auto'}
+        alignItems="center" width={'50%'} flexDirection="column" sx={{ marginTop: 2 }}>
+        <Button variant="contained" onClick={() => handleOpen()}>Add Staff</Button>
+        <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={4}>Loading...</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Cleaning Company</TableCell>
+                <TableCell>Roles</TableCell>
+                <TableCell>Client Organisations</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ) : (
-              paginatedData.map(staff => (
+            </TableHead>
+            <TableBody>
+              {staffs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((staff) => (
                 <TableRow key={staff.id}>
                   <TableCell>{staff.name}</TableCell>
+                  <TableCell>{staff.cleaningCompany.companyName}</TableCell>
                   <TableCell>{staff.roles.map(role => role.roleName).join(', ')}</TableCell>
-                  <TableCell>{staff.cleaningCompany.name}</TableCell>
+                  <TableCell>{staff.clientOrganisations.map(org => org.name).join(', ')}</TableCell>
                   <TableCell>
-                    <Button onClick={() => handleEditStaff(staff)} startIcon={<EditIcon />}>Edit</Button>
-                    <Button onClick={() => handleDeleteStaff(staff.id)} startIcon={<DeleteIcon />}>Delete</Button>
+                    <Button onClick={() => handleOpen(staff)}>Edit</Button>
+                    <Button onClick={() => handleDelete(staff.id)}>Delete</Button>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={filteredData.length}
-        rowsPerPage={rowsPerPage}
-        page={currentPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>{isEditing ? 'Edit Staff' : 'Add Staff'}</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={companyStaffs.name}
-            onChange={(e) => setCompanyStaffs({ ...companyStaffs, name: e.target.value })}
-            error={!!errors.name}
-            helperText={errors.name}
-          />
-          <FormControl fullWidth variant="standard" error={!!errors.roles}>
-            <InputLabel>Roles</InputLabel>
-            <Select
-              value={companyStaffs.roles[0] || ''}
-              onChange={(e) => {
-                setCompanyStaffs({ ...companyStaffs, roles: [e.target.value] });
-              }}
-            >
-              {roles.map((role) => (
-                <MenuItem key={role.id} value={role.id}>
-                  {role.roleName}
-                </MenuItem>
               ))}
-            </Select>
-            <FormHelperText>{errors.roles}</FormHelperText>
-          </FormControl>
-          <FormControl fullWidth variant="standard" error={!!errors.companyId}>
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          component="div"
+          count={staffs.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Box>
+
+      <Modal open={open} onClose={handleClose}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ ...modalStyle }}>
+          <TextField name="name" label="Name" defaultValue={selectedStaff ? selectedStaff.name : ''} fullWidth required sx={{ marginBottom: 2 }} />
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Cleaning Company</InputLabel>
-            <Select
-              value={companyStaffs.companyId}
-              onChange={(e) => setCompanyStaffs({ ...companyStaffs, companyId: e.target.value })}
-            >
+            <Select name="cleaningCompanyId" defaultValue={selectedStaff ? selectedStaff.cleaningCompany.id : ''} required>
               {cleaningCompanies.map(company => (
                 <MenuItem key={company.companyId} value={company.companyId}>{company.companyName}</MenuItem>
               ))}
             </Select>
-            <FormHelperText>{errors.companyId}</FormHelperText>
           </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button onClick={isEditing ? handleUpdateStaff : handleAddStaff}>
-            {isEditing ? 'Update' : 'Add'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity={severity}>
-          {message}
-        </Alert>
-      </Snackbar>
-    </div>
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Roles</InputLabel>
+            <Select name="roles" multiple defaultValue={selectedStaff ? selectedStaff.roles.map(role => role.id) : []} required>
+              {roles.map(role => (
+                <MenuItem key={role.id} value={role.id}>{role.roleName}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel>Client Organisations</InputLabel>
+            <Select name="clientOrganisations" multiple defaultValue={selectedStaff ? selectedStaff.clientOrganisations.map(org => org.id) : []} required>
+              {clientOrganisations.map(org => (
+                <MenuItem key={org.id} value={org.id}>{org.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button type="submit" variant="contained" fullWidth>{selectedStaff ? 'Update' : 'Create'}</Button>
+        </Box>
+      </Modal>
+    </Paper>
   );
+};
+
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
 };
 
 export default CompanyStaffs;
