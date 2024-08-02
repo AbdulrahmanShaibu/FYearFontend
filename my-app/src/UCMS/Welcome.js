@@ -2,123 +2,134 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Home from './Home';
-import { Card, Table, TableHead, TableCell, Typography, TableRow, TableBody, Box, Grid, CardContent, Paper } from '@mui/material';
+import { Card, Table, TableHead, TableCell, Typography, TableRow, TableBody, Box, Grid, CardContent, Paper, Icon } from '@mui/material';
+import BusinessIcon from '@mui/icons-material/Business';
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
+import PeopleIcon from '@mui/icons-material/People';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import PersonIcon from '@mui/icons-material/Person';
+import Button from '@mui/material/Button';
+import DownloadIcon from '@mui/icons-material/Download';
+import { keyframes } from '@emotion/react';
 
 const Welcome = () => {
-    const countAPI = 'http://localhost:8080/api/v1/count/cleaning/company';
-    const countCleaners = 'http://localhost:8080/api/v1/count/ClientOrganisations';
-    const countClaims = 'http://localhost:8080/api/v1/count/client-site';
-    const countStaffs = 'http://localhost:8080/api/v1/count/company-staff';
-    const countTools = 'http://localhost:8080/api/v1/staffs/count';
-    const countSupervisors = 'http://localhost:8080/api/v1/count/StaffComplain';
-    const countTasks = 'http://localhost:8080/api/v1/count/tools';
 
-    const [count, setCount] = useState(0);
-    const [cleanersCount, setCleanersCount] = useState(0);
-    const [claimsCount, setClaimsCount] = useState(0);
-    const [staffsCount, setStaffsCount] = useState(0);
-    const [toolsCount, setToolsCount] = useState(0);
-    const [supervisorsCount, setSupervisorsCount] = useState(0);
-    const [tasksCount, setTasksCount] = useState(0);
+    const fadeIn = keyframes`
+    from {
+     opacity: 0;
+     transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+    const cardStyle = {
+        backgroundColor: '#e3f2fd',
+        borderRadius: 2,
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        '&:hover': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        },
+        animation: `${fadeIn} 0.6s ease forwards`,
+    };
+
+    const countCleaningCompany = 'http://localhost:8080/api/v1/count/cleaning/company';
+    const countClientOrganisation = 'http://localhost:8080/api/v1/count/ClientOrganisations';
+    const countClientSite = 'http://localhost:8080/api/v1/count/client-site';
+    const countCompanyStaffs = 'http://localhost:8080/api/v1/count/company-staff';
+    const countStaffs = 'http://localhost:8080/api/v1/staffs/count';
+    const countStaffsComplain = 'http://localhost:8080/api/v1/count/StaffComplain';
+    const CountTools = 'http://localhost:8080/api/v1/count/tools';
+    const CountAttachments = 'http://localhost:8080/api/v1/count/attachments';
+
+    const [count, setCleaningCompanyCount] = useState(0);
+    const [clientOrganisationCount, setClientOrganisationCount] = useState(0);
+    const [clientSite, setClientSiteCount] = useState(0);
+    const [staffsCount, setCompanyStaffsCount] = useState(0);
+    const [staffs, setStaffsCount] = useState(0);
+    const [staffsComplainCount, setStaffsComplainCount] = useState(0);
+    const [tools, setToolsCount] = useState(0);
+    const [attachements, setAttachmentCount] = useState(0);
 
     useEffect(() => {
-        axios.get(countAPI).then(response => setCount(response.data)).catch(console.error);
-        axios.get(countCleaners).then(response => setCleanersCount(response.data)).catch(console.error);
-        axios.get(countClaims).then(response => setClaimsCount(response.data)).catch(console.error);
+        axios.get(countCleaningCompany).then(response => setCleaningCompanyCount(response.data)).catch(console.error);
+        axios.get(countClientOrganisation).then(response => setClientOrganisationCount(response.data)).catch(console.error);
+        axios.get(countClientSite).then(response => setClientSiteCount(response.data)).catch(console.error);
+        axios.get(countCompanyStaffs).then(response => setCompanyStaffsCount(response.data)).catch(console.error);
         axios.get(countStaffs).then(response => setStaffsCount(response.data)).catch(console.error);
-        axios.get(countTools).then(response => setToolsCount(response.data)).catch(console.error);
-        axios.get(countSupervisors).then(response => setSupervisorsCount(response.data)).catch(console.error);
-        axios.get(countTasks).then(response => setTasksCount(response.data)).catch(console.error);
+        axios.get(countStaffsComplain).then(response => setStaffsComplainCount(response.data)).catch(console.error);
+        axios.get(CountTools).then(response => setToolsCount(response.data)).catch(console.error);
+        axios.get(CountAttachments).then(response => setAttachmentCount(response.data)).catch(console.error);
     }, []);
 
     return (
-        <Box mt={5} p={2}>
+        <Box mt={15} p={2}>
             <Home />
-            <Grid container spacing={3} justifyContent="center" mt={5}>
-                <Grid item xs={12} md={8}>
-                    <Typography variant="h4" gutterBottom align="center" color="primary">Overview</Typography>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Client Organisations</Typography>
-                                    <Typography variant="h6" color="textPrimary">{cleanersCount}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Cleaning Companies</Typography>
-                                    <Typography variant="h6" color="textPrimary">{count}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Client Sites</Typography>
-                                    <Typography variant="h6" color="textPrimary">{claimsCount}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Company Staffs</Typography>
-                                    <Typography variant="h6" color="textPrimary">{staffsCount}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Staffs</Typography>
-                                    <Typography variant="h6" color="textPrimary">{supervisorsCount}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <Card variant="outlined" sx={{ backgroundColor: '#e3f2fd', borderRadius: 2 }}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" color="textSecondary">Staffs Complain</Typography>
-                                    <Typography variant="h6" color="textPrimary">{toolsCount}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    </Grid>
+            <Grid container spacing={3} justifyContent="center" mt={5} width="80%" margin="auto">
+                <Grid item xs={12} md={10}>
+                    <Paper elevation={5}>
+                        <Box p={3}>
+                            <Grid container spacing={2} justifyContent="center">
+                                {[
+                                    { icon: <BusinessIcon color="primary" />, label: 'Client Organizations', value: clientOrganisationCount },
+                                    { icon: <CleaningServicesIcon color="primary" />, label: 'Cleaning Companies', value: count },
+                                    { icon: <LocationCityIcon color="primary" />, label: 'Client Sites', value: clientSite },
+                                    { icon: <PersonIcon color="primary" />, label: 'Tools', value: tools },
+                                    { icon: <PeopleIcon color="primary" />, label: 'Company Staffs', value: staffsCount },
+                                    { icon: <ReportProblemIcon color="primary" />, label: 'Staff Complaints', value: staffsComplainCount },
+                                    { icon: <ReportProblemIcon color="primary" />, label: 'Attachments', value: attachements },
+                                    { icon: <PersonIcon color="primary" />, label: 'Staffs', value: staffs },
+                                ].map((item, index) => (
+                                    <Grid item xs={12} sm={6} md={4} key={index}>
+                                        <Card variant="outlined" sx={cardStyle}>
+                                            <CardContent>
+                                                <Grid container alignItems="center" spacing={2}>
+                                                    <Grid item>
+                                                        {item.icon}
+                                                    </Grid>
+                                                    <Grid item>
+                                                        <Typography variant="subtitle1" color="textSecondary">
+                                                            {item.label}
+                                                        </Typography>
+                                                        <Typography variant="h6" color="textPrimary">
+                                                            {item.value}
+                                                        </Typography>
+                                                    </Grid>
+                                                </Grid>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    </Paper>
                 </Grid>
                 <Grid item xs={12} md={8}>
-                    <Paper elevation={4} sx={{ p: 2 }}>
-                        <Typography variant="h5" gutterBottom align="center" color="primary">Details List</Typography>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Client Organisations</TableCell>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Cleaning Companies</TableCell>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Client Sites</TableCell>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Tools</TableCell>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Staffs</TableCell>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Staffs Complain</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>{cleanersCount}</TableCell>
-                                    <TableCell>{count}</TableCell>
-                                    <TableCell>{claimsCount}</TableCell>
-                                    <TableCell>{tasksCount}</TableCell>
-                                    <TableCell>{toolsCount}</TableCell>
-                                    <TableCell>{supervisorsCount} (reported)</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </Paper>
                     <Box textAlign="center" mt={4}>
                         <Link to="/generated_report" style={{ textDecoration: 'none' }}>
-                            <Typography variant="button" className="btn btn-success btn-lg" sx={{
-                                borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', fontWeight: 'bold', padding: '10px 20px', backgroundColor: '#28a745', color: 'white'
-                            }}>Generate Report</Typography>
+                            <Button
+                                variant="contained"
+                                startIcon={<DownloadIcon />}
+                                sx={{
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                    fontWeight: 'bold',
+                                    padding: '10px 20px',
+                                    backgroundColor: '#28a745',
+                                    color: 'white',
+                                    '&:hover': {
+                                        backgroundColor: '#218838',
+                                    },
+                                }}
+                            >
+                                <Typography variant="button">
+                                    Generate Report
+                                </Typography>
+                            </Button>
                         </Link>
                     </Box>
                 </Grid>

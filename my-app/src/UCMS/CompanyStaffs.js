@@ -7,7 +7,7 @@ const CompanyStaffs = () => {
   const [staffs, setStaffs] = useState([]);
   const [cleaningCompanies, setCleaningCompanies] = useState([]);
   const [clientOrganisations, setClientOrganisations] = useState([]);
-  const [roles, setRoles] = useState([]);
+  // const [roles, setRoles] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [page, setPage] = useState(0);
@@ -17,7 +17,7 @@ const CompanyStaffs = () => {
     fetchStaffs();
     fetchCleaningCompanies();
     fetchClientOrganisations();
-    fetchRoles();
+    // fetchRoles();
   }, []);
 
   const fetchStaffs = async () => {
@@ -35,11 +35,11 @@ const CompanyStaffs = () => {
     setClientOrganisations(response.data);
   };
 
-  const fetchRoles = async () => {
-    const response = await axios.get('http://localhost:8080/api/v1/list/roles');
-    setRoles(response.data);
-    console.log('Roles fetched:', response.data); // Log the roles to check structure
-  };
+  // const fetchRoles = async () => {
+  //   const response = await axios.get('http://localhost:8080/api/v1/list/roles');
+  //   setRoles(response.data);
+  //   console.log('Roles fetched:', response.data); // Log the roles to check structure
+  // };
 
   const handleOpen = (staff = null) => {
     setSelectedStaff(staff);
@@ -64,7 +64,7 @@ const CompanyStaffs = () => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData.entries());
-    data.roles = formData.getAll('roles');
+    // data.roles = formData.getAll('roles');
     if (selectedStaff) {
       await axios.put(`http://localhost:8080/api/v1/update/company-staff/${selectedStaff.id}`, data);
     } else {
@@ -84,14 +84,14 @@ const CompanyStaffs = () => {
       <Home />
       <Box display="flex" justifyContent="center" margin={'auto'}
         alignItems="center" width={'50%'} flexDirection="column" sx={{ marginTop: 2 }}>
-        <Button variant="contained" onClick={() => handleOpen()}>Add Staff</Button>
+        <Button variant="contained" onClick={() => handleOpen()}>Add Cleaner</Button>
         <TableContainer component={Paper} sx={{ marginTop: 2 }}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
+                <TableCell>Cleaner Name</TableCell>
                 <TableCell>Cleaning Company</TableCell>
-                <TableCell>Roles</TableCell>
+                {/* <TableCell>Roles</TableCell> */}
                 <TableCell>Client Organisations</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -101,7 +101,7 @@ const CompanyStaffs = () => {
                 <TableRow key={staff.id}>
                   <TableCell>{staff.name}</TableCell>
                   <TableCell>{staff.cleaningCompany.companyName}</TableCell>
-                  <TableCell>{staff.roles.map(role => role.roleName).join(', ')}</TableCell>
+                  {/* <TableCell>{staff.roles.map(role => role.roleName).join(', ')}</TableCell> */}
                   <TableCell>{staff.clientOrganisations.map(org => org.name).join(', ')}</TableCell>
                   <TableCell>
                     <Button onClick={() => handleOpen(staff)}>Edit</Button>
@@ -133,14 +133,21 @@ const CompanyStaffs = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+          {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Roles</InputLabel>
-            <Select name="roles" multiple defaultValue={selectedStaff ? selectedStaff.roles.map(role => role.id) : []} required>
+            <Select
+              name="roles"
+              multiple
+              defaultValue={selectedStaff ? selectedStaff.roles.map(role => role.id) : []}
+              required
+            >
               {roles.map(role => (
-                <MenuItem key={role.id} value={role.id}>{role.roleName}</MenuItem>
+                <MenuItem key={role.id} value={role.id}>
+                  {role.roleName}
+                </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl> */}
           <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Client Organisations</InputLabel>
             <Select name="clientOrganisations" multiple defaultValue={selectedStaff ? selectedStaff.clientOrganisations.map(org => org.id) : []} required>
