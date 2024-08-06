@@ -13,6 +13,7 @@ import {
     DialogTitle, Typography, Paper, Table, TableHead,
     TableBody, TableRow, TableCell, Container, Snackbar, Alert
 } from "@mui/material";
+import { Add, Info } from "@mui/icons-material";
 
 const ClaimType = () => {
     const [claimTypes, setClaimTypes] = useState([]);
@@ -77,12 +78,49 @@ const ClaimType = () => {
     return (
         <Container>
             <Home />
-            <Typography variant="h4" gutterBottom>
-                Claim Types
+            <br /> <br /> <br />
+            <Typography
+                variant="h5"
+                gutterBottom
+                style={{
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '15px',
+                    backgroundColor: 'whitesmoke',
+                    color: '#333', // A darker color for better readability
+                    fontWeight: '10' // Slightly bolder text for emphasis
+                }}
+            >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', fontSize: '20px', color: '#444', fontWeight: '600' }}>
+                        <Info style={{ marginRight: '8px', color: '#1976d2', fontSize: '26px' }} /> {/* Info icon with updated size */}
+                        Claim Types Management
+                    </span>
+
+                    <Button
+                        color="primary"
+                        onClick={() => handleDialogOpen()}
+                        style={{
+                            fontWeight: '600',
+                            textTransform: 'none',
+                            borderRadius: '12px',
+                            padding: '14px 28px', // Increased padding for better click area
+                            display: 'flex',
+                            backgroundColor: '#1976d2', //1976d2
+                            color: 'white',
+                            alignItems: 'center',
+                            gap: '12px', // Increased space between text and icon
+                            // boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', // Enhanced shadow for depth
+                            transition: 'background-color 0.3s, box-shadow 0.3s', // Smooth transition for hover effects
+                        }}
+                    >
+                        Add Claim Type
+                        <Add style={{ fontSize: '20px' }} /> {/* Icon with a consistent size */}
+                    </Button>
+                </div>
+
             </Typography>
-            <Button variant="contained" color="primary" onClick={() => handleDialogOpen()}>
-                Add Claim Type
-            </Button>
+
             <Paper>
                 <Table>
                     <TableHead>

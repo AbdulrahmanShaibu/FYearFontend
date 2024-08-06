@@ -13,6 +13,9 @@ import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import Home from './Home';
 import { Delete } from '@mui/icons-material';
+import { Container, Box, Typography } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import BusinessIcon from '@mui/icons-material/Business';
 
 const CleaningCompany = () => {
     const [open, setOpen] = useState(false);
@@ -30,6 +33,11 @@ const CleaningCompany = () => {
     const [errors, setErrors] = useState({});
     const [currentPage, setCurrentPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5); // Number of rows per page
+
+    const [isDialog2Open, setDialog2Open] = useState(true);
+    const handleCloseDialog2 = () => {
+        setDialog2Open(false);
+    };
 
     useEffect(() => {
         axios.get('http://localhost:8080/api/v1/list')
@@ -153,41 +161,65 @@ const CleaningCompany = () => {
     const paginatedData = companyData.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
     if (loading) {
-        return <div>Loading resources...</div>;
+        <div>Loading resources, please wait...</div>
     }
 
     return (
-        <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', padding: '60px' }}>
+        <div style={{ backgroundColor: 'white', minHeight: '100vh', padding: '60px' }}>
             <Home />
-            <div style={{
-                backgroundColor: 'white', textAlign: 'center',
-                padding: '20px 0', borderRadius: '8px', marginBottom: '20px'
-            }}>
-                <h2 style={{
-                    color: '#333333', fontWeight: 'normal',
-                    fontFamily: 'Arial, sans-serif', fontSize: '20px'
-                }}>Cleaning Company Information</h2>
-            </div>
-
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity={severity}>
-                    {message}
-                </Alert>
-            </Snackbar>
-
-            <div style={{
-                marginBottom: '20px', textAlign: 'center',
-                display: 'flex', gap: '10px', justifyContent: 'center'
-            }}>
-                <Button
-                    style={{ width: '200px', height: '40px', fontWeight: 'bold' }}
-                    onClick={handleOpenDialog}
-                    variant="contained"
-                    startIcon={<AddIcon />}
+            <Container maxWidth="md" sx={{ mt: 4 }}>
+                <Dialog
+                    open={isDialog2Open}
+                    onClose={handleCloseDialog2}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
                 >
-                    Add Company
-                </Button>
-            </div>
+                    <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <InfoIcon fontSize="large" sx={{ color: '#1976d2' }} />
+                        Cleaning Company Information
+                    </DialogTitle>
+                    <DialogContent>
+                        <Typography variant="body1" sx={{ fontSize: '16px', color: '#333', display: 'flex', alignItems: 'center' }}>
+                            <BusinessIcon sx={{ marginRight: '8px', color: '#1976d2' }} />
+                            Here you can manage all the information related to the cleaning companies.
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontSize: '14px', color: '#666', display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+                            <InfoIcon sx={{ marginRight: '8px', color: '#1976d2' }} />
+                            Ensure all details are correct to maintain company info accurately.
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog2} color="primary">
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Snackbar open={open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                    <Alert onClose={handleCloseSnackbar} severity={severity} sx={{ width: '100%' }}>
+                        {message}
+                    </Alert>
+                </Snackbar>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 4 }}>
+                    <Button
+                        sx={{
+                            width: '200px',
+                            height: '50px',
+                            fontWeight: 'bold',
+                            backgroundColor: '#1976d2',
+                            '&:hover': { backgroundColor: '#1565c0' },
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                        }}
+                        onClick={handleOpenDialog}
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                    >
+                        Add Company
+                    </Button>
+                </Box>
+            </Container>
 
             <Dialog open={dialogOpen} onClose={handleCloseDialog}>
                 <DialogTitle>{isEditing ? 'Update Company' : 'Add New Company'}</DialogTitle>

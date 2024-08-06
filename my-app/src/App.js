@@ -10,7 +10,7 @@ const App = () => {
     <div>
       {/* The Application Starts From Here... */}
       <Start />
-      <SessionTimeout timeoutInMinutes={100} /> Timeout after 15 minutes of inactivity
+      <SessionTimeout timeoutInMinutes={100} />
     </div>
   );
 };

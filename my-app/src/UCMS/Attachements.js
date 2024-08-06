@@ -7,7 +7,7 @@ import {
 import { Edit, Delete } from "@mui/icons-material";
 import Home from "./Home";
 import axios from "axios";
-import { Typography } from "@mui/material";
+import { Alert, AlertTitle, Typography } from "@mui/material";
 
 const Attachments = () => {
     const [attachments, setAttachments] = useState([]);
@@ -97,7 +97,14 @@ const Attachments = () => {
     return (
         <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '950px' }}>
             <Home />
-            <Typography variant="h6">Submitted Attachements</Typography><br />
+            <div>
+                <Alert severity="success">
+                    <AlertTitle>Success</AlertTitle>
+                    <Typography variant="h6">Submitted Attachments</Typography>
+                </Alert>
+                <br />
+                {/* You can add more content related to attachments here */}
+            </div>
             {/* <h4>Submitted Attachements</h4> */}
             {/* <form onSubmit={handleSubmit}>
                 <input type="file" onChange={handleFileChange} required />
