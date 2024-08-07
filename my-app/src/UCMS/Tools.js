@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   Button, TextField, Grid, Paper, Typography, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, FormControl, TablePagination, Select, MenuItem,
-  Dialog, DialogActions, DialogContent, DialogTitle
+  Dialog, DialogActions, DialogContent, DialogTitle,
+  Alert,
+  AlertTitle
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -139,10 +141,15 @@ const Tools = () => {
   };
 
   return (
-    <div style={{ margin: 'auto', width: '80%', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ margin: 'auto', width: '80%', display: 'flex', flexDirection: 'column' }}>
       <Home />
       <Grid container spacing={3} style={{ margin: 'auto' }}>
         <Grid style={{ margin: 'auto' }}>
+          <br /> <br />
+          <Alert severity="info">
+            <AlertTitle>client site tools details</AlertTitle>
+            <Typography variant="h6">Manage Tools</Typography>
+          </Alert>
           <Paper elevation={2} style={{
             padding: '20px',
             display: 'flex',
@@ -153,7 +160,7 @@ const Tools = () => {
                   style={{
                     marginBottom: '15px', textAlign: 'center',
                     padding: '10px', backgroundColor: 'white', borderRadius: '4px'
-                  }}>View Number of Tools: {countTools}
+                  }}>Number of Tools: {countTools}
                 </Typography>
                 <FormControl fullWidth margin="normal" style={{ marginBottom: '15px' }}>
                   <TextField
@@ -321,8 +328,6 @@ const Tools = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Footer />
     </div>
   );
 };

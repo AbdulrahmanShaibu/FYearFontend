@@ -3,7 +3,10 @@ import {
     TextField, Button, Table, TableHead, TableBody,
     TableRow, TableCell, Paper, Select, MenuItem,
     CircularProgress, Container, Grid, Box, Dialog,
-    DialogActions, DialogContent, DialogTitle, IconButton
+    DialogActions, DialogContent, DialogTitle, IconButton,
+    Alert,
+    AlertTitle,
+    Typography
 } from '@mui/material';
 import Home from "./Home";
 import axios from 'axios';
@@ -141,7 +144,11 @@ const Staffs = () => {
             <Box my={4}>
                 <Home />
             </Box>
-            <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
+            <Box justifyContent="center" alignItems="center" mb={4}>
+                <Alert severity="info">
+                    <AlertTitle>available staffs</AlertTitle>
+                    <Typography variant="h6">Manage Staffs</Typography>
+                </Alert>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
                         {/* <Button

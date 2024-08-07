@@ -93,7 +93,7 @@ const Home = () => {
         };
 
         fetchCounts();
-        const interval = setInterval(fetchCounts, 30000); // Fetch data every 30 seconds
+        const interval = setInterval(fetchCounts, 60000); // Fetch data every 60 seconds
 
         return () => clearInterval(interval);
     }, []);

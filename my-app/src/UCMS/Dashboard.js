@@ -1,95 +1,106 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Container, Box, Typography, Card, CardContent, Avatar, Grid, Paper } from '@mui/material';
-import { Padding } from '@mui/icons-material';
+import { Container, Box, Typography, Grid, Paper, Avatar, IconButton, Modal, Divider, Alert } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import PersonIcon from '@mui/icons-material/Person';
+import SecurityIcon from '@mui/icons-material/Security';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { VerifiedUser } from '@mui/icons-material';
 
 const Dashboard = () => {
-  const profileImageURL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEg09MmHvC-78aaRxyd52HabsZqI1-u8R6-w&usqp=CAU';
+  const profileImageURL = 'https://media.istockphoto.com/id/474001892/photo/a-icon-of-a-businessman-avatar-or-profile-pic.jpg?b=1&s=612x612&w=0&k=20&c=Vcxa_y_579iLodDV8OetV6mkG0eMRiouF57fMd9w5RQ=';
 
   const location = useLocation();
   const { state } = location;
-  const { admin_username, admin_email, admin_phone } = state || {};
+  const { UserName, Email, Phone } = state || {};
 
-  const style = {
-    fontWeight: 'bolder', textAlign: 'center',
-    backgroundColor: 'white'
-  }
+  const [openModal, setOpenModal] = useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   return (
-    <Container style={{ marginTop: '55px', backgroundColor: 'white' }}>
-      <Box sx={{ backgroundColor: 'white', margin: 'auto', py: 8 }}>
-        <Box sx={{ textAlign: 'center', mb: 5 }}>
-          <Typography variant="h5" component="h5" color="primary" fontWeight="bold">
-            Welcome {admin_username}! 👏
-          </Typography>
-          {/* <hr /> */}
-        </Box>
+    <Container sx={{ marginTop: 8 }}>
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Alert
+          icon={<VerifiedUser fontSize="inherit" />}
+          severity="success"
+          sx={{ fontSize: 'small', fontWeight: 'bold', textAlign: 'center' }}
+        >
+          Welcome, {UserName}! Your admin access is now active. 👏
+        </Alert>
 
-        <Paper container justifyContent="center" elevation={5}
-          style={{ width: '40%', margin: 'auto' }}>
-          <Grid item xs={6} sm={4} md={3}>
-            <Card sx={{ mb: 4 }}>
-              <Box sx={{ position: 'relative', height: 400 }}>
+      </Box>
+
+      <Grid container justifyContent="center">
+        <Grid item xs={12} md={6}>
+          <Paper elevation={5} sx={{ padding: 4, borderRadius: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={4}>
                 <Avatar
-                  alt={admin_username}
+                  alt={UserName}
                   src={profileImageURL}
                   sx={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '50%',
+                    width: 128,
+                    height: 128,
+                    margin: 'auto',
                   }}
                 />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    width: '100%',
-                    bgcolor: 'rgba(0, 0, 0, 0.6)',
-                    color: 'white',
-                    p: 2,
-                  }}
-                >
-                  <Typography variant="h6" style={{ ...style }}>Username: {admin_username}</Typography>
-                  <Typography variant="h6" style={{ ...style }}>Email: {admin_email}</Typography>
-                </Box>
-              </Box>
-              {/* <CardContent>
-                <Typography variant="h6" component="h2"
-                style={{textAlign:'center'}}
-                >
-                  Contact: {admin_phone}
-                </Typography>
-              </CardContent> */}
-            </Card>
-
-            <Card sx={{ backgroundColor: 'rgb(100, 200, 200)', p: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1" color="white" fontWeight="bold">
-                    Admin Email: {admin_email}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1" color="white" fontWeight="bold">
-                    Admin Name: {admin_username}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1" color="white" fontWeight="bold">
-                    Role: Super Admin
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1" color="white" fontWeight="bold">
-                    Admin Contact: {admin_phone}
-                  </Typography>
-                </Grid>
+                <hr style={{
+                  height: '80px',  // Adjust the height as needed
+                  border: 'none',
+                  borderLeft: '2px solid #4caf50',  // Adjust the color as needed
+                  marginLeft: '16px'  // Adjust spacing as needed
+                }} />
               </Grid>
-            </Card>
-          </Grid>
-        </Paper>
-      </Box>
-      {/* <CopyrightFooter /> */}
+              <Grid item xs={12} sm={8}>
+                <Typography variant="h5" color="textPrimary" fontWeight="bold" sx={{ mb: 1 }}>
+                  user-name: <b style={{ fontWeight: 'bolder' }}>{UserName}</b>
+                </Typography><br />
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                  <EmailIcon color="action" sx={{ mr: 1 }} />
+                  <Typography variant="body1" color="textSecondary">
+                    email:{Email}
+                  </Typography>
+                </Box><br />
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                  <PhoneIcon color="action" sx={{ mr: 1 }} />
+                  <Typography variant="body1" color="textSecondary">
+                    phone:{Phone}
+                  </Typography>
+                </Box><br />
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                  <PersonIcon color="action" sx={{ mr: 1 }} />
+                  <Typography variant="body1" color="textSecondary">
+                    role: super admin
+                  </Typography>
+                </Box><br />
+                <IconButton color="primary" onClick={handleOpenModal}>
+                  <EditIcon />
+                </IconButton>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <Modal open={openModal} onClose={handleCloseModal} aria-labelledby="admin-related-content-modal" aria-describedby="admin-related-content-modal-description">
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4 }}>
+          <Typography id="admin-related-content-modal" variant="h6" component="h2">
+            Admin Options
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          <Alert
+            icon={<ErrorIcon fontSize="inherit" />}
+            severity="error"
+            sx={{ fontSize: '1rem' }}
+          >
+            Noption available
+          </Alert>
+        </Box>
+      </Modal>
     </Container>
   );
 };

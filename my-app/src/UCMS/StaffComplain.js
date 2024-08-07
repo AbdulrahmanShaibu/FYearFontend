@@ -6,6 +6,10 @@ import {
 import '../styles/sidebar.css';
 import UpdateClaimModal from "../UpdateClaimModal";
 import Home from "./Home"
+import Info from "@mui/icons-material/Info";
+import { CgInfo } from "react-icons/cg";
+import { FaInfo } from "react-icons/fa";
+import { Alert, AlertTitle, Typography } from "@mui/material";
 
 const StaffComplain = () => {
 
@@ -43,7 +47,7 @@ const StaffComplain = () => {
       .catch(error => console.error('Error fetching complains:', error));
   };
   const fetchStaffs = () => {
-    fetch('http://localhost:8080/api/v1/staffs/list')
+    fetch('http://localhost:8080/api/v1/all-jwt-users')
       .then(response => response.json())
       .then(data => {
         setStaffs(data);
@@ -152,9 +156,11 @@ const StaffComplain = () => {
     <div style={{ margin: 'auto', marginTop: '80px', width: '950px' }}>
       <Home />
       <div>
-        <br /><br />
+        <Alert severity="success">
+          <AlertTitle>Success</AlertTitle>
+          <Typography variant="h6">Submitted Complains</Typography>
+        </Alert>
         <div style={{ margin: 'auto', backgroundColor: 'whitesmoke' }}>
-          <h4 style={{ margin: 'auto', width: '25%', fontWeight: 'bold' }}>Submitted Complains</h4>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>

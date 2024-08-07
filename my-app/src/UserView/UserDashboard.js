@@ -101,24 +101,30 @@ const UserDashboard = () => {
                     </CardContent>
                 </Card>
             )}
-            <Card sx={{ mt: 4, p: 4, boxShadow: 3 }}>
-                <CardContent>
-                    <Grid container spacing={2} sx={{ mt: 4 }}>
-                        <Grid item xs={12} md={6}>
-                            <Paper elevation={3} sx={{ p: 2, textAlign: 'center', position: 'relative' }}>
-                                <img src={''} alt="Complaints" style={{ width: '100px', marginBottom: '10px' }} />
-                                <Typography variant="h6" component="div">
-                                    Recent Complaints
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    View the most recent complaints submitted by staff.
-                                </Typography>
-                                <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleOpenDetails}>
-                                    View Details
-                                </Button>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
+            {/* <Card sx={{ mt: 4, p: 4, boxShadow: 3 }}>
+                <CardContent> */}
+            <Grid container spacing={2} sx={{ mt: 4 }}>
+                <Grid item xs={12} md={12}>
+                    <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
+                            <img src='https://images.pexels.com/photos/11255234/pexels-photo-11255234.jpeg?auto=compress&cs=tinysrgb&w=600' alt='Complaint 1' style={{ width: '100px', height: 'auto' }} />
+                            <img src='https://images.pexels.com/photos/8476073/pexels-photo-8476073.jpeg?auto=compress&cs=tinysrgb&w=400' alt='Complaint 2' style={{ width: '100px', height: 'auto' }} />
+                            <img src='https://images.pexels.com/photos/7434562/pexels-photo-7434562.jpeg?auto=compress&cs=tinysrgb&w=400' alt='Complaint 3' style={{ width: '100px', height: 'auto' }} />
+                        </div>
+                        <Typography variant="h6" component="div" sx={{ mb: 2 }}>
+                            Recent Complaints
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                            View the most recent complaints submitted by staff.
+                        </Typography>
+                        <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleOpenDetails}>
+                            View Details
+                        </Button>
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            {/* <Grid item xs={12} md={6}>
                             <Paper elevation={3} sx={{ p: 2, textAlign: 'center', position: 'relative' }}>
                                 <img src={''} alt="Status" style={{ width: '100px', marginBottom: '10px' }} />
                                 <Typography variant="h6" component="div">
@@ -131,8 +137,8 @@ const UserDashboard = () => {
                                     Check Status
                                 </Button>
                             </Paper>
-                        </Grid>
-                        <Grid item xs={12}>
+                        </Grid> */}
+            {/* <Grid item xs={12}>
                             <Paper elevation={3} sx={{ p: 2, textAlign: 'center', position: 'relative' }}>
                                 <img src={''} alt="New Complaint" style={{ width: '100px', marginBottom: '10px' }} />
                                 <Typography variant="h6" component="div">
@@ -145,10 +151,10 @@ const UserDashboard = () => {
                                     Report Issue
                                 </Button>
                             </Paper>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
+                        </Grid> */}
+            {/* </Grid> */}
+            {/* </CardContent>
+            </Card> */}
 
             <Dialog open={openDetails} onClose={handleCloseDetails}>
                 <DialogTitle>Complaint Details</DialogTitle>
@@ -221,7 +227,7 @@ const UserDashboard = () => {
                     <Button onClick={handleSubmitNewComplaint} color="primary">Submit</Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+        </Container >
     );
 };
 

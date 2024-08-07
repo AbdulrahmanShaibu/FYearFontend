@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Paper } from '@mui/material';
+import { Alert, Paper, Typography } from '@mui/material';
 import {
     Table, TableBody, TableCell,
     TableHead, TableRow,
@@ -34,21 +34,19 @@ const ViewCleaningCompany = () => {
 
     return (
         <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', padding: '60px' }}>
-            <UserHome/>
-            <div style={{
-                backgroundColor: 'white', textAlign: 'center',
-                padding: '20px 0', borderRadius: '8px', marginBottom: '20px'
-            }}>
-                <h2 style={{
-                    color: '#333333', fontWeight: 'normal',
-                    fontFamily: 'Arial, sans-serif', fontSize: '20px'
-                }}>Available Cleaning Companies</h2>
-            </div>
+            <UserHome />
             <Paper elevation={5} style={{
                 margin: 'auto', maxWidth: '950px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
                 borderRadius: '8px', overflow: 'hidden',
                 justifyContent: 'center'
             }}>
+                <div style={{ margin: '16px 0' }}>
+                    <Alert severity="info">
+                        <Typography variant="h6" component="strong">
+                            Available Cleaning Companies
+                        </Typography>
+                    </Alert>
+                </div>
                 <Table>
                     <TableHead>
                         <TableRow>

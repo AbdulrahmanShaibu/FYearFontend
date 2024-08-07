@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
-    Container, Grid, Table, TableRow, TableCell, TableHead, TableBody, TablePagination, Paper, Typography, Box
+    Container, Grid, Table, TableRow, TableCell, TableHead, TableBody, TablePagination, Paper, Typography, Box,
+    Alert
 } from '@mui/material';
 import axios from "axios";
 import UserHome from "./UserHome";
@@ -34,12 +35,21 @@ const ViewClientOrganisations = () => {
         <Container>
             <UserHome />
             <Box mt={8} mb={4}>
-                <Typography variant="h4" align="center" gutterBottom>
-                    Available Client Organisations
-                </Typography>
-                <Typography variant="body1" align="center" color="textSecondary">
-                    Below is the list of all client organisations currently available.
-                </Typography>
+                <Alert
+                    severity="info"
+                    variant="outlined"
+                    sx={{
+                        mb: 4,
+                        '& .MuiAlert-message': {  // Target the message area within the Alert
+                            textAlign: 'center',
+                            width: '100%',  // Ensure the text area takes full width
+                        }
+                    }}
+                >
+                    <Typography variant="body2">
+                        Below is the list of all client organisations currently available.
+                    </Typography>
+                </Alert>
             </Box>
             <Grid container justifyContent="center">
                 <Grid item xs={12} md={10} lg={8}>

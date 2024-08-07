@@ -8,6 +8,7 @@ import {
 import '../styles/sidebar.css';
 import UpdateClaimModal from "../UpdateClaimModal";
 import UserHome from "./UserHome";
+import { Alert, Stack, Typography } from "@mui/material";
 
 const UserStaffComplain = () => {
   const [state, setState] = useState({
@@ -146,9 +147,34 @@ const UserStaffComplain = () => {
 
   return (
     <div style={{ margin: 'auto', marginTop: '80px', width: '950px' }}>
+      <Stack sx={{ width: '100%' }} spacing={2}>
+        <Alert
+          severity="info"
+          sx={{
+            position: 'relative',
+            '& .MuiAlert-title': {
+              fontWeight: 'bold',
+              fontSize: '16px',
+            },
+            '& .MuiAlert-message': {
+              marginTop: '4px',
+            }
+          }}
+        >
+          <div>
+            <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+              Complaint Submission
+            </Typography>
+            <Typography variant="body2">
+              To submit a complaint, please use the button below to provide the necessary details.
+            </Typography>
+          </div>
+        </Alert>
+      </Stack>
+
       <UserHome />
       <div>
-        <br /><br />
+        <br />
         <Button variant="contained" color="primary" onClick={handleOpenFormModal}>
           Add Complain
         </Button>

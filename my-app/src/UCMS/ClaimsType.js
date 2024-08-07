@@ -93,7 +93,7 @@ const ClaimType = () => {
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px' }}>
                     <span style={{ display: 'flex', alignItems: 'center', fontSize: '20px', color: '#444', fontWeight: '600' }}>
-                        <Info style={{ marginRight: '8px', color: '#1976d2', fontSize: '26px' }} /> {/* Info icon with updated size */}
+                        <Info style={{ marginRight: '8px', color: 'green', fontSize: '26px' }} /> {/* Info icon with updated size */}
                         Claim Types Management
                     </span>
 
@@ -115,7 +115,7 @@ const ClaimType = () => {
                         }}
                     >
                         Add Claim Type
-                        <Add style={{ fontSize: '20px' }} /> {/* Icon with a consistent size */}
+                        <Add style={{ fontSize: '22px' }} /> {/* Icon with a consistent size */}
                     </Button>
                 </div>
 

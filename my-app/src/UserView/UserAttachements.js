@@ -8,6 +8,7 @@ import { Edit, Delete } from "@mui/icons-material";
 // import Home from "./Home";
 import axios from "axios";
 import UserHome from "./UserHome";
+import { Alert, Stack, Typography } from "@mui/material";
 
 const UserAttachments = () => {
     const [attachments, setAttachments] = useState([]);
@@ -91,6 +92,30 @@ const UserAttachments = () => {
 
     return (
         <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '950px' }}>
+            <Stack sx={{ width: '100%' }} spacing={2}>
+                <Alert
+                    severity="info"
+                    sx={{
+                        position: 'relative',
+                        '& .MuiAlert-title': {
+                            fontWeight: 'bold',
+                            fontSize: '16px',
+                        },
+                        '& .MuiAlert-message': {
+                            marginTop: '4px',
+                        }
+                    }}
+                >
+                    <div>
+                        <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                            Attachments
+                        </Typography>
+                        <Typography variant="body2">
+                            Please attachment your complain here
+                        </Typography>
+                    </div>
+                </Alert>
+            </Stack>
             <UserHome />
             <form onSubmit={handleSubmit}>
                 <input type="file" onChange={handleFileChange} required />
