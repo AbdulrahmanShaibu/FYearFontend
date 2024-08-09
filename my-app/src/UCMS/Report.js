@@ -54,10 +54,10 @@ const GenerateReport = () => {
             .catch(error => console.error('Error fetching staffs complain:', error));
     };
 
+
     const handleDownload = () => {
         const doc = new jsPDF();
 
-        // Initial settings
         let y = 20; // Initial vertical position
 
         // Title
@@ -67,6 +67,7 @@ const GenerateReport = () => {
         doc.text('University Cleaners Management System', 14, y);
         y += 10; // Increase y position for next element
 
+        // Line separator
         doc.setFontSize(18);
         doc.setFont("helvetica", "normal");
         doc.setDrawColor(0, 0, 0);
@@ -81,14 +82,19 @@ const GenerateReport = () => {
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
         client_site.forEach((client, index) => {
-            doc.text(`   - Client site:${index + 1}. ${client.name}`, 20, y);
-            y += 5; // Adjust spacing between lines
-            doc.text(`   - Client organisation: ${client.clientOrganisation.name}`, 25, y);
-            y += 10; // Adjust spacing for next client site
+            if (client.name) {
+                doc.text(`   - Client site ${index + 1}: ${client.name}`, 20, y);
+                y += 5; // Adjust spacing between lines
+                if (client.clientOrganisation && client.clientOrganisation.name) {
+                    doc.text(`     - Client organisation: ${client.clientOrganisation.name}`, 25, y);
+                    y += 5;
+                }
+                y += 10; // Adjust spacing for next client site
+            }
         });
 
         // Tools section
-        y += 5; // Space before next section
+        y += 10; // Space before next section
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
         doc.text('Tools', 14, y);
@@ -98,31 +104,39 @@ const GenerateReport = () => {
         tools.forEach((tool, index) => {
             doc.text(`${index + 1}. ${tool.toolType}`, 20, y);
             y += 5; // Adjust spacing between lines
-            doc.text(`   - Quantity: ${tool.quantity}`, 25, y);
-            y += 5;
-            doc.text(`   - Client Site: ${tool.clientSite.name}`, 25, y);
-            y += 5;
-            doc.text(`   - Client Organisation: ${tool.clientSite.clientOrganisation.name}`, 25, y);
+            if (tool.quantity) {
+                doc.text(`   - Quantity: ${tool.quantity}`, 25, y);
+                y += 5;
+            }
+            if (tool.clientSite && tool.clientSite.name) {
+                doc.text(`   - Client Site: ${tool.clientSite.name}`, 25, y);
+                y += 5;
+            }
+            if (tool.clientSite && tool.clientSite.clientOrganisation && tool.clientSite.clientOrganisation.name) {
+                doc.text(`   - Client Organisation: ${tool.clientSite.clientOrganisation.name}`, 25, y);
+                y += 5;
+            }
             y += 10; // Adjust spacing for next tool
         });
 
         // Cleaning Company section
-        y += 5; // Space before next section
+        y += 10; // Space before next section
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
         doc.text('Cleaning Company', 14, y);
         y += 8; // Increase y position for next element
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
-
         cleaningcompany.forEach((company, index) => {
             doc.text(`${index + 1}. ${company.companyName}`, 20, y);
             y += 5; // Adjust spacing between lines
-            doc.text(`   - Address: ${company.address}`, 25, y);
-            y += 5;
+            if (company.address) {
+                doc.text(`   - Address: ${company.address}`, 25, y);
+                y += 5;
+            }
             doc.text(`   - Staffs list:`, 25, y);
             y += 5;
-            company.companyStaffs.forEach((staff, staffIndex) => {
+            company.companyStaffs?.forEach((staff, staffIndex) => {
                 doc.text(`     ${staffIndex + 1}. ${staff.name}`, 30, y);
                 y += 5;
                 if (staff.clientOrganisations && staff.clientOrganisations.length > 0) {
@@ -139,14 +153,13 @@ const GenerateReport = () => {
         });
 
         // Company Staffs section
-        y += 5; // Space before next section
+        y += 10; // Space before next section
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
         doc.text('Company Staffs', 14, y);
         y += 8; // Increase y position for next element
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
-
         company_staffs.forEach((staff, index) => {
             doc.text(`${index + 1}. ${staff.username}`, 20, y);
             y += 5; // Adjust spacing between lines
@@ -154,15 +167,19 @@ const GenerateReport = () => {
             // Accessing cleaningCompany details
             const cleaningCompany = staff.cleaningCompany;
             if (cleaningCompany) {
-                doc.text(`   - Cleaning Company: ${cleaningCompany.companyName}`, 25, y);
-                y += 5;
+                if (cleaningCompany.companyName) {
+                    doc.text(`   - Cleaning Company: ${cleaningCompany.companyName}`, 25, y);
+                    y += 5;
+                }
 
                 // Accessing clientOrganisations details
                 const clientOrganisations = cleaningCompany.companyStaffs[0]?.clientOrganisations;
                 if (clientOrganisations) {
                     clientOrganisations.forEach(org => {
-                        doc.text(`   - Client Organisation: ${org.name}`, 25, y);
-                        y += 5;
+                        if (org.name) {
+                            doc.text(`   - Client Organisation: ${org.name}`, 25, y);
+                            y += 5;
+                        }
                     });
                 }
             }
@@ -170,7 +187,7 @@ const GenerateReport = () => {
         });
 
         // Staffs Complaints section
-        y += 5; // Space before next section
+        y += 10; // Space before next section
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
         doc.text('Staffs Complaints', 14, y);
@@ -180,21 +197,27 @@ const GenerateReport = () => {
         staffs_complain.forEach((complaint, index) => {
             doc.text(`${index + 1}. ${complaint.description}`, 20, y);
             y += 5; // Adjust spacing between lines
-            doc.text(`   - Submission Date: ${complaint.submissionDate}`, 25, y);
-            y += 5;
-            doc.text(`   - Staff Name: ${complaint.staff}`, 25, y);
-            y += 5;
-            doc.text(`   - Claim Types:`, 25, y);
-            y += 5;
-            complaint.claimTypes.forEach((claimType, claimIndex) => {
-                doc.text(`     ${claimIndex + 1}. ${claimType.type}`, 30, y);
-                y += 5; // Adjust spacing between claim types
-            });
+            if (complaint.submissionDate) {
+                doc.text(`   - Submission Date: ${complaint.submissionDate}`, 25, y);
+                y += 5;
+            }
+            if (complaint.staff) {
+                doc.text(`   - Staff Name: ${complaint.staff}`, 25, y);
+                y += 5;
+            }
+            if (complaint.claimTypes) {
+                doc.text(`   - Claim Types:`, 25, y);
+                y += 5;
+                complaint.claimTypes.forEach((claimType, claimIndex) => {
+                    doc.text(`     ${claimIndex + 1}. ${claimType}`, 30, y);
+                    y += 5;
+                });
+            }
             y += 10; // Adjust spacing for next complaint
         });
 
-        // Save and download PDF
-        doc.save('system_report.pdf');
+        // Save PDF
+        doc.save('report.pdf');
     };
 
 
