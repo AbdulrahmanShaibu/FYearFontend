@@ -1,19 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Modal, Backdrop, Fade, TextField, Button, FormControl, FormLabel
 } from "@material-ui/core";
 
 const UpdateClaimModal = ({ open, handleClose, claim, handleUpdate }) => {
-    const initialDescription = claim ? claim.claimsDescription : '';
-    const initialDate = claim ? claim.submissionDate : '';
+    const [claimsDescription, setClaimsDescription] = useState('');
+    const [submissionDate, setSubmissionDate] = useState('');
 
-    const [claimsDescription, setClaimsDescription] = useState(initialDescription);
-    const [submissionDate, setSubmissionDate] = useState(initialDate);
+    // Update form fields whenever the claim prop changes
+    useEffect(() => {
+        if (claim) {
+            setClaimsDescription(claim.description);  // Make sure to use the correct field name, 'description'
+            setSubmissionDate(claim.submissionDate);  // 'submissionDate' should match the backend field
+        }
+    }, [claim]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (claim) {
-            handleUpdate(claim.claimID, claimsDescription, submissionDate);
+            handleUpdate(claim.complainID, claimsDescription, submissionDate);
             handleClose();
         }
     };

@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
   Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Button, TablePagination
+  TableHead, TableRow, Paper, Button, TablePagination, Dialog, DialogActions, DialogContent, DialogTitle, TextField
 } from '@material-ui/core';
-import '../styles/sidebar.css';
-import UpdateClaimModal from "../UpdateClaimModal";
-import Home from "./Home"
-import Info from "@mui/icons-material/Info";
-import { CgInfo } from "react-icons/cg";
-import { FaInfo } from "react-icons/fa";
+import Home from "./Home";
 import { Alert, AlertTitle, Typography } from "@mui/material";
+import axios from "axios";
 
 const StaffComplain = () => {
-
-  const [claimsDescription, setClaimsDescription] = useState('');
+  const [description, setDescription] = useState('');
   const [submissionDate, setSubmissionDate] = useState('');
   const [selectedStaff, setSelectedStaff] = useState('');
   const [claims, setClaims] = useState([]);
@@ -22,7 +17,7 @@ const StaffComplain = () => {
   const [selectedClaim, setSelectedClaim] = useState(null);
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5); // You can change this as per your preference
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const style = {
     table: {
@@ -30,7 +25,7 @@ const StaffComplain = () => {
       color: 'white',
       fontWeight: 'bold'
     }
-  }
+  };
 
   useEffect(() => {
     fetchComplains();
@@ -38,21 +33,14 @@ const StaffComplain = () => {
   }, []);
 
   const fetchComplains = () => {
-    fetch('http://localhost:8080/api/v1/list/StaffComplain')
-      .then(response => response.json())
-      .then(data => {
-        setClaims(data);
-        console.log(data);
-      })
+    axios.get('http://localhost:8080/api/v1/list/StaffComplain')
+      .then(response => setClaims(response.data))
       .catch(error => console.error('Error fetching complains:', error));
   };
+
   const fetchStaffs = () => {
-    fetch('http://localhost:8080/api/v1/all-jwt-users')
-      .then(response => response.json())
-      .then(data => {
-        setStaffs(data);
-        console.log(data);
-      })
+    axios.get('http://localhost:8080/api/v1/all-jwt-users')
+      .then(response => setStaffs(response.data))
       .catch(error => console.error('Error fetching staffs:', error));
   };
 
@@ -64,69 +52,46 @@ const StaffComplain = () => {
     e.preventDefault();
 
     const data = {
-      claimsDescription: claimsDescription,
+      description: description,
       submissionDate: submissionDate,
+      staffs: selectedStaff
     };
 
-    fetch(saveAPI, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then(response => response.json())
-      .then(data => {
-        setClaims([...claims, data]);
-        console.log(data);
+    axios.post(saveAPI, data)
+      .then(response => {
+        setClaims([...claims, response.data]);
+        resetFormFields();
       })
-      .catch(error => console.error('Error saving complains:', error));
-
-    // Reset form fields
-    setClaimsDescription('');
-    setSubmissionDate('');
-    setSelectedStaff('');
+      .catch(error => console.error('Error saving complain:', error));
   };
 
   const handleDelete = (id) => {
-    fetch(deleteAPI + id, {
-      method: 'DELETE',
-    })
+    axios.delete(`${deleteAPI}/${id}`)
       .then(response => {
-        if (response.ok) {
-          // Remove the deleted claim from the list
-          setClaims(claims.filter(claim => claim.claimID !== id));
+        if (response.status === 200) {
+          setClaims(claims.filter(claim => claim.complainID !== id));
         } else {
           console.error('Error deleting complain:', response.statusText);
         }
       })
-      .catch(error => console.error('Error deleting complain:', error));
+      .catch(error => console.error('Error deleting complain:', error.message));
   };
 
-  const handleUpdate = (id, description, date) => {
+  const handleUpdate = (id) => {
     const data = {
-      claimsDescription: description,
-      submissionDate: date,
+      description: description,
+      submissionDate: submissionDate,
+      staffs: selectedStaff
     };
 
-    fetch(updateAPI + id, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
+    axios.put(`${updateAPI}/${id}`, data)
       .then(response => {
-        if (response.ok) {
-          // Updated successfully, update the claim in state
-          const updatedClaims = claims.map(claim => {
-            if (claim.claimID === id) {
-              return { ...claim, claimsDescription: description, submissionDate: date };
-            }
-            return claim;
-          });
+        if (response.status === 200) {
+          const updatedClaims = claims.map(claim =>
+            claim.complainID === id ? { ...claim, ...data } : claim
+          );
           setClaims(updatedClaims);
-          console.log('Claim updated successfully');
+          handleCloseModal(); // Close the modal after successful update
         } else {
           console.error('Error updating complain:', response.statusText);
         }
@@ -136,6 +101,9 @@ const StaffComplain = () => {
 
   const handleOpenModal = (claim) => {
     setSelectedClaim(claim);
+    setDescription(claim.description);
+    setSubmissionDate(claim.submissionDate);
+    setSelectedStaff(claim.staffs);
     setOpenModal(true);
   };
 
@@ -150,6 +118,12 @@ const StaffComplain = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const resetFormFields = () => {
+    setDescription('');
+    setSubmissionDate('');
+    setSelectedStaff('');
   };
 
   return (
@@ -179,7 +153,7 @@ const StaffComplain = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{claim.description}</TableCell>
                     <TableCell>{claim.submissionDate}</TableCell>
-                    <TableCell>{claim.staffs ? claim.staffs.StaffName : 'N/A'}</TableCell>
+                    <TableCell>{claim.staffs ? `${claim.staffs.firstName} ${claim.staffs.lastName}` : 'N/A'}</TableCell>
                     <TableCell>
                       <Button
                         variant="contained"
@@ -193,7 +167,7 @@ const StaffComplain = () => {
                       <Button
                         variant="contained"
                         color="secondary"
-                        onClick={() => handleDelete(claim.claimID)}
+                        onClick={() => handleDelete(claim.complainID)}
                       >
                         Delete
                       </Button>
@@ -208,21 +182,68 @@ const StaffComplain = () => {
               count={claims.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </TableContainer>
         </div>
       </div>
-      {/* Update Complain Modal */}
-      {selectedClaim && <UpdateClaimModal
-        open={openModal}
-        handleClose={handleCloseModal}
-        claim={selectedClaim}
-        handleUpdate={handleUpdate}
-      />}
+
+      {/* Modal Form for Updating */}
+      <Dialog open={openModal} onClose={handleCloseModal}>
+        <DialogTitle>Update Complaint</DialogTitle>
+        <DialogContent>
+          <form onSubmit={() => handleUpdate(selectedClaim.complainID)}>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Description"
+              fullWidth
+              variant="outlined"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <TextField
+              margin="dense"
+              label="Submission Date"
+              fullWidth
+              variant="outlined"
+              type="date"
+              value={submissionDate}
+              onChange={(e) => setSubmissionDate(e.target.value)}
+            />
+            <TextField
+              margin="dense"
+              label="Staff"
+              fullWidth
+              variant="outlined"
+              select
+              value={selectedStaff}
+              onChange={(e) => setSelectedStaff(e.target.value)}
+              SelectProps={{
+                native: true,
+              }}
+            >
+              <option disabled={true} value=""></option>
+              {staffs.map((staff) => (
+                <option key={staff.id} value={staff.id}>
+                  {staff.firstName} {staff.lastName}
+                </option>
+              ))}
+            </TextField>
+            <DialogActions>
+              <Button onClick={handleCloseModal} color="primary">
+                Cancel
+              </Button>
+              <Button type="submit" color="primary">
+                Update
+              </Button>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-}
+};
 
 export default StaffComplain;
