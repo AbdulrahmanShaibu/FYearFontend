@@ -10,7 +10,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import Home from "./Home";
-import Footer from "../Footer";
 
 const Tools = () => {
   const [toolsData, setToolsData] = useState([]);
@@ -32,6 +31,10 @@ const Tools = () => {
     quantity: '',
     id: ''
   });
+
+  // State for delete confirmation dialog
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [toolToDelete, setToolToDelete] = useState(null);
 
   // APIs
   const LIST_API = 'http://localhost:8080/api/v1/list/tools';
@@ -103,9 +106,23 @@ const Tools = () => {
     try {
       await axios.delete(`${DELETE_API}/${id}`);
       setToolsData(toolsData.filter(tool => tool.toolID !== id));
+      setConfirmDelete(false);  // Close the confirmation dialog
     } catch (error) {
       console.error('Error while deleting tool:', error);
     }
+  };
+
+  const handleOpenDeleteConfirm = (toolID) => {
+    setToolToDelete(toolID);
+    setConfirmDelete(true);
+  };
+
+  const handleCloseDeleteConfirm = () => {
+    setConfirmDelete(false);
+  };
+
+  const handleConfirmDelete = () => {
+    handleDeleteData(toolToDelete);
   };
 
   const handleInputChange = (event) => {
@@ -224,35 +241,29 @@ const Tools = () => {
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Tool Id</TableCell>
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Tool Type</TableCell>
                     <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Quantity</TableCell>
-                    <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Client Site</TableCell>
-                    <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Update</TableCell>
-                    <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Delete</TableCell>
+                    <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Site</TableCell>
+                    <TableCell style={{ fontWeight: 'bold', backgroundColor: '#334', color: 'white' }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {toolsData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((tool, index) => (
+                  {toolsData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((tool) => (
                     <TableRow key={tool.toolID}>
-                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{tool.toolID}</TableCell>
                       <TableCell>{tool.toolType}</TableCell>
                       <TableCell>{tool.quantity}</TableCell>
                       <TableCell>{tool.clientSite ? tool.clientSite.name : 'N/A'}</TableCell>
                       <TableCell>
                         <Button
-                          variant="outlined"
-                          color="primary"
-                          startIcon={<EditIcon />}
                           onClick={() => handleOpen(tool)}
-                          style={{ marginRight: '5px' }}
+                          startIcon={<EditIcon />}
+                          style={{ color: 'blue', textTransform: 'capitalize', fontWeight: 'bold' }}
                         >
-                          Update
+                          Edit
                         </Button>
-                      </TableCell>
-                      <TableCell>
                         <Button
-                          variant="outlined"
-                          color="secondary"
-                          startIcon={<DeleteIcon style={{ color: 'red' }} />}
-                          onClick={() => handleDeleteData(tool.toolID)}
+                          onClick={() => handleOpenDeleteConfirm(tool.toolID)}
+                          startIcon={<DeleteIcon />}
+                          style={{ color: 'red', textTransform: 'capitalize', fontWeight: 'bold' }}
                         >
                           Delete
                         </Button>
@@ -262,7 +273,7 @@ const Tools = () => {
                 </TableBody>
               </Table>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[5, 10, 15]}
                 component="div"
                 count={toolsData.length}
                 rowsPerPage={rowsPerPage}
@@ -276,7 +287,7 @@ const Tools = () => {
       </Grid>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Update Tool</DialogTitle>
+        <DialogTitle>Edit Tool</DialogTitle>
         <DialogContent>
           <TextField
             name="toolType"
@@ -286,7 +297,6 @@ const Tools = () => {
             onChange={handleModalInputChange}
             fullWidth
             margin="normal"
-            style={{ marginBottom: '15px' }}
             InputProps={{ style: { borderRadius: '4px', border: '1px solid #ccc' } }}
           />
           <TextField
@@ -297,10 +307,9 @@ const Tools = () => {
             onChange={handleModalInputChange}
             fullWidth
             margin="normal"
-            style={{ marginBottom: '15px' }}
             InputProps={{ style: { borderRadius: '4px', border: '1px solid #ccc' } }}
           />
-          <FormControl fullWidth margin="normal" style={{ marginBottom: '15px' }}>
+          <FormControl fullWidth margin="normal">
             <Select
               name="id"
               value={currentTool.id}
@@ -320,14 +329,26 @@ const Tools = () => {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleModalUpdate} color="primary">
-            Update
-          </Button>
+          <Button onClick={handleModalUpdate} color="primary" variant="contained">Update</Button>
+          <Button onClick={handleClose} color="secondary" variant="contained">Cancel</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={confirmDelete}
+        onClose={handleCloseDeleteConfirm}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this tool?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmDelete} color="primary" variant="contained">Yes</Button>
+          <Button onClick={handleCloseDeleteConfirm} color="secondary" variant="contained">No</Button>
+        </DialogActions>
+      </Dialog>
+      {/* <Footer /> */}
     </div>
   );
 };

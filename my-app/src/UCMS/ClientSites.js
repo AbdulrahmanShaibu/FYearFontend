@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
     TextField, Button, Table, TableHead, TableBody, TableRow, TableCell,
-    Paper, TablePagination, Dialog, DialogActions, DialogContent, DialogTitle
+    Paper, TablePagination, Dialog, DialogActions, DialogContent, DialogTitle,
+    Alert
 } from '@mui/material';
 import Home from "./Home";
 import axios from 'axios';
@@ -21,6 +22,8 @@ const ClientSites = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogAction, setDialogAction] = useState('add');
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // State for delete confirmation dialog
+    const [siteToDelete, setSiteToDelete] = useState(null); // State to store the site to delete
 
     useEffect(() => {
         axios.get(ListAPI)
@@ -66,9 +69,15 @@ const ClientSites = () => {
     };
 
     const handleDeleteData = (id) => {
-        axios.delete(`${DeleteAPI}/${id}`)
+        setSiteToDelete(id); // Store the site ID to be deleted
+        setDeleteDialogOpen(true); // Open the confirmation dialog
+    };
+
+    const confirmDelete = () => {
+        axios.delete(`${DeleteAPI}/${siteToDelete}`)
             .then(response => {
-                setClientSites(clientSites.filter(site => site.id !== id));
+                setClientSites(clientSites.filter(site => site.id !== siteToDelete));
+                setDeleteDialogOpen(false); // Close the confirmation dialog
             })
             .catch(error => {
                 console.error('Delete response failed:', error);
@@ -143,6 +152,11 @@ const ClientSites = () => {
         setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
     };
 
+    const handleDeleteDialogClose = () => {
+        setDeleteDialogOpen(false);
+        setSiteToDelete(null);
+    };
+
     return (
         <div style={{ margin: 'auto', marginTop: '150px', width: '900px' }}>
             <Home />
@@ -156,6 +170,9 @@ const ClientSites = () => {
                         Add Client Site
                     </Button>
                 </div>
+                <Alert severity="info">
+                    Manage your client sites efficiently. Use the button below to add a new client sites to the system, ensuring all relevant details are captured for effective management.
+                </Alert>
                 <Table>
                     <TableHead>
                         <TableRow style={{ backgroundColor: '#333' }}>
@@ -212,29 +229,45 @@ const ClientSites = () => {
                         onChange={(e) => handleInputChange(e, dialogAction === 'add' ? setNewClientSite : setUpdatedClientSite)}
                         label="Client Site Name"
                         fullWidth
-                        style={{ marginBottom: '20px' }}
+                        margin="normal"
                     />
-                    <select
+                    <TextField
+                        select
+                        SelectProps={{ native: true }}
                         name="clientOrganisation"
                         value={dialogAction === 'add' ? newClientSite.clientOrganisation.id : updatedClientSite.clientOrganisation.id}
                         onChange={(e) => handleInputChange(e, dialogAction === 'add' ? setNewClientSite : setUpdatedClientSite)}
-                        style={{ marginBottom: '20px', padding: '10px', borderRadius: '4px', width: '100%' }}
+                        label="Client Organisation"
+                        fullWidth
+                        margin="normal"
                     >
                         <option value="">Select Organisation</option>
                         {clientOrganisations.map(org => (
                             <option key={org.id} value={org.id}>{org.name}</option>
                         ))}
-                    </select>
+                    </TextField>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleDialogClose} color="primary">
                         Cancel
                     </Button>
-                    <Button
-                        onClick={dialogAction === 'add' ? handleAddData : () => handleUpdate(updatedClientSite.id)}
-                        color="primary"
-                    >
+                    <Button onClick={dialogAction === 'add' ? handleAddData : () => handleUpdate(updatedClientSite.id)} color="primary">
                         {dialogAction === 'add' ? 'Add' : 'Update'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    Are you sure you want to delete this client site? This action cannot be undone.
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteDialogClose} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmDelete} color="secondary">
+                        Confirm
                     </Button>
                 </DialogActions>
             </Dialog>

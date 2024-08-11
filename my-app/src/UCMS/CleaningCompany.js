@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import { Paper } from '@mui/material';
 import {
     Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow,
@@ -12,7 +11,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import axios from 'axios';
 import Home from './Home';
-import { Delete } from '@mui/icons-material';
 import { Container, Box, Typography } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import BusinessIcon from '@mui/icons-material/Business';
@@ -38,6 +36,9 @@ const CleaningCompany = () => {
     const handleCloseDialog2 = () => {
         setDialog2Open(false);
     };
+
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [companyToDelete, setCompanyToDelete] = useState(null);
 
     useEffect(() => {
         axios.get('http://localhost:8080/api/v1/list')
@@ -120,18 +121,30 @@ const CleaningCompany = () => {
             });
     }
 
-    const handleDelete = (id) => {
-        axios.delete(`http://localhost:8080/api/v1/delete/company/${id}`)
+    const handleDeleteClick = (id) => {
+        setCompanyToDelete(id);
+        setConfirmDialogOpen(true);
+    };
+
+    const handleDelete = () => {
+        axios.delete(`http://localhost:8080/api/v1/delete/company/${companyToDelete}`)
             .then(response => {
-                setCompanyData(companyData.filter(company => company.companyId !== id));
+                setCompanyData(companyData.filter(company => company.companyId !== companyToDelete));
                 showNotification('Company deleted successfully', 'success');
+                setConfirmDialogOpen(false);
                 console.log('Delete response data:', response.data);
             })
             .catch(error => {
                 showNotification('Error deleting company', 'error');
+                setConfirmDialogOpen(false);
                 console.log('Error while deleting company', error);
             });
-    }
+    };
+
+    const handleConfirmDialogClose = () => {
+        setConfirmDialogOpen(false);
+        setCompanyToDelete(null);
+    };
 
     const showNotification = (message, severity) => {
         setMessage(message);
@@ -244,52 +257,53 @@ const CleaningCompany = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={isEditing ? handleUpdateCompany : handleAddCompany} color="primary">
+                    <Button onClick={handleCloseDialog} color="primary">Cancel</Button>
+                    <Button
+                        onClick={isEditing ? handleUpdateCompany : handleAddCompany}
+                        color="primary"
+                        variant="contained"
+                    >
                         {isEditing ? 'Update' : 'Add'}
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            <Paper elevation={5} style={{
-                margin: 'auto', maxWidth: '950px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                borderRadius: '8px', overflow: 'hidden',
-                justifyContent: 'center'
-            }}>
+            <TableContainer sx={{ margin: '20px', padding: '10px', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto', borderRadius: '10px' }}>
+                <Alert severity="info">
+                    Manage your cleaning company efficiently. Use the button above to add a new cleaning company to the system, ensuring all relevant details are captured for effective management.
+                </Alert>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell >S/N</TableCell>
-                            <TableCell >Company Name</TableCell>
-                            <TableCell >Address</TableCell>
-                            <TableCell >Edit</TableCell>
-                            <TableCell >Delete</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', textAlign: 'center' }}>Company Name</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', textAlign: 'center' }}>Address</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', textAlign: 'center' }}>Update</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', fontSize: '16px', textAlign: 'center' }}>Delete</TableCell>
                         </TableRow>
                     </TableHead>
-
                     <TableBody>
-                        {paginatedData.map((company, index) => (
+                        {paginatedData.map((company) => (
                             <TableRow key={company.companyId}>
-                                <TableCell style={{ textAlign: 'center' }}>{index + 1}</TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{company.companyName}</TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{company.address}</TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>
+                                <TableCell sx={{ textAlign: 'center' }}>{company.companyName}</TableCell>
+                                <TableCell sx={{ textAlign: 'center' }}>{company.address}</TableCell>
+                                <TableCell sx={{ textAlign: 'center' }}>
                                     <Button
-                                        onClick={() => handleEditCompany(company)}
-                                        //  variant="contained"
+                                        variant="outlined"
+                                        color="primary"
                                         startIcon={<EditIcon />}
+                                        onClick={() => handleEditCompany(company)}
+                                        sx={{ marginRight: '10px' }}
                                     >
                                         Edit
                                     </Button>
                                 </TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>
+
+                                <TableCell>
                                     <Button
-                                        style={{ color: 'blue', backgroundColor: 'white' }}
-                                        onClick={() => handleDelete(company.companyId)}
-                                        variant="contained"
-                                        startIcon={<Delete style={{ color: 'red' }} />}
+                                        variant="outlined"
+                                        color="error"
+                                        startIcon={<DeleteIcon />}
+                                        onClick={() => handleDeleteClick(company.companyId)}
                                     >
                                         Delete
                                     </Button>
@@ -297,20 +311,58 @@ const CleaningCompany = () => {
                             </TableRow>
                         ))}
                     </TableBody>
-
                 </Table>
-            </Paper>
+            </TableContainer>
 
-            {/* Rows per page selection */}
-            <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <span>Rows per page: </span>
-                <select value={rowsPerPage} onChange={handleRowsPerPageChange} style={{ marginLeft: '5px' }}>
-                    {[5, 10, 25].map(rows => (
-                        <option key={rows} value={rows}>{rows}</option>
-                    ))}
-                </select>
+            {/* Confirmation Dialog */}
+            <Dialog
+                open={confirmDialogOpen}
+                onClose={handleConfirmDialogClose}
+                aria-labelledby="confirm-dialog-title"
+                aria-describedby="confirm-dialog-description"
+            >
+                <DialogTitle id="confirm-dialog-title">Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this company?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleConfirmDialogClose} color="primary">Cancel</Button>
+                    <Button onClick={handleDelete} color="primary" variant="contained">Delete</Button>
+                </DialogActions>
+            </Dialog>
+
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textAlign: 'center'
+                }}
+            >
+                <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>Page: {currentPage + 1}</Typography>
+                <Typography sx={{ fontSize: '14px', fontWeight: 'bold' }}>Rows per page: {rowsPerPage}</Typography>
+                <div style={{ marginTop: '10px' }}>
+                    <Button
+                        variant="contained"
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 0}
+                        sx={{ marginRight: '10px' }}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage + 1 >= Math.ceil(companyData.length / rowsPerPage)}
+                    >
+                        Next
+                    </Button>
+                </div>
             </div>
+
         </div>
     );
-};
+}
+
 export default CleaningCompany;

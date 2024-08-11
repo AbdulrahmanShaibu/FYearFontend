@@ -85,8 +85,17 @@ const Attachments = () => {
     };
 
     const handleDelete = async (id) => {
-        await axios.delete(`http://localhost:8080/api/v1/delete/attachments/${id}`);
-        fetchAttachments();
+        // Display a confirmation dialog
+        const confirmed = window.confirm("Are you sure you want to delete this attachment?");
+        if (confirmed) {
+            try {
+                // Proceed with deletion if confirmed
+                await axios.delete(`http://localhost:8080/api/v1/delete/attachments/${id}`);
+                fetchAttachments();
+            } catch (error) {
+                console.error("Error deleting attachment", error);
+            }
+        }
     };
 
     const getStaffNameById = (id) => {

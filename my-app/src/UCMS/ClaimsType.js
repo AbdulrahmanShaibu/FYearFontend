@@ -18,7 +18,9 @@ import { Add, Info } from "@mui/icons-material";
 const ClaimType = () => {
     const [claimTypes, setClaimTypes] = useState([]);
     const [open, setOpen] = useState(false);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [currentClaimType, setCurrentClaimType] = useState({ id: '', type: '' });
+    const [deleteId, setDeleteId] = useState(null);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     useEffect(() => {
@@ -64,15 +66,25 @@ const ClaimType = () => {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleDeleteClick = (id) => {
+        setDeleteId(id);
+        setConfirmDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
         try {
-            await axios.delete(`http://localhost:8080/api/v1/delete/claim-type/${id}`);
+            await axios.delete(`http://localhost:8080/api/v1/delete/claim-type/${deleteId}`);
             setSnackbar({ open: true, message: 'Claim Type deleted successfully', severity: 'success' });
             fetchClaimTypes();
+            setConfirmDialogOpen(false);
         } catch (error) {
             setSnackbar({ open: true, message: 'Failed to delete Claim Type', severity: 'error' });
             console.error("There was an error deleting the claim type!", error);
         }
+    };
+
+    const handleDeleteCancel = () => {
+        setConfirmDialogOpen(false);
     };
 
     return (
@@ -131,15 +143,15 @@ const ClaimType = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {claimTypes.map((claimType) => (
+                        {claimTypes.map((claimType, index) => (
                             <TableRow key={claimType.id}>
-                                <TableCell>{claimType.id}</TableCell>
+                                <TableCell>{index + 1}</TableCell>
                                 <TableCell>{claimType.type}</TableCell>
                                 <TableCell>
                                     <IconButton onClick={() => handleDialogOpen(claimType)}>
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton onClick={() => handleDelete(claimType.id)}>
+                                    <IconButton onClick={() => handleDeleteClick(claimType.id)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>
@@ -148,6 +160,27 @@ const ClaimType = () => {
                     </TableBody>
                 </Table>
             </Paper>
+
+            {/* Confirmation Dialog */}
+            <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete this Claim Type?</Typography>
+                    <Grid container spacing={2} style={{ marginTop: '16px' }}>
+                        <Grid item xs={6}>
+                            <Button onClick={handleDeleteConfirm} color="primary" variant="contained">
+                                Confirm
+                            </Button>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Button onClick={handleDeleteCancel} color="secondary" variant="outlined">
+                                Cancel
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
+
             <Dialog open={open} onClose={handleDialogClose}>
                 <DialogTitle>{currentClaimType.id ? 'Edit Claim Type' : 'Add Claim Type'}</DialogTitle>
                 <DialogContent>
@@ -174,6 +207,7 @@ const ClaimType = () => {
                     </Grid>
                 </DialogContent>
             </Dialog>
+
             <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                 <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>
                     {snackbar.message}

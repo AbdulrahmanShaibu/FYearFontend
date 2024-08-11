@@ -14,7 +14,9 @@ const StaffComplain = () => {
   const [claims, setClaims] = useState([]);
   const [staffs, setStaffs] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
+  const [claimToDelete, setClaimToDelete] = useState(null);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -65,11 +67,12 @@ const StaffComplain = () => {
       .catch(error => console.error('Error saving complain:', error));
   };
 
-  const handleDelete = (id) => {
-    axios.delete(`${deleteAPI}/${id}`)
+  const handleDelete = () => {
+    axios.delete(`${deleteAPI}/${claimToDelete}`)
       .then(response => {
         if (response.status === 200) {
-          setClaims(claims.filter(claim => claim.complainID !== id));
+          setClaims(claims.filter(claim => claim.complainID !== claimToDelete));
+          handleCloseConfirmDialog(); // Close the confirmation dialog after successful delete
         } else {
           console.error('Error deleting complain:', response.statusText);
         }
@@ -109,6 +112,16 @@ const StaffComplain = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const handleOpenConfirmDialog = (id) => {
+    setClaimToDelete(id);
+    setOpenConfirmDialog(true);
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setOpenConfirmDialog(false);
+    setClaimToDelete(null);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -167,7 +180,7 @@ const StaffComplain = () => {
                       <Button
                         variant="contained"
                         color="secondary"
-                        onClick={() => handleDelete(claim.complainID)}
+                        onClick={() => handleOpenConfirmDialog(claim.complainID)}
                       >
                         Delete
                       </Button>
@@ -241,6 +254,22 @@ const StaffComplain = () => {
             </DialogActions>
           </form>
         </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog for Deleting */}
+      <Dialog open={openConfirmDialog} onClose={handleCloseConfirmDialog}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this complaint?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );
