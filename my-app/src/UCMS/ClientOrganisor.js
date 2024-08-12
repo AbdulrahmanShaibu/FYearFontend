@@ -126,20 +126,20 @@ const ClientOrganisation = () => {
                 </Button>
                 {/* Your modal component should go here */}
             </div>
-            <Paper elevation={1} style={{ width: '90%', height: '100%' }}>
+            <Paper style={{ width: '90%', height: '100%' }}>
                 <Alert severity="info">
                     Manage your client organizations efficiently. Use the button above to add a new client organization to the system, ensuring all relevant details are captured for effective management.
                 </Alert>
-                <Grid container>
-                    <Grid style={{ width: '50%', height: '100%' }}>
+                <Grid >
+                    <Grid style={{ width: '60%' }}>
                         <div style={{ margin: 'auto' }}>
                             <Table>
                                 <TableHead className="thead-dark">
                                     <TableRow>
-                                        <TableCell style={{ backgroundColor: '#333', color: 'white' }}>S/N</TableCell>
-                                        <TableCell style={{ backgroundColor: '#333', color: 'white' }}>Name</TableCell>
-                                        <TableCell style={{ backgroundColor: '#333', color: 'white' }}>Update</TableCell>
-                                        <TableCell style={{ backgroundColor: '#333', color: 'white' }}>Delete</TableCell>
+                                        <TableCell>S/N</TableCell>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Update</TableCell>
+                                        <TableCell>Delete</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -150,7 +150,7 @@ const ClientOrganisation = () => {
                                             <TableCell>
                                                 <Button
                                                     onClick={() => handleUpdate(clientOrganisation.id)}
-                                                    variant="contained"
+                                                    // variant="contained"
                                                     color="primary"
                                                     startIcon={<Edit />}
                                                 >
@@ -160,9 +160,9 @@ const ClientOrganisation = () => {
                                             <TableCell>
                                                 <Button
                                                     onClick={() => handleDelete(clientOrganisation.id)}
-                                                    variant="contained"
+                                                    // variant="contained"
                                                     color="secondary"
-                                                    startIcon={<Delete />}
+                                                    startIcon={<Delete style={{color:'red'}}/>}
                                                 >
                                                     Delete
                                                 </Button>

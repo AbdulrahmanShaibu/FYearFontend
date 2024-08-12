@@ -268,7 +268,7 @@ const CleaningCompany = () => {
                 </DialogActions>
             </Dialog>
 
-            <TableContainer sx={{ margin: '20px', padding: '10px', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto', borderRadius: '10px' }}>
+            <TableContainer sx={{ margin: '20px', padding: '5px', maxWidth: '1100px', marginLeft: 'auto', marginRight: 'auto'}}>
                 <Alert severity="info">
                     Manage your cleaning company efficiently. Use the button above to add a new cleaning company to the system, ensuring all relevant details are captured for effective management.
                 </Alert>

@@ -16,8 +16,8 @@ const ClientSites = () => {
 
     const [clientSites, setClientSites] = useState([]);
     const [clientOrganisations, setClientOrganisations] = useState([]);
-    const [newClientSite, setNewClientSite] = useState({ name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
-    const [updatedClientSite, setUpdatedClientSite] = useState({ id: '', name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
+    const [newClientSite, setNewClientSite] = useState({ name: '', clientOrganisation: { id: '', name: '' } });
+    const [updatedClientSite, setUpdatedClientSite] = useState({ id: '', name: '', clientOrganisation: { id: '', name: '' } });
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -43,28 +43,54 @@ const ClientSites = () => {
             });
     }, []);
 
-    const handleAddData = () => {
-        const selectedOrganisation = clientOrganisations.find(org => org.id === newClientSite.clientOrganisation.id);
-        if (!selectedOrganisation) {
-            console.error('No client organisation selected');
-            return;
-        }
-        const dataToSend = {
-            name: newClientSite.name,
-            clientOrganisation: selectedOrganisation,
-            staffs: newClientSite.staffs
-        };
+    const handleAddData = (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
 
-        console.log('Sending data:', dataToSend); // Debugging log
+        const dataToSend = {
+            name: formData.get('name'),
+            clientOrganisation: {
+                id: formData.get('clientOrganisation')
+            }
+        };
 
         axios.post(AddAPI, dataToSend)
             .then(response => {
                 setClientSites([...clientSites, response.data]);
-                setNewClientSite({ name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
+                setNewClientSite({ name: '', clientOrganisation: { id: '' } });
                 setDialogOpen(false);
             })
             .catch(error => {
                 console.error('Error while adding data to database', error);
+            });
+    };
+
+    const handleUpdate = (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+
+        const dataToSend = {
+            id: updatedClientSite.id,
+            name: formData.get('name'),
+            clientOrganisation: {
+                id: formData.get('clientOrganisation')
+            }
+        };
+
+        axios.put(`${UpdateAPI}/${updatedClientSite.id}`, dataToSend)
+            .then(response => {
+                const updatedData = clientSites.map(site => {
+                    if (site.id === updatedClientSite.id) {
+                        return { ...site, ...response.data };
+                    }
+                    return site;
+                });
+                setClientSites(updatedData);
+                setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '' } });
+                setDialogOpen(false);
+            })
+            .catch(error => {
+                console.error('Update failed:', error);
             });
     };
 
@@ -81,38 +107,6 @@ const ClientSites = () => {
             })
             .catch(error => {
                 console.error('Delete response failed:', error);
-            });
-    };
-
-    const handleUpdate = (id) => {
-        const selectedOrganisation = clientOrganisations.find(org => org.id === updatedClientSite.clientOrganisation.id);
-        if (!selectedOrganisation) {
-            console.error('No client organisation selected');
-            return;
-        }
-        const dataToSend = {
-            id: updatedClientSite.id,
-            name: updatedClientSite.name,
-            clientOrganisation: selectedOrganisation,
-            staffs: updatedClientSite.staffs
-        };
-
-        console.log('Sending data:', dataToSend); // Debugging log
-
-        axios.put(`${UpdateAPI}/${id}`, dataToSend)
-            .then(response => {
-                const updatedData = clientSites.map(site => {
-                    if (site.id === id) {
-                        return { ...site, ...response.data };
-                    }
-                    return site;
-                });
-                setClientSites(updatedData);
-                setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
-                setDialogOpen(false);
-            })
-            .catch(error => {
-                console.error('Update failed:', error);
             });
     };
 
@@ -139,8 +133,7 @@ const ClientSites = () => {
             setUpdatedClientSite({
                 id: site.id,
                 name: site.name,
-                clientOrganisation: { id: site.clientOrganisation?.id, name: site.clientOrganisation?.name },
-                staffs: site.staffs || []
+                clientOrganisation: { id: site.clientOrganisation?.id, name: site.clientOrganisation?.name }
             });
         }
         setDialogOpen(true);
@@ -148,8 +141,8 @@ const ClientSites = () => {
 
     const handleDialogClose = () => {
         setDialogOpen(false);
-        setNewClientSite({ name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
-        setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' }, staffs: [] });
+        setNewClientSite({ name: '', clientOrganisation: { id: '', name: '' } });
+        setUpdatedClientSite({ id: '', name: '', clientOrganisation: { id: '', name: '' } });
     };
 
     const handleDeleteDialogClose = () => {
@@ -171,15 +164,15 @@ const ClientSites = () => {
                     </Button>
                 </div>
                 <Alert severity="info">
-                    Manage your client sites efficiently. Use the button below to add a new client sites to the system, ensuring all relevant details are captured for effective management.
+                    Manage your client sites efficiently. Use the button below to add a new client site to the system, ensuring all relevant details are captured for effective management.
                 </Alert>
                 <Table>
                     <TableHead>
-                        <TableRow style={{ backgroundColor: '#333' }}>
-                            <TableCell style={{ fontWeight: 'bold', color: 'white' }}>S/N</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', color: 'white' }}>Client Site</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', color: 'white' }}>Client Organisation</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', color: 'white' }}>Actions</TableCell>
+                        <TableRow>
+                            <TableCell style={{ fontWeight: 'bold', color: 'black' }}>S/N</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', color: 'black' }}>Client Site</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', color: 'black' }}>Client Organisation</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', color: 'black' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -220,55 +213,65 @@ const ClientSites = () => {
                 />
             </Paper>
 
+            {/* Dialog for Adding/Updating Client Sites */}
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>{dialogAction === 'add' ? 'Add Client Site' : 'Update Client Site'}</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        name="name"
-                        value={dialogAction === 'add' ? newClientSite.name : updatedClientSite.name}
-                        onChange={(e) => handleInputChange(e, dialogAction === 'add' ? setNewClientSite : setUpdatedClientSite)}
-                        label="Client Site Name"
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        select
-                        SelectProps={{ native: true }}
-                        name="clientOrganisation"
-                        value={dialogAction === 'add' ? newClientSite.clientOrganisation.id : updatedClientSite.clientOrganisation.id}
-                        onChange={(e) => handleInputChange(e, dialogAction === 'add' ? setNewClientSite : setUpdatedClientSite)}
-                        label="Client Organisation"
-                        fullWidth
-                        margin="normal"
-                    >
-                        <option value="">Select Organisation</option>
-                        {clientOrganisations.map(org => (
-                            <option key={org.id} value={org.id}>{org.name}</option>
-                        ))}
-                    </TextField>
+                    <form onSubmit={dialogAction === 'add' ? handleAddData : handleUpdate}>
+                        <TextField
+                            name="name"
+                            value={dialogAction === 'add' ? newClientSite.name : updatedClientSite.name}
+                            onChange={(e) => handleInputChange(e, dialogAction === 'add' ? setNewClientSite : setUpdatedClientSite)}
+                            label="Client Site Name"
+                            fullWidth
+                            margin="normal"
+                        />
+                        <TextField
+                            select
+                            SelectProps={{ native: true }}
+                            name="clientOrganisation"
+                            value={dialogAction === 'add' ? newClientSite.clientOrganisation.id : updatedClientSite.clientOrganisation.id}
+                            onChange={(e) => handleInputChange(e, dialogAction === 'add' ? setNewClientSite : setUpdatedClientSite)}
+                            label="Client Organisation"
+                            fullWidth
+                            margin="normal"
+                        >
+                            <option value="">Select Organisation</option>
+                            {clientOrganisations.map((org) => (
+                                <option key={org.id} value={org.id}>
+                                    {org.name}
+                                </option>
+                            ))}
+                        </TextField>
+                        <DialogActions>
+                            <Button onClick={handleDialogClose} color="secondary">Cancel</Button>
+                            <Button type="submit" color="primary">
+                                {dialogAction === 'add' ? 'Add' : 'Update'}
+                            </Button>
+                        </DialogActions>
+                    </form>
+
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDialogClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={dialogAction === 'add' ? handleAddData : () => handleUpdate(updatedClientSite.id)} color="primary">
+                {/* <DialogActions>
+                    <Button onClick={handleDialogClose} color="secondary">Cancel</Button>
+                    <Button
+                        onClick={dialogAction === 'add' ? handleAddData : () => handleUpdate(updatedClientSite.id)}
+                        color="primary"
+                    >
                         {dialogAction === 'add' ? 'Add' : 'Update'}
                     </Button>
-                </DialogActions>
+                </DialogActions> */}
             </Dialog>
 
+            {/* Delete Confirmation Dialog */}
             <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
-                    Are you sure you want to delete this client site? This action cannot be undone.
+                    Are you sure you want to delete this client site?
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDeleteDialogClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={confirmDelete} color="secondary">
-                        Confirm
-                    </Button>
+                    <Button onClick={handleDeleteDialogClose} color="primary">Cancel</Button>
+                    <Button onClick={confirmDelete} color="secondary">Delete</Button>
                 </DialogActions>
             </Dialog>
         </div>

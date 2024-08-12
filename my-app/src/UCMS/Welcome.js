@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Home from './Home';
-import { Card, Table, TableHead, TableCell, Typography, TableRow, TableBody, Box, Grid, CardContent, Paper, Icon } from '@mui/material';
+import { Card, Typography, Box, Grid, CardContent, Paper } from '@mui/material';
 import BusinessIcon from '@mui/icons-material/Business';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
@@ -11,6 +11,9 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import PersonIcon from '@mui/icons-material/Person';
 import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import BuildIcon from '@mui/icons-material/Build';
+
 import { keyframes } from '@emotion/react';
 
 const Welcome = () => {
@@ -78,10 +81,10 @@ const Welcome = () => {
                                     { icon: <BusinessIcon color="primary" />, label: 'Client Organizations', value: clientOrganisationCount },
                                     { icon: <CleaningServicesIcon color="primary" />, label: 'Cleaning Companies', value: count },
                                     { icon: <LocationCityIcon color="primary" />, label: 'Client Sites', value: clientSite },
-                                    { icon: <PersonIcon color="primary" />, label: 'Tools', value: tools },
+                                    { icon: <BuildIcon color="primary" />, label: 'Tools', value: tools },
                                     { icon: <PeopleIcon color="primary" />, label: 'Company Staffs', value: staffsCount },
                                     { icon: <ReportProblemIcon color="primary" />, label: 'Staff Complaints', value: staffsComplainCount },
-                                    { icon: <ReportProblemIcon color="primary" />, label: 'Attachments', value: attachements },
+                                    { icon: <AttachFileIcon color="primary" />, label: 'Attachments', value: attachements },
                                     { icon: <PersonIcon color="primary" />, label: 'Staffs', value: staffs },
                                 ].map((item, index) => (
                                     <Grid item xs={12} sm={6} md={4} key={index}>

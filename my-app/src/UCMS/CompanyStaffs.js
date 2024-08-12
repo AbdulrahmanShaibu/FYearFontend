@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button, Modal, Box, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button, Modal, Box, TextField, Select, MenuItem, FormControl, InputLabel, Alert } from '@mui/material';
 import axios from 'axios';
 import Home from './Home';
 
@@ -63,16 +63,22 @@ const CompanyStaffs = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
-    // data.roles = formData.getAll('roles');
+    const data = {
+        name: formData.get('name'),
+        cleaningCompany: {
+            companyId: formData.get('cleaningCompanyId')
+        },
+        clientOrganisations: formData.getAll('clientOrganisations').map(id => ({ id: id }))
+    };
+
     if (selectedStaff) {
-      await axios.put(`http://localhost:8080/api/v1/update/company-staff/${selectedStaff.id}`, data);
+        await axios.put(`http://localhost:8080/api/v1/update/company-staff/${selectedStaff.id}`, data);
     } else {
-      await axios.post('http://localhost:8080/api/v1/post/company-staff', data);
+        await axios.post('http://localhost:8080/api/v1/post/company-staff', [data]);
     }
     fetchStaffs();
     handleClose();
-  };
+};
 
   const handleDelete = async (id) => {
     await axios.delete(`http://localhost:8080/api/v1/delete/company-staff/${id}`);
@@ -80,20 +86,36 @@ const CompanyStaffs = () => {
   };
 
   return (
-    <Paper sx={{ padding: 25 }}>
+    // <Paper sx={{ padding: 10 }}>
+    <div style={{ padding: 120 }}>
       <Home />
-      <Box display="flex" justifyContent="center" margin={'auto'}
-        alignItems="center" width={'50%'} flexDirection="column" sx={{ marginTop: 2 }}>
-        <Button variant="contained" onClick={() => handleOpen()}>Add Cleaner</Button>
-        <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        width="50%"
+        margin="auto"
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleOpen()}
+          sx={{ marginBottom: 2 }}
+        >
+          Add Cleaner
+        </Button>
+
+        <TableContainer component={Paper} sx={{ width: '150%', marginBottom: 2 }}>
+          <Alert severity="info">
+            Manage your company staffs efficiently. Use the button above to add a new company staffs to the system, ensuring all relevant details are captured for effective management.
+          </Alert>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Cleaner Name</TableCell>
-                <TableCell>Cleaning Company</TableCell>
-                {/* <TableCell>Roles</TableCell> */}
-                <TableCell>Client Organisations</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell><strong>Cleaner Name</strong></TableCell>
+                <TableCell><strong>Cleaning Company</strong></TableCell>
+                <TableCell><strong>Client Organisations</strong></TableCell>
+                <TableCell><strong>Actions</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -101,17 +123,30 @@ const CompanyStaffs = () => {
                 <TableRow key={staff.id}>
                   <TableCell>{staff.name}</TableCell>
                   <TableCell>{staff.cleaningCompany.companyName}</TableCell>
-                  {/* <TableCell>{staff.roles.map(role => role.roleName).join(', ')}</TableCell> */}
                   <TableCell>{staff.clientOrganisations.map(org => org.name).join(', ')}</TableCell>
                   <TableCell>
-                    <Button onClick={() => handleOpen(staff)}>Edit</Button>
-                    <Button onClick={() => handleDelete(staff.id)}>Delete</Button>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleOpen(staff)}
+                      sx={{ marginRight: 1 }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDelete(staff.id)}
+                    >
+                      Delete
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+
         <TablePagination
           component="div"
           count={staffs.length}
@@ -119,47 +154,56 @@ const CompanyStaffs = () => {
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          sx={{ marginBottom: 2 }}
         />
       </Box>
 
       <Modal open={open} onClose={handleClose}>
-        <Box component="form" onSubmit={handleSubmit} sx={{ ...modalStyle }}>
-          <TextField name="name" label="Name" defaultValue={selectedStaff ? selectedStaff.name : ''} fullWidth required sx={{ marginBottom: 2 }} />
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={modalStyle}>
+        <TextField
+            name="name"
+            label="Name"
+            defaultValue={selectedStaff ? selectedStaff.name : ''}
+            fullWidth
+            required
+            sx={{ marginBottom: 2 }}
+        />
+        <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Cleaning Company</InputLabel>
-            <Select name="cleaningCompanyId" defaultValue={selectedStaff ? selectedStaff.cleaningCompany.id : ''} required>
-              {cleaningCompanies.map(company => (
-                <MenuItem key={company.companyId} value={company.companyId}>{company.companyName}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {/* <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel>Roles</InputLabel>
             <Select
-              name="roles"
-              multiple
-              defaultValue={selectedStaff ? selectedStaff.roles.map(role => role.id) : []}
-              required
+                name="cleaningCompanyId"
+                defaultValue={selectedStaff ? selectedStaff.cleaningCompany.companyId : ''}
+                required
             >
-              {roles.map(role => (
-                <MenuItem key={role.id} value={role.id}>
-                  {role.roleName}
-                </MenuItem>
-              ))}
+                {cleaningCompanies.map(company => (
+                    <MenuItem key={company.companyId} value={company.companyId}>
+                        {company.companyName}
+                    </MenuItem>
+                ))}
             </Select>
-          </FormControl> */}
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+        </FormControl>
+        <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <InputLabel>Client Organisations</InputLabel>
-            <Select name="clientOrganisations" multiple defaultValue={selectedStaff ? selectedStaff.clientOrganisations.map(org => org.id) : []} required>
-              {clientOrganisations.map(org => (
-                <MenuItem key={org.id} value={org.id}>{org.name}</MenuItem>
-              ))}
+            <Select
+                name="clientOrganisations"
+                multiple
+                defaultValue={selectedStaff ? selectedStaff.clientOrganisations.map(org => org.id) : []}
+                required
+            >
+                {clientOrganisations.map(org => (
+                    <MenuItem key={org.id} value={org.id}>
+                        {org.name}
+                    </MenuItem>
+                ))}
             </Select>
-          </FormControl>
-          <Button type="submit" variant="contained" fullWidth>{selectedStaff ? 'Update' : 'Create'}</Button>
-        </Box>
-      </Modal>
-    </Paper>
+        </FormControl>
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+            {selectedStaff ? 'Update' : 'Create'}
+        </Button>
+    </Box>
+</Modal>
+
+    </div>
   );
 };
 

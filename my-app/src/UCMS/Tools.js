@@ -73,9 +73,20 @@ const Tools = () => {
     }
   };
 
-  const handleAddData = async () => {
+  const handleAddData = async (event) => {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    const formData = new FormData(event.target); // Capture form data
+    const data = {
+      toolType: formData.get('toolType'),
+      quantity: formData.get('quantity'),
+      clientSite: {
+        id: formData.get('id')
+      }
+    };
+
     try {
-      const response = await axios.post(ADD_API, tools);
+      const response = await axios.post(ADD_API, data);
       setToolsData([...toolsData, response.data]);
       setTools({
         toolType: '',
@@ -87,6 +98,7 @@ const Tools = () => {
       console.error('Error while saving tools:', error);
     }
   };
+
 
   const handleUpdateData = async (toolID, updatedTool) => {
     try {
@@ -172,7 +184,7 @@ const Tools = () => {
             display: 'flex',
           }}>
             <div>
-              <form style={{ backgroundColor: 'whitesmoke', padding: '20px', borderRadius: '4px', width: '100%' }}>
+              <form onSubmit={handleAddData} style={{ backgroundColor: 'whitesmoke', padding: '20px', borderRadius: '4px', width: '100%' }}>
                 <Typography variant="body1"
                   style={{
                     marginBottom: '15px', textAlign: 'center',
@@ -223,7 +235,7 @@ const Tools = () => {
                 </FormControl>
 
                 <Button
-                  onClick={handleAddData}
+                  type="submit"  // Changed to submit the form
                   variant="contained"
                   color="primary"
                   fullWidth
@@ -232,6 +244,7 @@ const Tools = () => {
                   Add Tool
                 </Button>
               </form>
+
             </div>
 
             <TableContainer component={Paper} style={{ width: '80%' }}>
