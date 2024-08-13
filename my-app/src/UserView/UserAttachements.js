@@ -64,7 +64,7 @@ const UserAttachments = () => {
     };
 
     return (
-        <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '90%' }}>
+        <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '60%' }}>
             <Stack sx={{ width: '100%' }} spacing={2}>
                 <Alert
                     severity="info"
@@ -108,7 +108,7 @@ const UserAttachments = () => {
             </form>
             <Grid container spacing={3}>
                 {attachments.map((attachment) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={attachment.id}>
+                    <Grid item xs={6} sm={6} md={4} lg={3} key={attachment.id}>
                         <Card sx={{ height: '100%' }}>
                             <CardMedia
                                 component="img"
