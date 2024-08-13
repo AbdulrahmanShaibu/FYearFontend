@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-    Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Button,
-    FormControl, Select, MenuItem
-} from '@material-ui/core';
-import { Edit, Delete } from "@mui/icons-material";
-// import Home from "./Home";
+    Card, CardContent, CardMedia, Typography,
+    FormControl, Select, MenuItem, Button, Stack, Grid
+} from '@mui/material';
+import { Alert } from "@mui/material";
 import axios from "axios";
 import UserHome from "./UserHome";
-import { Alert, Stack, Typography } from "@mui/material";
 
 const UserAttachments = () => {
     const [attachments, setAttachments] = useState([]);
@@ -17,7 +14,6 @@ const UserAttachments = () => {
     const [staffs, setStaffs] = useState([]);
     const [editing, setEditing] = useState(false);
     const [currentId, setCurrentId] = useState(null);
-    const [foundStaff, setFoundStaff] = useState(null);
 
     useEffect(() => {
         fetchAttachments();
@@ -39,23 +35,12 @@ const UserAttachments = () => {
     };
 
     const handleStaffChange = (e) => {
-        setStaffId(e.target.value); // Set the staff ID
-    };
-
-    const findStaffById = async (id) => {
-        try {
-            const response = await axios.get(`http://localhost:8080/api/v1/staffs/${id}`);
-            setFoundStaff(response.data);
-        } catch (error) {
-            console.error("Error finding staff by ID", error);
-            setFoundStaff(null);
-        }
+        setStaffId(e.target.value);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate staffId
         if (!staffId) {
             alert("Please select a valid staff");
             return;
@@ -78,20 +63,8 @@ const UserAttachments = () => {
         fetchAttachments();
     };
 
-    const handleEdit = (attachment) => {
-        setEditing(true);
-        setCurrentId(attachment.id);
-        setStaffId(attachment.staffs ? attachment.staffs.StaffID : '');
-        findStaffById(attachment.staffs ? attachment.staffs.StaffID : '');
-    };
-
-    const handleDelete = async (id) => {
-        await axios.delete(`http://localhost:8080/api/v1/delete/attachments/${id}`);
-        fetchAttachments();
-    };
-
     return (
-        <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '950px' }}>
+        <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '90%' }}>
             <Stack sx={{ width: '100%' }} spacing={2}>
                 <Alert
                     severity="info"
@@ -111,13 +84,13 @@ const UserAttachments = () => {
                             Attachments
                         </Typography>
                         <Typography variant="body2">
-                            Please attachment your complain here
+                            Please attach your complaint here
                         </Typography>
                     </div>
                 </Alert>
             </Stack>
             <UserHome />
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
                 <input type="file" onChange={handleFileChange} required />
                 <FormControl fullWidth>
                     <Select value={staffId} onChange={handleStaffChange} required>
@@ -131,70 +104,30 @@ const UserAttachments = () => {
                         ))}
                     </Select>
                 </FormControl>
-                <Button type="submit">{editing ? 'Update' : 'Attach Complain'}</Button>
+                <Button type="submit">{editing ? 'Update' : 'Attach Complaint'}</Button>
             </form>
-            {foundStaff && (
-                <div>
-                    <h3>Found Staff Details</h3>
-                    <p>ID: {foundStaff.StaffID}</p>
-                    <p>Name: {foundStaff.StaffName}</p>
-                    <p>Email: {foundStaff.StaffEmail}</p>
-                    <p>Phone: {foundStaff.StaffPhone}</p>
-                    {foundStaff.clientSite && (
-                        <div>
-                            <h4>Client Site</h4>
-                            <p>ID: {foundStaff.clientSite.id}</p>
-                            <p>Name: {foundStaff.clientSite.name}</p>
-                            {foundStaff.clientSite.clientOrganisation && (
-                                <div>
-                                    <h5>Client Organisation</h5>
-                                    <p>ID: {foundStaff.clientSite.clientOrganisation.id}</p>
-                                    <p>Name: {foundStaff.clientSite.clientOrganisation.name}</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                    {foundStaff.attachments && foundStaff.attachments.length > 0 && (
-                        <div>
-                            <h4>Attachments</h4>
-                            <ul>
-                                {foundStaff.attachments.map(attachment => (
-                                    <li key={attachment.id}>{attachment.fileName}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
-            )}
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell>File Name</TableCell>
-                            <TableCell>Image</TableCell>
-                            <TableCell>Staff</TableCell>
-                            {/* <TableCell>Actions</TableCell> */}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {attachments.map((attachment, index) => (
-                            <TableRow key={attachment.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{attachment.fileName}</TableCell>
-                                <TableCell>
-                                    <img src={`http://localhost:8080/api/v1/images/${attachment.id}`} alt={attachment.fileName} style={{ width: '100px', height: '100px' }} />
-                                </TableCell>
-                                <TableCell>{attachment.staffs ? attachment.staffs.StaffName : 'N/A'}</TableCell>
-                                {/* <TableCell>
-                                    <Button onClick={() => handleEdit(attachment)}><Edit /></Button>
-                                    <Button onClick={() => handleDelete(attachment.id)}><Delete /></Button>
-                                </TableCell> */}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <Grid container spacing={3}>
+                {attachments.map((attachment) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={attachment.id}>
+                        <Card sx={{ height: '100%' }}>
+                            <CardMedia
+                                component="img"
+                                height="140"
+                                image={`http://localhost:8080/api/v1/images/${attachment.id}`}
+                                alt={attachment.fileName}
+                            />
+                            <CardContent>
+                                <Typography gutterBottom variant="h6" component="div">
+                                    {attachment.fileName}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {attachment.staffs ? attachment.staffs.StaffName : 'No Staff Assigned'}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
         </div>
     );
 };

@@ -13,6 +13,7 @@ const StaffComplain = () => {
   const [selectedStaff, setSelectedStaff] = useState('');
   const [claims, setClaims] = useState([]);
   const [staffs, setStaffs] = useState([]);
+  const [complainType, setClaimTypes] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
@@ -31,9 +32,18 @@ const StaffComplain = () => {
 
   useEffect(() => {
     fetchComplains();
+    fetchClaimTypes();
     fetchStaffs();
   }, []);
 
+  const fetchClaimTypes = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/v1/list/claim-type');
+      setClaimTypes(response.data);
+    } catch (error) {
+      console.error('Error fetching claim types:', error);
+    }
+  };
   const fetchComplains = () => {
     axios.get('http://localhost:8080/api/v1/list/StaffComplain')
       .then(response => setClaims(response.data))
@@ -155,7 +165,8 @@ const StaffComplain = () => {
                   <TableCell style={style.table}>S/N</TableCell>
                   <TableCell style={style.table}>Description</TableCell>
                   <TableCell style={style.table}>Date Submitted</TableCell>
-                  <TableCell style={style.table}>Staff Name</TableCell>
+                  <TableCell style={style.table}>Complain Type</TableCell>
+                  {/* <TableCell style={style.table}>Staff Name</TableCell> */}
                   <TableCell style={style.table}>Update</TableCell>
                   <TableCell style={style.table}>Delete</TableCell>
                 </TableRow>
@@ -166,7 +177,8 @@ const StaffComplain = () => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{claim.description}</TableCell>
                     <TableCell>{claim.submissionDate}</TableCell>
-                    <TableCell>{claim.staffs ? `${claim.staffs.firstName} ${claim.staffs.lastName}` : 'N/A'}</TableCell>
+                    <TableCell>{claim.claimTypes.map(ct => ct.type).join(', ')}</TableCell>
+                    {/* <TableCell>{claim.staffs ? `${claim.staffs.firstName} ${claim.staffs.lastName}` : 'N/A'}</TableCell> */}
                     <TableCell>
                       <Button
                         variant="contained"

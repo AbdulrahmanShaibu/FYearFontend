@@ -1,22 +1,28 @@
 import React, { useEffect, useState } from "react";
 import {
-    Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Button,
-    FormControl, Select, MenuItem
-} from '@material-ui/core';
-import { Edit, Delete } from "@mui/icons-material";
+    Card, CardContent, CardMedia, Typography, CardActions, Button,
+    Grid, Container, Snackbar
+} from '@mui/material';
+import { Edit, Delete, FileCopy, Person, CalendarToday, Description } from "@mui/icons-material";
 import Home from "./Home";
 import axios from "axios";
-import { Alert, AlertTitle, Typography } from "@mui/material";
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Attachments = () => {
     const [attachments, setAttachments] = useState([]);
     const [file, setFile] = useState(null);
-    const [staffId, setStaffId] = useState('');
+    const [id, setId] = useState('');
     const [staffs, setStaffs] = useState([]);
     const [editing, setEditing] = useState(false);
     const [currentId, setCurrentId] = useState(null);
     const [foundStaff, setFoundStaff] = useState(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
 
     useEffect(() => {
         fetchAttachments();
@@ -38,7 +44,7 @@ const Attachments = () => {
     };
 
     const handleStaffChange = (e) => {
-        setStaffId(e.target.value); // Set the staff ID
+        setId(e.target.value); // Set the staff ID
     };
 
     const findStaffById = async (id) => {
@@ -54,44 +60,47 @@ const Attachments = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate staffId
-        if (!staffId) {
-            alert("Please select a valid staff");
+        if (!id) {
+            setSnackbarMessage("Please select a valid staff");
+            setSnackbarOpen(true);
             return;
         }
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('staffId', staffId);
+        formData.append('id', id);
 
-        if (editing) {
-            await axios.put(`http://localhost:8080/api/v1/update/attachments/${currentId}`, formData);
-            setEditing(false);
-            setCurrentId(null);
-        } else {
-            await axios.post('http://localhost:8080/api/v1/upload/attachment', formData);
+        try {
+            if (editing) {
+                await axios.put(`http://localhost:8080/api/v1/update/attachments/${currentId}`, formData);
+                setEditing(false);
+                setCurrentId(null);
+            } else {
+                await axios.post('http://localhost:8080/api/v1/upload/attachment', formData);
+            }
+            setFile(null);
+            setId('');
+            fetchAttachments();
+        } catch (error) {
+            console.error("Error submitting form", error);
         }
-
-        setFile(null);
-        setStaffId('');
-        fetchAttachments();
     };
 
     const handleEdit = (attachment) => {
         setEditing(true);
         setCurrentId(attachment.id);
-        setStaffId(attachment.staffs ? attachment.staffs.StaffID : '');
-        findStaffById(attachment.staffs ? attachment.staffs.StaffID : '');
+        setId(attachment.staffs ? attachment.staffs.id : '');
+        findStaffById(attachment.staffs ? attachment.staffs.id : '');
     };
 
     const handleDelete = async (id) => {
-        // Display a confirmation dialog
         const confirmed = window.confirm("Are you sure you want to delete this attachment?");
         if (confirmed) {
             try {
-                // Proceed with deletion if confirmed
                 await axios.delete(`http://localhost:8080/api/v1/delete/attachments/${id}`);
                 fetchAttachments();
+                setSnackbarMessage("Attachment deleted successfully");
+                setSnackbarOpen(true);
             } catch (error) {
                 console.error("Error deleting attachment", error);
             }
@@ -99,101 +108,95 @@ const Attachments = () => {
     };
 
     const getStaffNameById = (id) => {
-        const staff = staffs.find(staff => staff.StaffID === id);
-        return staff ? staff.StaffName : 'N/A';
+        const staff = staffs.find(staff => staff.id === id);
+        return staff ? staff.firstName : 'N/A';
     };
 
     return (
-        <div style={{ display: 'block', margin: 'auto', marginTop: '150px', width: '950px' }}>
+        <Container>
             <Home />
-            <div>
-                <Alert severity="success">
-                    <AlertTitle>Success</AlertTitle>
-                    <Typography variant="h6">Submitted Attachments</Typography>
+            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={() => setSnackbarOpen(false)}>
+                <Alert onClose={() => setSnackbarOpen(false)} severity="info">
+                    {snackbarMessage}
                 </Alert>
-                <br />
-                {/* You can add more content related to attachments here */}
-            </div>
-            {/* <h4>Submitted Attachements</h4> */}
-            {/* <form onSubmit={handleSubmit}>
-                <input type="file" onChange={handleFileChange} required />
-                <FormControl fullWidth>
-                    <Select value={staffId} onChange={handleStaffChange} required>
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>
-                        {staffs.map(staff => (
-                            <MenuItem key={staff.StaffID} value={staff.id}>
-                                {staff.fileName}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <Button type="submit">{editing ? 'Update' : 'Upload'}</Button>
-            </form> */}
-            {foundStaff && (
-                <div>
-                    <h3>Found Staff Details</h3>
-                    <p>ID: {foundStaff.id}</p>
-                    <p>Name: {foundStaff.fileName}</p>
-                    <p>Email: {foundStaff.email}</p>
-                    <p>Last Name: {foundStaff.lastName}</p>
-                    {foundStaff.clientSite && (
-                        <div>
-                            <h4>Client Site</h4>
-                            <p>ID: {foundStaff.clientSite.id}</p>
-                            <p>Name: {foundStaff.clientSite.name}</p>
-                            {foundStaff.clientSite.clientOrganisation && (
+            </Snackbar>
+            <div style={{ marginTop: '150px' }}>
+                <Alert variant="h5" gutterBottom>
+                    Submitted Attachments
+                </Alert>
+                {foundStaff && (
+                    <Card variant="outlined" style={{ marginBottom: '20px' }}>
+                        <CardContent>
+                            <Typography variant="h6">Found Staff Details</Typography>
+                            <Typography>ID: {foundStaff.id}</Typography>
+                            <Typography>Name: {foundStaff.fileName}</Typography>
+                            <Typography>Email: {foundStaff.email}</Typography>
+                            <Typography>Last Name: {foundStaff.lastName}</Typography>
+                            {foundStaff.clientSite && (
                                 <div>
-                                    <h5>Client Organisation</h5>
-                                    <p>ID: {foundStaff.clientSite.clientOrganisation.id}</p>
-                                    <p>Name: {foundStaff.clientSite.clientOrganisation.name}</p>
+                                    <Typography variant="subtitle1">Client Site</Typography>
+                                    <Typography>ID: {foundStaff.clientSite.id}</Typography>
+                                    <Typography>Name: {foundStaff.clientSite.name}</Typography>
+                                    {foundStaff.clientSite.clientOrganisation && (
+                                        <div>
+                                            <Typography variant="subtitle2">Client Organisation</Typography>
+                                            <Typography>ID: {foundStaff.clientSite.clientOrganisation.id}</Typography>
+                                            <Typography>Name: {foundStaff.clientSite.clientOrganisation.name}</Typography>
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                        </div>
-                    )}
-                    {foundStaff.attachments && foundStaff.attachments.length > 0 && (
-                        <div>
-                            <h4>Attachments</h4>
-                            <ul>
-                                {foundStaff.attachments.map(attachment => (
-                                    <li key={attachment.id}>{attachment.fileName}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
-            )}
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>ID</TableCell>
-                            <TableCell>File Name</TableCell>
-                            <TableCell>Image</TableCell>
-                            <TableCell>Staff</TableCell>
-                            <TableCell>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {attachments.map((attachment, index) => (
-                            <TableRow key={attachment.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{attachment.fileName}</TableCell>
-                                <TableCell>
-                                    <img src={`http://localhost:8080/api/v1/images/${attachment.id}`} alt={attachment.fileName} style={{ width: '100px', height: '100px' }} />
-                                </TableCell>
-                                <TableCell>{getStaffNameById(attachment.staffId)}</TableCell>
-                                <TableCell>
-                                    <Button onClick={() => handleEdit(attachment)}><Edit /></Button>
-                                    <Button onClick={() => handleDelete(attachment.id)}><Delete /></Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
+                            {foundStaff.attachments && foundStaff.attachments.length > 0 && (
+                                <div>
+                                    <Typography variant="subtitle1">Attachments</Typography>
+                                    <ul>
+                                        {foundStaff.attachments.map(attachment => (
+                                            <li key={attachment.id}>{attachment.fileName}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
+                <Grid container spacing={3}>
+                    {attachments.map((attachment) => (
+                        <Grid item xs={12} sm={6} md={4} key={attachment.id}>
+                            <Card>
+                                <CardMedia
+                                    component="img"
+                                    height="140"
+                                    image={`http://localhost:8080/api/v1/images/${attachment.id}`}
+                                    alt={attachment.fileName}
+                                />
+                                <CardContent>
+                                    <Typography variant="h6">
+                                        <FileCopy style={{ verticalAlign: 'middle' }} /> {attachment.fileName}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
+                                        <Person style={{ verticalAlign: 'middle', marginRight: 4 }} /> Staff Name: {getStaffNameById(attachment.id)}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
+                                        <CalendarToday style={{ verticalAlign: 'middle', marginRight: 4 }} /> Description: submitted on {new Date().toLocaleDateString()}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
+                                        <Description style={{ verticalAlign: 'middle', marginRight: 4 }} /> Status: submitted
+                                    </Typography>
+                                </CardContent>
+                                <CardActions>
+                                    <Button size="small" color="primary" onClick={() => handleEdit(attachment)}>
+                                        <Edit />
+                                    </Button>
+                                    <Button size="small" color="secondary" onClick={() => handleDelete(attachment.id)}>
+                                        <Delete />
+                                    </Button>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+            </div>
+        </Container>
     );
 };
 
