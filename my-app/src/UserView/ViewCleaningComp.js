@@ -59,9 +59,9 @@ const ViewCleaningCompany = () => {
                     <TableBody>
                         {paginatedData.map((company, index) => (
                             <TableRow key={company.companyId}>
-                                <TableCell style={{ textAlign: 'center' }}>{index + 1}</TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{company.companyName}</TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{company.address}</TableCell>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>{company.companyName}</TableCell>
+                                <TableCell>{company.address}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

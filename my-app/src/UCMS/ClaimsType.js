@@ -106,7 +106,7 @@ const ClaimType = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px' }}>
                     <span style={{ display: 'flex', alignItems: 'center', fontSize: '20px', color: '#444', fontWeight: '600' }}>
                         <Info style={{ marginRight: '8px', color: 'green', fontSize: '26px' }} /> {/* Info icon with updated size */}
-                        Claim Types Management
+                        Complain Types Management
                     </span>
 
                     <Button
@@ -126,7 +126,7 @@ const ClaimType = () => {
                             transition: 'background-color 0.3s, box-shadow 0.3s', // Smooth transition for hover effects
                         }}
                     >
-                        Add Claim Type
+                        Add Complain Type
                         <Add style={{ fontSize: '22px' }} /> {/* Icon with a consistent size */}
                     </Button>
                 </div>
