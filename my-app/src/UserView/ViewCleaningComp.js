@@ -33,52 +33,76 @@ const ViewCleaningCompany = () => {
     }, []);
 
     return (
-        <div style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', padding: '60px' }}>
+
+        <div style={{ minHeight: '97vh', padding: '40px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <UserHome />
-            <Paper elevation={5} style={{
-                margin: 'auto', maxWidth: '950px', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                borderRadius: '8px', overflow: 'hidden',
-                justifyContent: 'center'
+            <Paper style={{
+                maxWidth: '900px',
+                width: '100%',
+                boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.1)',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                backgroundColor: '#ffffff',
             }}>
-                <div style={{ margin: '16px 0' }}>
-                    <Alert severity="info">
-                        <Typography variant="h6" component="strong">
+                <div style={{ padding: '24px 16px' }}>
+                    <Alert severity="info" style={{ backgroundColor: '#e3f2fd', color: '#1976d2' }}>
+                        {/* <Typography variant="h6" component="strong"> */}
                             Available Cleaning Companies
-                        </Typography>
+                        {/* </Typography> */}
                     </Alert>
                 </div>
                 <Table>
                     <TableHead>
-                        <TableRow>
-                            <TableCell >S/N</TableCell>
-                            <TableCell >Company Name</TableCell>
-                            <TableCell >Address</TableCell>
+                        <TableRow style={{ backgroundColor: '#f1f1f1' }}>
+                            <TableCell style={{ fontWeight: 'bold' }}>S/N</TableCell>
+                            <TableCell style={{ fontWeight: 'bold' }}>Company Name</TableCell>
+                            <TableCell style={{ fontWeight: 'bold' }}>Address</TableCell>
                         </TableRow>
                     </TableHead>
-
                     <TableBody>
                         {paginatedData.map((company, index) => (
-                            <TableRow key={company.companyId}>
+                            <TableRow key={company.companyId} style={{
+                                transition: 'background-color 0.3s',
+                                '&:hover': {
+                                    backgroundColor: '#e0f7fa',
+                                }
+                            }}>
                                 <TableCell>{index + 1}</TableCell>
                                 <TableCell>{company.companyName}</TableCell>
                                 <TableCell>{company.address}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
-
                 </Table>
             </Paper>
-
-            {/* Rows per page selection */}
-            <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <span>Rows per page: </span>
-                <select value={rowsPerPage} onChange={handleRowsPerPageChange} style={{ marginLeft: '5px' }}>
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <span style={{ fontSize: '16px', fontWeight: '500', color: '#1976d2' }}>Rows per page:</span>
+                <select
+                    value={rowsPerPage}
+                    onChange={handleRowsPerPageChange}
+                    style={{
+                        marginLeft: '10px',
+                        padding: '6px 12px',
+                        fontSize: '16px',
+                        borderRadius: '8px',
+                        border: '1px solid #1976d2',
+                        backgroundColor: '#ffffff',
+                        color: '#1976d2',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        outline: 'none',
+                        '&:hover': {
+                            backgroundColor: '#e3f2fd',
+                        }
+                    }}
+                >
                     {[5, 10, 25].map(rows => (
                         <option key={rows} value={rows}>{rows}</option>
                     ))}
                 </select>
             </div>
         </div>
+
     )
 }
 export default ViewCleaningCompany

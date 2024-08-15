@@ -78,14 +78,15 @@ const Welcome = () => {
                         <Box p={3}>
                             <Grid container spacing={2} justifyContent="center">
                                 {[
-                                    { icon: <BusinessIcon color="primary" />, label: 'Client Organizations', value: clientOrganisationCount },
-                                    { icon: <CleaningServicesIcon color="primary" />, label: 'Cleaning Companies', value: count },
-                                    { icon: <LocationCityIcon color="primary" />, label: 'Client Sites', value: clientSite },
-                                    { icon: <BuildIcon color="primary" />, label: 'Tools', value: tools },
-                                    { icon: <PeopleIcon color="primary" />, label: 'Company Staffs', value: staffsCount },
-                                    { icon: <ReportProblemIcon color="primary" />, label: 'Staff Complaints', value: staffsComplainCount },
-                                    { icon: <AttachFileIcon color="primary" />, label: 'Attachments', value: attachements },
-                                    { icon: <PersonIcon color="primary" />, label: 'Staffs', value: staffs },
+                                    { icon: <BusinessIcon style={{ color: '#007bff' }} />, label: 'Client Organizations', value: clientOrganisationCount },
+                                    { icon: <CleaningServicesIcon style={{ color: '#28a745' }} />, label: 'Cleaning Companies', value: count },
+                                    { icon: <LocationCityIcon style={{ color: '#17a2b8' }} />, label: 'Client Sites', value: clientSite },
+                                    { icon: <BuildIcon style={{ color: '#ffc107' }} />, label: 'Tools', value: tools },
+                                    { icon: <PeopleIcon style={{ color: '#6f42c1' }} />, label: 'Company Staffs', value: staffsCount },
+                                    { icon: <ReportProblemIcon style={{ color: '#dc3545' }} />, label: 'Staff Complaints', value: staffsComplainCount },
+                                    { icon: <AttachFileIcon style={{ color: '#fd7e14' }} />, label: 'Attachments', value: attachements },
+                                    { icon: <PersonIcon style={{ color: '#20c997' }} />, label: 'Staffs', value: staffs },
+
                                 ].map((item, index) => (
                                     <Grid item xs={12} sm={6} md={4} key={index}>
                                         <Card variant="outlined" sx={cardStyle}>

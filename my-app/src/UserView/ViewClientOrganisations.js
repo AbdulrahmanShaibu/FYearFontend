@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
     Container, Grid, Table, TableRow, TableCell, TableHead, TableBody, TablePagination, Paper, Typography, Box,
-    Alert
+    Alert,
+    TableContainer,
+    TableFooter
 } from '@mui/material';
 import axios from "axios";
 import UserHome from "./UserHome";
@@ -32,64 +34,69 @@ const ViewClientOrganisations = () => {
     };
 
     return (
-        <Container>
+        <Container maxWidth="md" sx={{ paddingTop: '40px', paddingBottom: '40px' }}>
             <UserHome />
-            <Box mt={8} mb={4}>
+            <Box mt={4} mb={4}>
                 <Alert
                     severity="info"
                     variant="outlined"
                     sx={{
-                        mb: 4,
-                        '& .MuiAlert-message': {  // Target the message area within the Alert
-                            textAlign: 'center',
-                            width: '100%',  // Ensure the text area takes full width
+                        width: '100%',
+                        textAlign: 'center',
+                        backgroundColor: '#e3f2fd',
+                        borderColor: '#90caf9',
+                        '& .MuiAlert-message': {
+                            width: '100%',
                         }
                     }}
                 >
-                    <Typography variant="body2">
+                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                         Below is the list of all client organisations currently available.
                     </Typography>
                 </Alert>
             </Box>
-            <Grid container justifyContent="center">
-                <Grid item xs={12} md={10} lg={8}>
-                    <Paper elevation={3} sx={{ width: '100%', overflow: 'hidden' }}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>S/N</TableCell>
-                                    <TableCell sx={{ backgroundColor: '#1976d2', color: 'white' }}>Client Organisation</TableCell>
+            <Paper elevation={3}>
+                <TableContainer component={Box} sx={{ maxHeight: 500 }}>
+                    <Table stickyHeader aria-label="client organisations table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>S/N</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Client Organisation</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {clientOrganisations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((clientOrganisation, index) => (
+                                <TableRow key={clientOrganisation.id} hover>
+                                    <TableCell align="center">{page * rowsPerPage + index + 1}</TableCell>
+                                    <TableCell align="center">{clientOrganisation.name}</TableCell>
                                 </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {clientOrganisations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((clientOrganisation, index) => (
-                                    <TableRow key={clientOrganisation.id}>
-                                        <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                                        <TableCell>{clientOrganisation.name}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={clientOrganisations.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                            sx={{
-                                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-input, & .MuiTablePagination-displayedRows': {
-                                    marginBottom: '0'
-                                },
-                                '& .MuiTablePagination-actions': {
-                                    paddingRight: '2rem',
-                                },
-                            }}
-                        />
-                    </Paper>
-                </Grid>
-            </Grid>
+                            ))}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 25]}
+                                    colSpan={2}
+                                    count={clientOrganisations.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                    sx={{
+                                        borderTop: '1px solid #e0e0e0',
+                                        '.MuiTablePagination-select': {
+                                            marginLeft: 2,
+                                        },
+                                        '.MuiTablePagination-actions': {
+                                            marginRight: 2,
+                                        }
+                                    }}
+                                />
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </TableContainer>
+            </Paper>
         </Container>
     );
 };
