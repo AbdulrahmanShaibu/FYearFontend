@@ -6,6 +6,8 @@ import {
 import Home from "./Home";
 import { Alert, AlertTitle, Typography } from "@mui/material";
 import axios from "axios";
+import jsPDF from 'jspdf';
+import DownloadIcon from '@mui/icons-material/Download'; // Use MUI's built-in icon
 
 const StaffComplain = () => {
   const [description, setDescription] = useState('');
@@ -18,6 +20,8 @@ const StaffComplain = () => {
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [claimToDelete, setClaimToDelete] = useState(null);
+
+  const [attachements, setAttachments] = useState([]);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -34,6 +38,7 @@ const StaffComplain = () => {
     fetchComplains();
     fetchClaimTypes();
     fetchStaffs();
+    fetchAttachments();
   }, []);
 
   const fetchClaimTypes = async () => {
@@ -54,6 +59,11 @@ const StaffComplain = () => {
     axios.get('http://localhost:8080/api/v1/all-jwt-users')
       .then(response => setStaffs(response.data))
       .catch(error => console.error('Error fetching staffs:', error));
+  };
+
+  const fetchAttachments = async () => {
+    const response = await axios.get('http://localhost:8080/api/v1/get/attachments');
+    setAttachments(response.data);
   };
 
   const saveAPI = 'http://localhost:8080/api/v1/save/StaffComplain';
@@ -149,6 +159,75 @@ const StaffComplain = () => {
     setSelectedStaff('');
   };
 
+
+
+  const downloadAttachments = async () => {
+    const doc = new jsPDF();
+
+    // Set document metadata
+    doc.setProperties({
+      title: 'Complaint Details',
+      subject: 'Complaints and Attachments',
+      author: 'Your Company',
+    });
+
+    // Title for the document
+    doc.setFontSize(18);
+    doc.text('Complaint Details', 10, 20);
+    doc.setLineWidth(0.5);
+    doc.line(10, 25, 200, 25); // Horizontal line
+    doc.setFontSize(12);
+
+    // Adding complaints with attachments
+    let yPosition = 30;
+    claims.forEach((complaint, index) => {
+      // Add Complaint Details
+      doc.setFontSize(14);
+      doc.text(`Complaint ${index + 1}`, 10, yPosition);
+      doc.setFontSize(12);
+
+      yPosition += 10;
+      doc.text(`Description: ${complaint.description}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Submission Date: ${complaint.submissionDate}`, 10, yPosition);
+      yPosition += 10;
+      doc.text(`Claim Types: ${complaint.claimTypes.join(', ')}`, 10, yPosition);
+      yPosition += 15;
+
+      // Add corresponding attachments
+      const relatedAttachments = attachements.filter(att => att.complaintId === complaint.id);
+
+      if (relatedAttachments.length > 0) {
+        doc.setFontSize(14);
+        doc.text('Attachments:', 10, yPosition);
+        yPosition += 10;
+
+        relatedAttachments.forEach((attachment, i) => {
+          if (yPosition + 60 > 280) { // Check if space is running out on the page
+            doc.addPage();
+            yPosition = 20;
+          }
+
+          const imageData = `data:image/jpeg;base64,${attachment.imageData}`;
+          doc.addImage(imageData, 'JPEG', 10, yPosition, 50, 50); // Displaying the image
+          doc.text(attachment.fileName, 70, yPosition + 30); // Displaying the filename next to the image
+
+          yPosition += 60;
+        });
+      }
+
+      yPosition += 10; // Add some space before the next complaint
+      if (yPosition >= 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
+    });
+
+    // Save the PDF
+    doc.save('attachments_and_complaints.pdf');
+  };
+
+
   return (
     <div style={{ margin: 'auto', marginTop: '80px', width: '950px' }}>
       <Home />
@@ -169,6 +248,7 @@ const StaffComplain = () => {
                   {/* <TableCell style={style.table}>Staff Name</TableCell> */}
                   <TableCell style={style.table}>Update</TableCell>
                   <TableCell style={style.table}>Delete</TableCell>
+                  <TableCell style={style.table}>Attachments</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -195,6 +275,31 @@ const StaffComplain = () => {
                         onClick={() => handleOpenConfirmDialog(claim.complainID)}
                       >
                         Delete
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        style={{ color: 'green' }}
+                        onClick={downloadAttachments}
+                        startIcon={<DownloadIcon />} // Use the icon directly
+                        sx={{
+                          padding: '10px 20px',
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                          '&:hover': {
+                            backgroundColor: '#2e7d32', // Darker green for hover
+                          },
+                          '&:active': {
+                            backgroundColor: '#1b5e20', // Even darker green for active
+                          },
+                          '& .MuiButton-startIcon': {
+                            marginRight: '8px',
+                          },
+                        }}
+                        aria-label="Download attachments"
+                      >
+                        <Typography variant="button">Download</Typography>
                       </Button>
                     </TableCell>
                   </TableRow>

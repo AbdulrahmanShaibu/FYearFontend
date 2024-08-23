@@ -11,9 +11,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { styled, keyframes } from '@mui/system';
 import { Alert, AlertTitle } from "@mui/material";
+import { PersonAdd } from "@mui/icons-material";
 
 const RegistrationForm = () => {
   const RegisterApi = 'http://localhost:8080/api/v1/auth/register';
+  const CleanerLoginApi = 'http://localhost:8080/api/v1/cleaner-login';
 
   const [formData, setFormData] = useState({
     firstname: '',
@@ -22,8 +24,15 @@ const RegistrationForm = () => {
     password: '',
   });
 
+  const [loginData, setLoginData] = useState({
+    name: '',
+    cleaningCompanyId: '',
+  });
+
   const [showAlert, setShowAlert] = useState(false);
+  const [loginAlert, setLoginAlert] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -35,12 +44,19 @@ const RegistrationForm = () => {
     });
   };
 
+  const handleLoginChange = (e) => {
+    const { name, value } = e.target;
+    setLoginData({
+      ...loginData,
+      [name]: value,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(RegisterApi, formData);
-
       if (response.status === 200) {
         setShowSuccessModal(true);
       } else {
@@ -52,6 +68,26 @@ const RegistrationForm = () => {
       setShowAlert(true);
     }
   };
+
+  const handleLoginSubmit = async () => {
+    try {
+      const response = await axios.get(CleanerLoginApi)
+      if (response.status === 200) {
+        // Handle successful login
+        setLoginAlert(false);
+        handleCloseLoginModal();
+      } else {
+        console.error('Login failed');
+        setLoginAlert(true);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setLoginAlert(true);
+    }
+  };
+
+  const handleOpenLoginModal = () => setShowLoginModal(true);
+  const handleCloseLoginModal = () => setShowLoginModal(false);
 
   // Custom animation for the success icon
   const fireAnimation = keyframes`
@@ -79,85 +115,220 @@ const RegistrationForm = () => {
   };
 
   return (
-    <Box sx={{
-      p: 3, borderRadius: 1,
-      backgroundColor: 'whitesmoke', width: '26.5%', margin: 'auto'
-    }}>
-      <div align="center">
-        <img src="cleaning-logo.webp" style={{ margin: 'auto', width: '45%' }} />
-      </div>
-      <Grid item xs={4}>
+    <Box sx={{ p: 3, borderRadius: 1, backgroundColor: 'whitesmoke', width: '36.5%', margin: 'auto' }}>
+      <Grid item xs={12}>
+
         <Box component="form" onSubmit={handleSubmit}
-          sx={{
-            p: 3, boxShadow: 3, borderRadius: 1,
-            backgroundColor: 'white', width: '100%', margin: 'auto', marginTop: '5%'
-          }}>
-          <Typography variant="h5" align="center"
-            style={{ fontWeight: 'bold' }}
-            gutterBottom>Staff SiginUp</Typography>
-          <TextField
-            fullWidth
-            margin="normal"
-            label="First Name"
-            name="firstname"
-            required
-            value={formData.firstname}
-            onChange={handleChange}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Last Name"
-            name="lastname"
-            required
-            value={formData.lastname}
-            onChange={handleChange}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Email"
-            name="email"
-            type="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Password"
-            name="password"
-            type="password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-          />
+          sx={{ p: 3, boxShadow: 3, borderRadius: 1, backgroundColor: 'white', width: '100%', margin: 'auto', marginTop: '5%' }}>
+          <div align="center">
+            <img src="cleaning-logo.webp" style={{ margin: 'auto', width: '40%' }} />
+            <hr style={{
+              backgroundColor: 'green',
+              height: '2px',
+              border: 'none',
+              margin: '20px 0',
+              opacity: 0.7,
+              borderRadius: '5px',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }} />
+          </div>
+          <Alert
+            severity="info"
+            style={{
+              fontWeight: 'bold',
+              backgroundColor: '#e3f2fd',
+              color: '#0d47a1',
+              padding: '10px 20px',
+              textAlign: 'center'
+            }}
+          >
+            <Typography style={{ fontWeight: 'bold' }}>
+              Staff Sign-Up
+            </Typography>
+          </Alert>
+
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <TextField
+                color="success"
+                focused
+                fullWidth
+                margin="normal"
+                label="First Name"
+                name="firstname"
+                required
+                value={formData.firstname}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                color="success"
+                focused
+                fullWidth
+                margin="normal"
+                label="Last Name"
+                name="lastname"
+                required
+                value={formData.lastname}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                color="success"
+                focused
+                fullWidth
+                margin="normal"
+                label="Email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                color="success"
+                focused
+                fullWidth
+                margin="normal"
+                label="Password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </Grid>
+          </Grid>
+
           <Button
+            style={{
+              backgroundColor: 'green',
+              background: 'linear-gradient(45deg, #43a047, #66bb6a)',
+            }}
             fullWidth
             variant="contained"
-            color="primary"
             type="submit"
-            sx={{ mt: 2 }}
+            startIcon={<PersonAdd />}
+            sx={{
+              mt: 2,
+              fontWeight: 'bold',
+              padding: '12px 24px',
+              borderRadius: '12px',
+              textTransform: 'none',
+              fontSize: '16px',
+              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+              transition: 'background-color 0.3s, transform 0.5s, box-shadow 0.3s',
+              '&:hover': {
+                backgroundColor: '#388e3c',
+                background: 'linear-gradient(45deg, #388e3c, #4caf50)',
+                boxShadow: '0px 6px 16px rgba(0, 0, 0, 0.2)',
+                transform: 'translateY(-2px)',
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+              },
+            }}
           >
             Register
           </Button>
+          {/* 
+         <Button
+            style={{
+              backgroundColor: 'green',
+              background: 'linear-gradient(45deg, #43a047, #66bb6a)',
+            }}
+            fullWidth
+            vari ant="contained"
+            onClick={handleOpenLoginModal}
+            startIcon={<PersonAdd />}
+            sx={{
+              mt: 2,
+              fontWeight: 'bold',
+              padding: '12px 24px',
+              borderRadius: '12px',
+              textTransform: 'none',
+              fontSize: '16px',
+              boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+              transition: 'background-color 0.3s, transform 0.5s, box-shadow 0.3s',
+              '&:hover': {
+                backgroundColor: '#388e3c',
+                background: 'linear-gradient(45deg, #388e3c, #4caf50)',
+                boxShadow: '0px 6px 16px rgba(0, 0, 0, 0.2)',
+                transform: 'translateY(-2px)',
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+              },
+            }}
+          >
+            Cleaner Login
+          </Button> */}
+
           <Typography align="center" sx={{ mt: 2 }}>
-            Already registered? <Link to="/login">Please Login</Link>
+            Already registered? <Link to="/login">Staff Login</Link>
           </Typography>
           <Typography align="center" sx={{ mt: 2 }}>
             Admin? <Link to="/admin-login">Login here</Link>
           </Typography>
         </Box>
 
-        <Grid item xs={12} md={4}>
-          {showAlert && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              <AlertTitle>Error</AlertTitle>
-              An error occurred during registration. Please try again.
-            </Alert>
-          )}
-        </Grid>
+        {showAlert && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <AlertTitle>Error</AlertTitle>
+            An error occurred during registration. Please try again.
+          </Alert>
+        )}
+
+        <Modal
+          open={showLoginModal}
+          onClose={handleCloseLoginModal}
+          aria-labelledby="login-modal-title"
+          aria-describedby="login-modal-description"
+        >
+          <Box sx={modalStyle}>
+            <Typography id="login-modal-title" variant="h6" component="h2" sx={{ mt: 2 }}>
+              Cleaner Login
+            </Typography>
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Username"
+              name="name"
+              required
+              value={loginData.name}
+              onChange={handleLoginChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Cleaning Company ID"
+              name="cleaningCompanyId"
+              required
+              value={loginData.cleaningCompanyId}
+              onChange={handleLoginChange}
+            />
+            {loginAlert && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                <AlertTitle>Error</AlertTitle>
+                An error occurred during login. Please try again.
+              </Alert>
+            )}
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleLoginSubmit}
+              sx={{ mt: 2, fontWeight: 'bold', padding: '10px 0', borderRadius: '8px', textTransform: 'none', fontSize: '16px' }}
+            >
+              Submit
+            </Button>
+          </Box>
+        </Modal>
       </Grid>
 
       <Modal
@@ -181,7 +352,6 @@ const RegistrationForm = () => {
             Close
           </Button>
         </Box>
-
       </Modal>
     </Box>
   );
